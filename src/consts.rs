@@ -4,25 +4,22 @@ pub(crate)const
                         =
                             "Gambler";
 ///////////////////////////////////////
-pub(crate)const WINDOW_TITLE2:&str= "GamblerEditor";
+pub const WINDOW_TITLE2:&str= "GamblerEditor";
 
-pub(crate)const WINDOW_DEFAULT_WIDTH: u32 = 800;
-pub(crate)const WINDOW_DEFAULT_HEIGHT: u32 = 600;
-pub(crate)const WINDOW_DEFAULT_BACKGROUND_COLOR: [f32; 4] = [0.0, 0.0, 0.0, 1.0];
-
-
-pub(crate)const TILE_SCALE: f32 = 1.0;
-pub(crate)const TILE_SCALE_X: f32 = TILE_SIZE * TILE_SCALE;
-pub(crate)const TILE_SCALE_Y: f32 = TILE_SIZE * TILE_SCALE;
-pub(crate)const TILE_SIZE: f32 = 32.0;
+pub const WINDOW_DEFAULT_WIDTH: u32 = 800;
+pub const WINDOW_DEFAULT_HEIGHT: u32 = 600;
+pub const WINDOW_DEFAULT_BACKGROUND_COLOR: [f32; 4] = [0.0, 0.0, 0.0, 1.0];
 
 
+pub const TILE_SCALE: f32 = 1.0;
+pub const TILE_SCALE_X: f32 = TILE_SIZE * TILE_SCALE;
+pub const TILE_SCALE_Y: f32 = TILE_SIZE * TILE_SCALE;
+pub const TILE_SIZE: f32 = 32.0;
 
-
-
-
-
-
+pub const SCREEN_WIDTH: f32 = 800.;
+pub const SCREEN_HEIGHT: f32 = 600.;
+pub const ASSETS_PATH: &str = "assets/";
+pub const TEXTURES_PATH: &str = "assets/textures/";
 
 
 //ALL THE VARIABLES THAT NEVER CHANGE FOR THE ENRITE TIME THE GAME IS RUNNING:
