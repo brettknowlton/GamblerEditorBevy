@@ -1,25 +1,12 @@
-use std::path::Path;
+use std::{f32::consts::E, path::Path};
 
 use bevy::math::Vec2;
 use bevy::prelude::*;
 use consts::{SCREEN_HEIGHT, SCREEN_WIDTH, TEXTURES_PATH, WINDOW_DEFAULT_HEIGHT};
 
-mod consts;
-mod tiles;
-mod interactables;
-mod editor_ui;
-mod actors;
-mod utilities;
 
-
-#[derive(Default)]
-pub enum EditorState {
-    #[default]
-    NormalMode,
-    TileMode,
-    ActorMode,
-    InteractableMode,
-}
+mod editor;
+pub(crate) mod consts;
 
 
 fn main() {
@@ -40,6 +27,7 @@ fn main() {
                 })
                 .build(),
         )
+        .add_plugins(editor_plugin)
         .add_systems(Startup, (hello_world, setup))
         .run();
 }
@@ -58,9 +46,6 @@ fn setup(mut commands: Commands) {
     });
 }
 
-#[derive(Component)]
-pub struct Player {}
-
 fn spawn_players(mut commands: Commands, asset_server: Res<AssetServer>) {
     let textures_path = Path::new(&format!("{TEXTURES_PATH}/player.png")).to_path_buf();
     
@@ -70,14 +55,14 @@ fn spawn_players(mut commands: Commands, asset_server: Res<AssetServer>) {
     commands.spawn(SpriteBundle {
         sprite: Sprite {
             custom_size: Some(Vec2::new(100.0, 100.0)),
+            image: tex1,
             ..default()
         },
         transform: Transform::from_xyz(
-            consts::WINDOW_DEFAULT_WIDTH as f32 / 2.0,
-            WINDOW_DEFAULT_HEIGHT as f32 / 2.0,
+            consts::WINDOW_WIDTH as f32 / 2.0,
+            WINDOW_HEIGHT as f32 / 2.0,
             0.0,
         ),
-        texture: tex1,
         ..default()
     });
 }
