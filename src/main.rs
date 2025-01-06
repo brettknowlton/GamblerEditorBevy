@@ -1,13 +1,12 @@
-use std::{f32::consts::E, path::Path};
+use std::path::Path;
 
 use bevy::math::Vec2;
 use bevy::prelude::*;
-use consts::{SCREEN_HEIGHT, SCREEN_WIDTH, TEXTURES_PATH, WINDOW_DEFAULT_HEIGHT};
+use consts::{TEXTURES_PATH, WINDOW_HEIGHT, WINDOW_WIDTH};
 
-
-mod editor;
 pub(crate) mod consts;
-
+pub(crate) mod utilities;
+mod editor;
 
 fn main() {
     App::new()
@@ -17,58 +16,38 @@ fn main() {
                 .set(WindowPlugin {
                     primary_window: Some(Window {
                         title: "Harken".into(),
-                        resolution: (SCREEN_WIDTH, SCREEN_HEIGHT).into(),
+                        resolution: (WINDOW_WIDTH, WINDOW_HEIGHT).into(),
                         resizable: false,
                         decorations: true,
-                        visible: false,
+                        visible: true,
                         ..default()
                     }),
                     ..default()
                 })
                 .build(),
         )
-        .add_plugins(editor_plugin)
-        .add_systems(Startup, (hello_world, setup))
+        .add_plugins(editor::editor_plugin)
+        .add_systems(Startup, setup)
+        .insert_resource(ClearColor(Color::srgb(0.2, 0.05, 0.1)))
         .run();
 }
+
 
 //bundles are a collection of components that are commonly used together
 //OrthographicCameraBundle is a bundle that contains the following components:
 //Transform, GlobalTransform, OrthographicCamera, Visible, and MainCamera
 fn setup(mut commands: Commands) {
-    
-    commands.spawn(Camera2dBundle {
-        camera: Camera {
-            clear_color: ClearColorConfig::Custom(Color::srgba(0.2, 0.05, 0.1, 1.0)),
-            ..default()
-        },
-        ..default()
-    });
+    commands.spawn(Camera2d { ..default() });
 }
 
 fn spawn_players(mut commands: Commands, asset_server: Res<AssetServer>) {
     let textures_path = Path::new(&format!("{TEXTURES_PATH}/player.png")).to_path_buf();
-    
-    
+
     let tex1 = asset_server.load(textures_path);
 
-    commands.spawn(SpriteBundle {
-        sprite: Sprite {
-            custom_size: Some(Vec2::new(100.0, 100.0)),
-            image: tex1,
-            ..default()
-        },
-        transform: Transform::from_xyz(
-            consts::WINDOW_WIDTH as f32 / 2.0,
-            WINDOW_HEIGHT as f32 / 2.0,
-            0.0,
-        ),
+    commands.spawn(Sprite {
+        custom_size: Some(Vec2::new(100.0, 100.0)),
+        image: tex1,
         ..default()
     });
 }
-
-fn hello_world() {
-    println!("Hello, world!");
-}
-
-

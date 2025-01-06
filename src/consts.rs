@@ -13,8 +13,8 @@ pub const TILE_SCALE_X: f32 = TILE_SIZE * TILE_SCALE;
 pub const TILE_SCALE_Y: f32 = TILE_SIZE * TILE_SCALE;
 pub const TILE_SIZE: f32 = 1.;
 
-pub const WINDOW_WIDTH: f32 = 800.;
-pub const WINDOW_HEIGHT: f32 = 600.;
+pub const WINDOW_WIDTH: f32 = 1200.;
+pub const WINDOW_HEIGHT: f32 = 800.;
 pub const ASSETS_PATH: &str = "assets/";
 pub const TEXTURES_PATH: &str = "assets/textures/";
 
