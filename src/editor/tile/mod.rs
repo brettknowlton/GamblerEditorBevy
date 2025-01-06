@@ -22,20 +22,26 @@ pub fn tilemode_plugin(app: &mut App) {
         .insert_resource(CurrentEditorObject(Tile::new()))
 
         //more keybinds for tile editing
-        .add_systems(Update, tilemode_keybinds.run_if(in_state(TileEditorState::Active)))
+        .add_systems(Update, (
+            tilemode_keybinds.run_if(in_state(TileEditorState::Active)),
+            move_tile_ui.run_if(in_state(TileEditorState::Active)),
+        ))
         .add_systems(OnExit(EditorState::Tile), (
             exit_tilemode.before(tilemode_keybinds),
             despawn_all::<TileModeUI>.before(exit_tilemode),
         ));
 }
 
-/// A handle to the tilesheet image.
-#[derive(Resource, Default)]
-struct TilesheetHandle(Handle<Image>);
 
-/// A component that marks an entity as part of the tile editing UI.
-#[derive(Component)]
-struct TileModeUI;
+fn move_tile_ui(
+    mut tileUI: Query<(&mut Transform, &TileModeUI)>, 
+    crosshair: Query<&Crosshair>
+) {
+    for (mut transform, ui) in tileUI.iter_mut() {
+        let crosshair = crosshair.single();
+        transform.translation = Vec3::new(crosshair.location.0 as f32 + ui.x_offset, crosshair.location.1 as f32 + ui.y_offset, 0.0);
+    }
+}
 
 fn init_tilemode_textures(mut commands: Commands, asset_server: Res<AssetServer>) {
     //load the tilesheet for this mode
@@ -57,6 +63,9 @@ fn init_tilemode(
     let texpath = PathBuf::from("textures/menus/menu1.png");
     let tex1 = asset_server.load(texpath);
 
+    let x_off = - WINDOW_WIDTH / 2.0 + UI_SCALE as f32 * TILE_SIZE as f32;
+    let y_off = - WINDOW_HEIGHT / 2.0 + UI_SCALE as f32 * TILE_SIZE as f32;
+
     //spawn tilemodeUI
     commands.spawn((
         Sprite {
@@ -64,11 +73,14 @@ fn init_tilemode(
             ..default()
         },
         Transform {
-            translation: Vec3::new(-WINDOW_WIDTH / 2.0, WINDOW_HEIGHT / 2.0, 0.0),
-            scale: Vec3::new(10.0, 10.0, 1.0),
+            translation: Vec3::new(WINDOW_WIDTH / 2.0 + x_off, WINDOW_HEIGHT / 2.0 + y_off, 0.0),
+            scale: Vec3::new(UI_SCALE as f32, UI_SCALE as f32, 1.0),
             ..default()
         },
-        TileModeUI,
+        TileModeUI {
+            x_offset: x_off,
+            y_offset: y_off,
+        },
     ));
 }
 
@@ -179,6 +191,18 @@ fn exit_tilemode(mut commands: Commands, mut tile_state: ResMut<NextState<TileEd
     commands.insert_resource(CurrentEditorObject(Tile::new()));
 }
 
+
+/// A handle to the tilesheet image.
+#[derive(Resource, Default)]
+struct TilesheetHandle(Handle<Image>);
+
+/// A component that marks an entity as part of the tile editing UI.
+#[derive(Component)]
+struct TileModeUI{
+    x_offset: f32,
+    y_offset: f32,
+}
+/// A component to track some basic info about a tile
 #[derive(Component, Debug)]
 pub struct Tile {
     pub tile_type: u64,
@@ -198,6 +222,7 @@ impl Default for Tile {
     }
 }
 
+/// A component that marks an entity as a savable editor item.
 #[derive(Component, Default)]
 pub struct EditorObject {
     major_type: char, //'T' for tile, 'E' for entity, 'P' for player, etc.
@@ -250,51 +275,3 @@ impl EditorObject {
         }
     }
 }
-// #[derive(Component, Debug, Eq, PartialEq, Hash, Copy, Clone, Default)]
-// pub struct TileData {
-//     pub tile_type: u64,
-//     pub coordinate: Coordinate,
-// }
-
-// impl TileData {
-//     pub fn new() -> Self {
-//         Self {
-//             tile_type: 0,
-//             coordinate: Coordinate(0, 0),
-//         }
-//     }
-
-//     /**
-//      * Takes a coordinate of the currently
-//      * selected tile via the hovered crosshair
-//      * and adds it to the scene.
-//      */
-//     fn place(&self, coordinate: Coordinate, id: u64) {
-//         todo!()
-//     }
-
-//     fn get_coordinate(&self) -> Coordinate {
-//         todo!()
-//     }
-
-//     /**
-//      * This will be a file that we will parse through
-//      * the file at a given tile size some sprites,
-//      * we will ID them based on order received, which will
-//      * not ever change throughout the game unless we want to
-//      * change what the tile looks like
-//      */
-//     fn get_sprite(&mut self, tile_type: u64) -> anyhow::Result<Sprite, anyhow::Error> {
-//         todo!()
-//     }
-// }
-
-// impl EditorObject for TileData {
-//     fn get_goid(&self) -> String {
-//         format!("X{}Y{}O{}S{}", self.coordinate.0, self.coordinate.1, 'T', self.tile_type)
-//     }
-
-//     fn get_coordinate(&self) -> Coordinate {
-//         self.coordinate
-//     }
-// }

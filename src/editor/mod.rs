@@ -1,8 +1,9 @@
 mod tile;
+mod scene;
 pub use tile::*;
 pub use crate::consts::*;
 pub use crate::utilities::*;
-pub use std::{fmt::Debug, path::PathBuf};
+pub use std::{ fmt::Debug, path::PathBuf };
 
 use bevy::{
     prelude::*,
@@ -10,12 +11,12 @@ use bevy::{
     // utils::HashMap,
 };
 
-
 #[derive(Clone, Copy, Default, Eq, PartialEq, Debug, Hash, States)]
 pub enum EditorState {
     #[default]
     Inactive,
     Normal,
+    Saving,
     Tile,
     Interactable,
     Actor,
@@ -31,14 +32,20 @@ pub fn editor_plugin(app: &mut App) {
     //.insert_resource(Scene(Scene::new()))
 }
 
-fn initialize() {
+fn initialize(mut commands: Commands) {
     println!("Entering Gambler Editor");
+
+    //create scene manager component that will read/write our scene data between the enviornment and a json file
+    println!(
+        "Prompt to go here eventually to ask if the user would like to load a specific file, for now we will always just load from DEFAULT_SCENE_PATH"
+    );
+    commands.spawn(scene::Scene::new(Some(PathBuf::from(DEFAULT_SCENE_PATH))));
 
     //create grid
     //a texture slightly larger than the window size? just keeps getting snapped to the nearest grid point... seems like it would work
 }
 
-fn create_crosshair(mut commands: Commands, asset_server: Res<AssetServer>){
+fn create_crosshair(mut commands: Commands, asset_server: Res<AssetServer>) {
     //create crosshair
     let tex_path = PathBuf::from("textures/crosshairs/crosshair1.png");
     let tex1 = asset_server.load(tex_path);
@@ -82,24 +89,42 @@ fn keybinds(
     input: Res<ButtonInput<KeyCode>>,
     // m_input: Res<ButtonInput<MouseButton>>,
 
-    mut crosshairs: Query<(&mut Transform, &mut Crosshair, &mut Sprite)>
-) {
-    // let crosshair = crosshairs.iter_mut().next().unwrap().1;
+    mut crosshairs: Query<(&mut Transform, &mut Crosshair, &mut Sprite)>,
 
+    mut scenes: Query<&mut scene::Scene>
+) {
+    let scene = scenes.single();
+
+    //manage the editor state, uses top row starting with "E" key to control which UI mode we will be in
     if input.just_pressed(KeyCode::KeyT) {
         next_state.set(EditorState::Tile);
     }
-    if input.just_pressed(KeyCode::Escape) {
+    if input.just_pressed(KeyCode::KeyE) {
         next_state.set(EditorState::Normal);
     }
-    if input.just_pressed(KeyCode::KeyQ) {
-        //if state is anything but normal, return to normal
-        if state.get() != &EditorState::Normal {
-            next_state.set(EditorState::Normal);
-        } else {
-            //if state is normal, exit editor
-            println!("Would you like to save the current scene?");
 
+    //Controlling the "Q" key
+    if input.just_pressed(KeyCode::KeyQ) {
+        if state.get() == &EditorState::Normal {
+            //pressing q will enter "saving" mode if we are already in normal mode:
+            next_state.set(EditorState::Saving);
+            println!("Would you like to save the current scene?");
+        } else if state.get() == &EditorState::Saving {
+            //pressing q will cancel the save if we are already in saving mode:
+            next_state.set(EditorState::Normal);
+            println!("Save cancelled");
+        } else {
+            next_state.set(EditorState::Normal);
+        }
+    }
+    //controlling the "E" key
+    if input.just_pressed(KeyCode::KeyE) {
+        //if we are in save mode, pressing "E" will save the current scene
+        if state.get() == &EditorState::Saving {
+            println!("Attempting to save scene");
+            scene.write_serialized_scene(DEFAULT_SCENE_PATH.to_string());
+            next_state.set(EditorState::Normal);
+            println!("Scene saved, returning to Normal Mode");
         }
     }
 
@@ -127,13 +152,11 @@ fn keybinds(
         crosshair.vel_y = crosshair.vel_y * (0.99 as i32 as f32);
         crosshair.vel_x = crosshair.vel_x * (0.99 as i32 as f32);
         crosshair.location = Coordinate(
-            (transform.translation.x) as i64,
-            (transform.translation.y) as i64,
+            transform.translation.x as i64,
+            transform.translation.y as i64
         );
     }
 }
-
-
 
 #[derive(Component)]
 struct Crosshair {

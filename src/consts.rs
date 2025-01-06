@@ -1,3 +1,5 @@
+use std::path::PathBuf;
+
 use bevy::color::Srgba;
 
 //WILD shit right? dont worry its not too bad.
@@ -19,6 +21,10 @@ pub const TILE_SIZE: usize = 16;
 
 pub const SPRITESHEET_WIDTH: usize = 10;
 pub const MAX_SPRITESHEET_ITEMS: usize = 16;
+pub const DEFAULT_SCENE_PATH: &str = "assets/scenes/scene.json";
+
+
+pub const UI_SCALE: usize = 10;
 
 pub const WINDOW_WIDTH: f32 = 1200.;
 pub const WINDOW_HEIGHT: f32 = 800.;

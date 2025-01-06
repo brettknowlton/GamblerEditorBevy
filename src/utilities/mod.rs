@@ -1,4 +1,5 @@
 use bevy::prelude::*;
+use serde::{Serialize, Deserialize};
 
 pub(crate) mod resources;
 pub(crate) use resources::*;
@@ -14,5 +15,5 @@ pub fn despawn_all<T: Component>(mut commands: Commands, to_despawn: Query<Entit
 
 
 //Helper Components
-#[derive(Component, Debug, Hash, Eq, PartialEq, Clone, Copy, Default)]
+#[derive(Component, Debug, Hash, Eq, PartialEq, Clone, Copy, Default, Deserialize, Serialize)]
 pub(crate) struct Coordinate(pub i64, pub i64);
