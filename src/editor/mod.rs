@@ -1,4 +1,6 @@
-use std::path::PathBuf;
+use std::{collections::HashMap, env, fmt::Debug, path::PathBuf};
+use serde::Deserialize;
+use serde_json::*;
 
 use bevy::{
     gizmos::cross,
@@ -8,7 +10,7 @@ use bevy::{
     sprite::Anchor,
     state::state,
     transform,
-    utils::HashMap,
+    // utils::HashMap,
 };
 use resources::CurrentEditorObject;
 use crate::{ consts::{ WINDOW_HEIGHT, WINDOW_WIDTH }, utilities::* };
@@ -28,7 +30,7 @@ pub enum EditorMode {
     Trigger,
 }
 
-pub trait EditorObject {
+pub trait EditorObject: Sync + Send {
     //field for goid
     ///If implemented, the object will be able to return a GOID based on its position and style;
     ///
@@ -86,9 +88,6 @@ fn initialize(mut commands: Commands, asset_server: Res<AssetServer>) {
         },
     ));
     //create grid
-
-    //spawn scene object
-    commands.spawn((Scene::new(), Transform::default()));
 }
 
 fn move_camera(
@@ -128,6 +127,7 @@ fn keybinds(
         } else {
             //if state is normal, exit editor
             println!("Would you like to save the current scene?");
+
         }
     }
 
@@ -157,23 +157,43 @@ fn keybinds(
     }
 }
 
-#[derive(Component, Debug, Eq, Hash, PartialEq)]
+#[derive(Component)]
 pub struct Scene {
-    data: Vec<String>,
+    data: HashMap<String, Box<dyn EditorObject>>,
 }
+
 
 impl Scene {
     pub fn new() -> Self {
         Self {
-            data: Vec::new(),
+            data: HashMap::new(),
         }
     }
 
-    pub fn push(&mut self, object: TileData) {
-        self.data.push(object.get_goid())
+    pub fn push(&mut self, object: Box<dyn EditorObject>) {
+        self.data.insert(object.get_goid(), object);
     }
 
     pub fn remove(&mut self, location: Coordinate) {
-        self.data.retain(|x| { x.clone().split_off(3) != format!("{}{}", location.0, location.1) });
+        // self.data.retain(|x| { x.clone().split_off(3) != format!("{}{}", location.0, location.1) });
+    }
+
+    pub fn get_data(&mut self) -> Option<Box<dyn EditorObject>> {
+        let read_dir = std::fs::read(format!("{:?}/test.json", env::current_dir()));
+        match read_dir {
+            Ok(file_bytes) => {
+                let to_string = String::from_utf8(file_bytes).unwrap_or_default();
+                let contents: std::result::Result<Box<dyn EditorObject>, Error> = serde_json::from_str(&to_string);
+                if let Ok(file_contents) = contents {
+                    // println!("We got some file contents: {file_contents:?}");
+                    // let conversion = 
+                }
+            },
+            Err(e) => println!("Error reading file contents: {e:?}"),
+        }
+        
+        None
     }
 }
+
+

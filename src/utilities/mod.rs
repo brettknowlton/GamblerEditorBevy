@@ -13,5 +13,5 @@ pub fn despawn_all<T: Component>(mut commands: Commands, to_despawn: Query<Entit
 
 
 //Helper Components
-#[derive(Component, Debug, Hash, Eq, PartialEq, Clone, Copy)]
+#[derive(Component, Debug, Hash, Eq, PartialEq, Clone, Copy, Default)]
 pub(crate) struct Coordinate(pub i64, pub i64);
