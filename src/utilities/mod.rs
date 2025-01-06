@@ -1,6 +1,7 @@
 use bevy::prelude::*;
 
-pub mod resources;
+pub(crate) mod resources;
+pub(crate) use resources::*;
 
 
 

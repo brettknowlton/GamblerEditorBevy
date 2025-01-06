@@ -1,12 +1,12 @@
-use std::path::Path;
-
-use bevy::math::Vec2;
 use bevy::prelude::*;
-use consts::{TEXTURES_PATH, WINDOW_HEIGHT, WINDOW_WIDTH};
 
 pub(crate) mod consts;
 pub(crate) mod utilities;
-mod editor;
+pub(crate) mod editor;
+
+pub use consts::*;
+pub use utilities::*;
+pub use editor::*;
 
 fn main() {
     App::new()
@@ -41,14 +41,14 @@ fn setup(mut commands: Commands) {
     commands.spawn(Camera2d { ..default() });
 }
 
-fn spawn_players(mut commands: Commands, asset_server: Res<AssetServer>) {
-    let textures_path = Path::new(&format!("{TEXTURES_PATH}/player.png")).to_path_buf();
+// fn spawn_players(mut commands: Commands, asset_server: Res<AssetServer>) {
+//     let textures_path = Path::new(&format!("{TEXTURES_PATH}/player.png")).to_path_buf();
 
-    let tex1 = asset_server.load(textures_path);
+//     let tex1 = asset_server.load(textures_path);
 
-    commands.spawn(Sprite {
-        custom_size: Some(Vec2::new(100.0, 100.0)),
-        image: tex1,
-        ..default()
-    });
-}
+//     commands.spawn(Sprite {
+//         custom_size: Some(Vec2::new(100.0, 100.0)),
+//         image: tex1,
+//         ..default()
+//     });
+// }

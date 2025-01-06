@@ -1,3 +1,5 @@
+use bevy::color::Srgba;
+
 //WILD shit right? dont worry its not too bad.
 pub(crate)const 
                         WINDOW_TITLE:                                                                   &str
@@ -5,13 +7,18 @@ pub(crate)const
                             "Gambler";
 ///////////////////////////////////////
 pub const WINDOW_TITLE2:&str= "GamblerEditor";
-pub const WINDOW_DEFAULT_BACKGROUND_COLOR: [f32; 4] = [0., 0., 0., 1.];
+
+//Default color that the background will be replaced by if nothing is being rendered
+pub const WINDOW_DEFAULT_BACKGROUND_COLOR: Srgba = Srgba::new(0.35, 0.05, 0.1, 1.0);
 
 
-pub const TILE_SCALE: f32 = 1.;
-pub const TILE_SCALE_X: f32 = TILE_SIZE * TILE_SCALE;
-pub const TILE_SCALE_Y: f32 = TILE_SIZE * TILE_SCALE;
-pub const TILE_SIZE: f32 = 1.;
+pub const TILE_SCALE: usize = 4;
+pub const TILE_SCALE_X: usize = TILE_SIZE * TILE_SCALE;
+pub const TILE_SCALE_Y: usize = TILE_SIZE * TILE_SCALE;
+pub const TILE_SIZE: usize = 16;
+
+pub const SPRITESHEET_WIDTH: usize = 10;
+pub const MAX_SPRITESHEET_ITEMS: usize = 16;
 
 pub const WINDOW_WIDTH: f32 = 1200.;
 pub const WINDOW_HEIGHT: f32 = 800.;

@@ -1,26 +1,18 @@
-use std::{collections::HashMap, env, fmt::Debug, path::PathBuf};
-use serde::Deserialize;
-use serde_json::*;
+mod tile;
+pub use tile::*;
+pub use crate::consts::*;
+pub use crate::utilities::*;
+pub use std::{fmt::Debug, path::PathBuf};
 
 use bevy::{
-    gizmos::cross,
-    input::mouse::MouseButtonInput,
     prelude::*,
-    render::camera,
     sprite::Anchor,
-    state::state,
-    transform,
     // utils::HashMap,
 };
-use resources::CurrentEditorObject;
-use crate::{ consts::{ WINDOW_HEIGHT, WINDOW_WIDTH }, utilities::* };
-pub(crate) mod tile;
-use tile::*;
 
-use super::utilities::*;
 
 #[derive(Clone, Copy, Default, Eq, PartialEq, Debug, Hash, States)]
-pub enum EditorMode {
+pub enum EditorState {
     #[default]
     Inactive,
     Normal,
@@ -30,46 +22,28 @@ pub enum EditorMode {
     Trigger,
 }
 
-pub trait EditorObject: Sync + Send {
-    //field for goid
-    ///If implemented, the object will be able to return a GOID based on its position and style;
-    ///
-    ///
-    fn get_goid(&self) -> String {
-        "OXXYYST".to_string()
-    }
-    fn get_coordinate(&self) -> Coordinate {
-        Coordinate(0, 0)
-    }
-
-    /*
-    GOID is a generic way to uniquely identify game objects, broken down as such: 
-    O: Object Type (ie. tile, actor, trigger, etc.), X: Object starting X position, Y: Object starting Y position, ST: Object style/state upon creation
-    */
-}
-
-#[derive(Component)]
-struct Crosshair {
-    location: Coordinate,
-    vel_x: f32,
-    vel_y: f32,
-}
-
 pub fn editor_plugin(app: &mut App) {
-    app.init_state::<EditorMode>()
-        .add_systems(Startup, initialize)
+    app.init_state::<EditorState>()
+        .add_systems(Startup, (initialize, create_crosshair))
         .add_plugins(tile::tilemode_plugin)
         .add_systems(Update, move_camera)
         .add_systems(Update, keybinds);
     //.insert_resource(Scene(Scene::new()))
 }
 
-fn initialize(mut commands: Commands, asset_server: Res<AssetServer>) {
+fn initialize() {
     println!("Entering Gambler Editor");
+
+    //create grid
+    //a texture slightly larger than the window size? just keeps getting snapped to the nearest grid point... seems like it would work
+}
+
+fn create_crosshair(mut commands: Commands, asset_server: Res<AssetServer>){
     //create crosshair
     let tex_path = PathBuf::from("textures/crosshairs/crosshair1.png");
     let tex1 = asset_server.load(tex_path);
 
+    //spawn crosshair
     commands.spawn((
         Crosshair {
             location: Coordinate((WINDOW_WIDTH as i64) / 2, (WINDOW_HEIGHT as i64) / 2),
@@ -83,11 +57,10 @@ fn initialize(mut commands: Commands, asset_server: Res<AssetServer>) {
         },
         Transform {
             translation: Vec3::new(0.0, 0.0, 0.0),
-            scale: Vec3::new(5.0, 5.0, 5.0),
+            scale: Vec3::new(TILE_SCALE as f32, TILE_SCALE as f32, 5.0),
             ..default()
         },
     ));
-    //create grid
 }
 
 fn move_camera(
@@ -103,27 +76,26 @@ fn move_camera(
 }
 
 fn keybinds(
-    mut commands: Commands,
-    mut next_state: ResMut<NextState<EditorMode>>,
-    mut state: ResMut<State<EditorMode>>,
+    mut next_state: ResMut<NextState<EditorState>>,
+    state: ResMut<State<EditorState>>,
     time: Res<Time>,
     input: Res<ButtonInput<KeyCode>>,
-    m_input: Res<ButtonInput<MouseButton>>,
+    // m_input: Res<ButtonInput<MouseButton>>,
 
     mut crosshairs: Query<(&mut Transform, &mut Crosshair, &mut Sprite)>
 ) {
-    let crosshair = crosshairs.iter_mut().next().unwrap().1;
+    // let crosshair = crosshairs.iter_mut().next().unwrap().1;
 
     if input.just_pressed(KeyCode::KeyT) {
-        next_state.set(EditorMode::Tile);
+        next_state.set(EditorState::Tile);
     }
     if input.just_pressed(KeyCode::Escape) {
-        next_state.set(EditorMode::Normal);
+        next_state.set(EditorState::Normal);
     }
     if input.just_pressed(KeyCode::KeyQ) {
         //if state is anything but normal, return to normal
-        if state.get() != &EditorMode::Normal {
-            next_state.set(EditorMode::Normal);
+        if state.get() != &EditorState::Normal {
+            next_state.set(EditorState::Normal);
         } else {
             //if state is normal, exit editor
             println!("Would you like to save the current scene?");
@@ -154,46 +126,18 @@ fn keybinds(
         //apply friction
         crosshair.vel_y = crosshair.vel_y * (0.99 as i32 as f32);
         crosshair.vel_x = crosshair.vel_x * (0.99 as i32 as f32);
+        crosshair.location = Coordinate(
+            (transform.translation.x) as i64,
+            (transform.translation.y) as i64,
+        );
     }
 }
+
+
 
 #[derive(Component)]
-pub struct Scene {
-    data: HashMap<String, Box<dyn EditorObject>>,
+struct Crosshair {
+    location: Coordinate,
+    vel_x: f32,
+    vel_y: f32,
 }
-
-
-impl Scene {
-    pub fn new() -> Self {
-        Self {
-            data: HashMap::new(),
-        }
-    }
-
-    pub fn push(&mut self, object: Box<dyn EditorObject>) {
-        self.data.insert(object.get_goid(), object);
-    }
-
-    pub fn remove(&mut self, location: Coordinate) {
-        // self.data.retain(|x| { x.clone().split_off(3) != format!("{}{}", location.0, location.1) });
-    }
-
-    pub fn get_data(&mut self) -> Option<Box<dyn EditorObject>> {
-        let read_dir = std::fs::read(format!("{:?}/test.json", env::current_dir()));
-        match read_dir {
-            Ok(file_bytes) => {
-                let to_string = String::from_utf8(file_bytes).unwrap_or_default();
-                let contents: std::result::Result<Box<dyn EditorObject>, Error> = serde_json::from_str(&to_string);
-                if let Ok(file_contents) = contents {
-                    // println!("We got some file contents: {file_contents:?}");
-                    // let conversion = 
-                }
-            },
-            Err(e) => println!("Error reading file contents: {e:?}"),
-        }
-        
-        None
-    }
-}
-
-
