@@ -21,7 +21,7 @@ pub struct Scene {
 }
 
 impl Scene {
-    pub fn new(&self, load_path: Option<PathBuf>) -> Self {
+    pub fn new(load_path: Option<PathBuf>) -> Self {
             match load_path.clone() {
                 Some(path) => {
                     println!("Attempting to create scene from scene data from file: {path:?}");
@@ -30,7 +30,8 @@ impl Scene {
                     println!("Path was not provided, starting with blank scene");
                 },
             }
-        self.read_and_deserialize(&load_path.unwrap())
+        let scene = Self::default();
+        scene.read_and_deserialize(&load_path.unwrap())
     }
 
 
