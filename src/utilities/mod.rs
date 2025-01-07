@@ -1,8 +1,8 @@
 use bevy::prelude::*;
 use serde::{Serialize, Deserialize};
 
-pub(crate) mod resources;
-pub(crate) use resources::*;
+pub mod resources;
+pub use resources::*;
 
 
 
@@ -14,6 +14,39 @@ pub fn despawn_all<T: Component>(mut commands: Commands, to_despawn: Query<Entit
 }
 
 
-//Helper Components
-#[derive(Component, Debug, Hash, Eq, PartialEq, Clone, Copy, Default, Deserialize, Serialize)]
-pub(crate) struct Coordinate(pub i64, pub i64);
+///A Coordinate is a simple struct that holds two i64 values, x and y identifying a point in our editor
+/// most items are anchored to Bottom Left, so the x and y values (generally) define the bottom left corner of the object
+#[derive(Component, Deserialize, Serialize, Debug, Hash, Eq, PartialEq, Clone, Copy, Default)]
+pub struct Coordinate(pub i64, pub i64);
+impl Coordinate {
+    pub fn from(v: Vec3) -> Self {
+        Self(v.x as i64, v.y as i64)
+    }
+}
+
+///A TCoordinate, or a "typed coordinate" is a coordinate that also includes an identifying character, 
+///this way the coordinate is unique, as no two objects of the same type can occupy the same space,
+/// and makes for an efficient Unique Identifier for the object
+#[derive(Component, Deserialize, Serialize, Debug, Clone, PartialEq, Eq, Hash)]
+pub struct TCoordinate {
+    pub object_type: char,
+    pub coord: Coordinate,
+}
+
+impl TCoordinate {
+    pub fn new(object_type: char, coord: Coordinate) -> Self {
+        Self {
+            object_type,
+            coord,
+        }
+    }
+}
+
+impl Default for TCoordinate {
+    fn default() -> Self {
+        Self {
+            object_type: ' ',
+            coord: Coordinate(0, 0),
+        }
+    }
+}

@@ -26,10 +26,11 @@ fn main() {
                 })
                 .build(),
         )
+
         .add_plugins(editor::editor_plugin)
         
-        .add_systems(Startup, setup)
         .insert_resource(ClearColor(Color::from(WINDOW_DEFAULT_BACKGROUND_COLOR)))
+        .insert_resource(Time::<Fixed>::from_hz(64.0))
         .run();
 }
 
@@ -37,9 +38,6 @@ fn main() {
 //bundles are a collection of components that are commonly used together
 //OrthographicCameraBundle is a bundle that contains the following components:
 //Transform, GlobalTransform, OrthographicCamera, Visible, and MainCamera
-fn setup(mut commands: Commands) {
-    commands.spawn(Camera2d { ..default() });
-}
 
 // fn spawn_players(mut commands: Commands, asset_server: Res<AssetServer>) {
 //     let textures_path = Path::new(&format!("{TEXTURES_PATH}/player.png")).to_path_buf();

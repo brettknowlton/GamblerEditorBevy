@@ -1,8 +1,8 @@
-use std::path::PathBuf;
-
 use bevy::color::Srgba;
 
 //WILD shit right? dont worry its not too bad.
+//disable dead code warnings with #[warn(dead...)]
+
 pub(crate)const 
                         WINDOW_TITLE:                                                                   &str
                         =
@@ -19,10 +19,9 @@ pub const TILE_SCALE_X: usize = TILE_SIZE * TILE_SCALE;
 pub const TILE_SCALE_Y: usize = TILE_SIZE * TILE_SCALE;
 pub const TILE_SIZE: usize = 16;
 
-pub const SPRITESHEET_WIDTH: usize = 10;
+pub const SPRITESHEET_WIDTH: usize = 4;
 pub const MAX_SPRITESHEET_ITEMS: usize = 16;
 pub const DEFAULT_SCENE_PATH: &str = "assets/scenes/scene.json";
-
 
 pub const UI_SCALE: usize = 10;
 

@@ -1,18 +1,14 @@
 use bevy::prelude::*;
-use serde_json::Error;
-use std::{ collections::HashMap, path::Path };
+use super::*;
+use std::collections::HashMap;
 use serde::{ Serialize, Deserialize };
 use std::path::PathBuf;
+
 
 pub use crate::utilities::*;
 
 //Helper Components
-#[derive(Component, Deserialize, Serialize, Debug, Clone, PartialEq, Eq, Hash)]
-///A TCoordinate, or a "typed coordinate" is a coordinate that also includes the
-pub(crate) struct TCoordinate {
-    pub object_type: char,
-    pub coord: Coordinate,
-}
+
 
 #[derive(Serialize, Deserialize, Component, Debug, Clone, PartialEq, Default)]
 ///A Scene will manage and hold onto any and all of our editor objects,
@@ -36,11 +32,6 @@ impl Scene {
         scene.read_and_deserialize(&load_path.unwrap())
     }
 
-    pub fn insert_all(&mut self){
-        todo!();
-    }
-
-
     pub fn push(&mut self, tcoord: TCoordinate, e: Entity) {
         self.layout.insert(tcoord, e);
     }
@@ -49,8 +40,12 @@ impl Scene {
         self.layout.remove(&object);
     }
 
+    pub fn get(&self, k: &TCoordinate) -> Option<&Entity> {
+        self.layout.get(k)
+    }
+
     pub fn serialize(&self) -> String {
-        serde_json::to_string(&self).unwrap_or_default()
+        serde_json::to_string(&self.layout).unwrap_or_default()
     }
 
     fn from_data(bytes: String) -> Self {
@@ -82,15 +77,43 @@ impl Scene {
         }
     }
 
-    pub fn write_serialized_scene(&self, path: String) {
+    pub fn write_serialized_scene(&self, path: Option<PathBuf>) {
         //write all scene data to path's file, create a new file or overwite an existing one if it exists for now
-        let write_path = PathBuf::from(&path);
-        let write_result = std::fs::write(write_path.clone(), self.serialize());
+        let p = if let Some(path) = path {
+            path
+        } else {
+            PathBuf::from(DEFAULT_SCENE_PATH)
+        };
+
+        let mut data: Vec<serde_json::Value> = Vec::new();
+
+        for e in &self.layout {
+            info!("Gathering Entity for write: {:?}", e);
+            data.push(serde_json::to_value(e).unwrap());
+        }
+
+        let json_data = serde_json::to_string(&data).unwrap();
+        warn!("Saving Json payload:\n{}", json_data);
+
+        todo!();
+
+        write_json(&json_data, &p).expect("Issue Creating or Writing file");
+
+
+
+        let write_result = std::fs::write(p.clone(), self.serialize());
         match write_result {
-            Ok(_) => println!("Scene data written to file: {:?}", write_path),
+            Ok(_) => println!("Scene data written to file: {:?}", p),
             Err(e) => println!("Error writing scene data to file: {e:?}"),
         };
     }
+}
+
+fn write_json(json_string: &str, file_path: &str) -> Result<(), std::io::Error> {
+    info!("Attempting to create file: {}", file_path);
+    std::fs::write(file_path, json_string.as_bytes())?;
+    info!("File Created Successfully");
+    Ok(())
 }
 
 

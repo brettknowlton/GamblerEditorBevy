@@ -3,4 +3,4 @@ use crate::Tile;
 
 
 #[derive(Resource, Debug, Component)]
-pub(crate) struct CurrentEditorObject(pub Tile);
+pub(crate) struct PlaceholderTile(pub Tile);
