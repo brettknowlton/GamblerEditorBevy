@@ -79,12 +79,11 @@ impl Scene {
 
     pub fn write_serialized_scene(&self, path: Option<PathBuf>) {
         //write all scene data to path's file, create a new file or overwite an existing one if it exists for now
-        let p = if let Some(path) = path {
-            path
-        } else {
-            PathBuf::from(DEFAULT_SCENE_PATH)
-        };
+        let p = path.expect("Serialized scene requires a path to write to todo!()");
 
+        let good_path = p.to_str().unwrap();
+
+        
         let mut data: Vec<serde_json::Value> = Vec::new();
 
         for e in &self.layout {
@@ -95,15 +94,13 @@ impl Scene {
         let json_data = serde_json::to_string(&data).unwrap();
         warn!("Saving Json payload:\n{}", json_data);
 
-        todo!();
-
-        write_json(&json_data, &p).expect("Issue Creating or Writing file");
+        write_json(&json_data, &good_path).expect("Issue Creating or Writing file");
 
 
 
-        let write_result = std::fs::write(p.clone(), self.serialize());
+        let write_result = std::fs::write(good_path.clone(), self.serialize());
         match write_result {
-            Ok(_) => println!("Scene data written to file: {:?}", p),
+            Ok(_) => println!("Scene data written to file: {:?}", good_path),
             Err(e) => println!("Error writing scene data to file: {e:?}"),
         };
     }

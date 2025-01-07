@@ -1,8 +1,8 @@
 use bevy::prelude::*;
 
-pub(crate) mod consts;
-pub(crate) mod utilities;
-pub(crate) mod editor;
+pub mod consts;
+pub mod utilities;
+pub mod editor;
 
 pub use consts::*;
 pub use utilities::*;

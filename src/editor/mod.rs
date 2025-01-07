@@ -124,7 +124,7 @@ fn keybinds(
         } else if state.get() == &EditorState::Saving {
             println!("Attempting to save scene");
 
-            scene.write_serialized_scene(PathBuf::from(DEFAULT_SCENE_PATH));
+            scene.write_serialized_scene(Some(PathBuf::from(DEFAULT_SCENE_PATH)));
 
             next_state.set(EditorState::Normal);
             println!("Scene saved, returning to Normal Mode");

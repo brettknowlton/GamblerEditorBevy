@@ -264,6 +264,7 @@ fn show_placeholder(mut commands: Commands, spritesheet: Res<TilesheetHandle>) {
             x_offset: 0.0,
             y_offset: 0.0,
         },
+        PlaceholderObject
     ));
 }
 
