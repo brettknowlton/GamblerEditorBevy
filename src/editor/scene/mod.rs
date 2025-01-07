@@ -8,15 +8,17 @@ pub use crate::utilities::*;
 
 //Helper Components
 #[derive(Component, Deserialize, Serialize, Debug, Clone, PartialEq, Eq, Hash)]
+///A TCoordinate, or a "typed coordinate" is a coordinate that also includes the
 pub(crate) struct TCoordinate {
     pub object_type: char,
     pub coord: Coordinate,
 }
-///A TCoordinate, or a "typed coordinate" is a coordinate that also includes the
 
 #[derive(Serialize, Deserialize, Component, Debug, Clone, PartialEq, Default)]
+///A Scene will manage and hold onto any and all of our editor objects,
+///  upon the entity being added to the Scene, it will be serialized and saved as a String in  hashmap for later use
 pub struct Scene {
-    items: HashMap<TCoordinate, String>,
+    layout: HashMap<TCoordinate, Entity>,
     scene_path: PathBuf,
 }
 
@@ -34,13 +36,17 @@ impl Scene {
         scene.read_and_deserialize(&load_path.unwrap())
     }
 
+    pub fn insert_all(&mut self){
+        todo!();
+    }
 
-    pub fn push(&mut self, object: TCoordinate, goid: String) {
-        self.items.insert(object, goid);
+
+    pub fn push(&mut self, tcoord: TCoordinate, e: Entity) {
+        self.layout.insert(tcoord, e);
     }
 
     pub fn remove(&mut self, object: TCoordinate) {
-        self.items.remove(&object);
+        self.layout.remove(&object);
     }
 
     pub fn serialize(&self) -> String {

@@ -29,7 +29,7 @@ fn main() {
         .add_plugins(editor::editor_plugin)
         
         .add_systems(Startup, setup)
-        .insert_resource(ClearColor(Color::srgb(0.2, 0.05, 0.1)))
+        .insert_resource(ClearColor(Color::from(WINDOW_DEFAULT_BACKGROUND_COLOR)))
         .run();
 }
 

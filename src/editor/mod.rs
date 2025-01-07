@@ -1,5 +1,6 @@
 mod tile;
 mod scene;
+
 pub use tile::*;
 pub use crate::consts::*;
 pub use crate::utilities::*;
@@ -29,7 +30,6 @@ pub fn editor_plugin(app: &mut App) {
         .add_plugins(tile::tilemode_plugin)
         .add_systems(Update, move_camera)
         .add_systems(Update, keybinds);
-    //.insert_resource(Scene(Scene::new()))
 }
 
 fn initialize(mut commands: Commands) {
@@ -93,7 +93,7 @@ fn keybinds(
 
     mut scenes: Query<&mut scene::Scene>
 ) {
-    let scene = scenes.single();
+    
 
     //manage the editor state, uses top row starting with "E" key to control which UI mode we will be in
     if input.just_pressed(KeyCode::KeyT) {
@@ -109,10 +109,12 @@ fn keybinds(
             //pressing q will enter "saving" mode if we are already in normal mode:
             next_state.set(EditorState::Saving);
             println!("Would you like to save the current scene?");
+
         } else if state.get() == &EditorState::Saving {
             //pressing q will cancel the save if we are already in saving mode:
             next_state.set(EditorState::Normal);
             println!("Save cancelled");
+
         } else {
             next_state.set(EditorState::Normal);
         }
@@ -122,7 +124,9 @@ fn keybinds(
         //if we are in save mode, pressing "E" will save the current scene
         if state.get() == &EditorState::Saving {
             println!("Attempting to save scene");
-            scene.write_serialized_scene(DEFAULT_SCENE_PATH.to_string());
+
+            scenes.single_mut().insert_all();
+
             next_state.set(EditorState::Normal);
             println!("Scene saved, returning to Normal Mode");
         }

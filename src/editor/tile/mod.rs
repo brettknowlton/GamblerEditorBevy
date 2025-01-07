@@ -34,10 +34,10 @@ pub fn tilemode_plugin(app: &mut App) {
 
 
 fn move_tile_ui(
-    mut tileUI: Query<(&mut Transform, &TileModeUI)>, 
+    mut tile_ui: Query<(&mut Transform, &TileModeUI)>, 
     crosshair: Query<&Crosshair>
 ) {
-    for (mut transform, ui) in tileUI.iter_mut() {
+    for (mut transform, ui) in tile_ui.iter_mut() {
         let crosshair = crosshair.single();
         transform.translation = Vec3::new(crosshair.location.0 as f32 + ui.x_offset, crosshair.location.1 as f32 + ui.y_offset, 0.0);
     }
@@ -177,8 +177,8 @@ fn tilemode_keybinds(
         //cycles through the spritesheet down
         current_editor_object.0.tile_type =
             (current_editor_object.0.tile_type +
-                (MAX_SPRITESHEET_ITEMS as u64) -
-                (SPRITESHEET_WIDTH as u64)) %
+            (MAX_SPRITESHEET_ITEMS as u64) -
+            (SPRITESHEET_WIDTH as u64)) %
             (MAX_SPRITESHEET_ITEMS as u64);
     }
 }
