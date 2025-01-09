@@ -1,6 +1,6 @@
-use bevy::prelude::*;
+use bevy::{ecs::world::DynamicComponentFetch, prelude::*};
 use super::*;
-use std::collections::HashMap;
+use std::{collections::HashMap, path};
 use serde::{ Serialize, Deserialize };
 use std::path::PathBuf;
 
@@ -10,108 +10,108 @@ pub use crate::utilities::*;
 //Helper Components
 
 
-#[derive(Serialize, Deserialize, Component, Debug, Clone, PartialEq, Default)]
-///A Scene will manage and hold onto any and all of our editor objects,
-///  upon the entity being added to the Scene, it will be serialized and saved as a String in  hashmap for later use
-pub struct Scene {
-    layout: HashMap<TCoordinate, Entity>,
-    scene_path: PathBuf,
-}
+// #[derive(Serialize, Deserialize, Component, Clone, PartialEq, Default)]
+// ///A Scene will manage and hold onto any and all of our editor objects,
+// ///  upon the entity being added to the Scene, it will be serialized and saved as a String in  hashmap for later use
+// pub struct Scene {
+//     layout: HashMap<TCoordinate, Entity>,
+//     scene_path: PathBuf,
+// }
 
-impl Scene {
-    pub fn new(load_path: Option<PathBuf>) -> Self {
-            match load_path.clone() {
-                Some(path) => {
-                    println!("Attempting to create scene from scene data from file: {path:?}");
-                },
-                None => {
-                    println!("Path was not provided, starting with blank scene");
-                },
-            }
-        let scene = Self::default();
-        scene.read_and_deserialize(&load_path.unwrap())
-    }
+// impl Scene {
+    
+//     pub fn new() -> Self {
+//         Self {
+//             layout: HashMap::new(),
+//             scene_path: PathBuf::new(),
+//         }
+//     }
+//     pub fn from_path(path: PathBuf, c: Commands) -> Self {
+//         let mut this = Self::new();
+//         this.scene_path = path.clone();
+//         this.read_and_deserialize(&path, c)
+//     }
+//     ///reads the provided path and tries to deserialize the contents into a Scene struct.
+//     /// If the file is not found, or if the file is not valid JSON, it will return an empty scene.
+//     pub fn read_and_deserialize(&self, path: &PathBuf, c: Commands) -> Self {
+//         todo!();
+//     }
 
-    pub fn push(&mut self, tcoord: TCoordinate, e: Entity) {
-        self.layout.insert(tcoord, e);
-    }
+//     pub fn serialize_and_write(&self, path: &PathBuf) {
+//         for item in self.layout.iter() {
+//             let mut components = item.1.;
+//         }
 
-    pub fn remove(&mut self, object: TCoordinate) {
-        self.layout.remove(&object);
-    }
 
-    pub fn get(&self, k: &TCoordinate) -> Option<&Entity> {
-        self.layout.get(k)
-    }
+//         todo!();
+//     }
 
-    pub fn serialize(&self) -> String {
-        serde_json::to_string(&self.layout).unwrap_or_default()
-    }
 
-    fn from_data(bytes: String) -> Self {
-        match serde_json::from_str::<Self>(&bytes) {
-            Ok(scene_data) => scene_data,
-            Err(e) => {
-                println!("Reading scene data failed: {e:?}");
-                println!("Continuing with blank scene");
-                Self::default()
-            }
-        }
-    }
 
-    ///reads the provided path and tries to deserialize the contents into a Scene struct.
-    /// If the file is not found, or if the file is not valid JSON, it will return an empty scene.
-    pub fn read_and_deserialize(&self, path: &PathBuf) -> Self {
+//     pub fn push(&mut self, tcoord: TCoordinate, e: Entity) {
+//         self.layout.insert(tcoord, e);
+//     }
 
-        let read_dir = std::fs::read(&path);
-        match read_dir {
-            Ok(file_bytes) => {
-                let to_string = String::from_utf8(file_bytes).unwrap_or_default();
-                Self::from_data(to_string)
-            },
-            Err(e) => {
-                println!("Error reading file contents: {e:?}");
-                println!("Continuing with blank scene");
-                Self::default()
-            }
-        }
-    }
+//     pub fn remove(&mut self, object: TCoordinate) {
+//         self.layout.remove(&object);
+//     }
 
-    pub fn write_serialized_scene(&self, path: Option<PathBuf>) {
-        //write all scene data to path's file, create a new file or overwite an existing one if it exists for now
-        let p = path.expect("Serialized scene requires a path to write to todo!()");
+//     pub fn get(&self, k: &TCoordinate) -> Option<&Entity> {
+//         self.layout.get(k)
+//     }
 
-        let good_path = p.to_str().unwrap();
+//     pub fn serialize(&self) -> String {
+//         serde_json::to_string(&self.layout).unwrap_or_default()
+//     }
+
+//     fn from_data(bytes: String) -> Self {
+//         match serde_json::from_str::<Self>(&bytes) {
+//             Ok(scene_data) => scene_data,
+//             Err(e) => {
+//                 println!("Reading scene data failed: {e:?}");
+//                 println!("Continuing with blank scene");
+//                 Self::default()
+//             }
+//         }
+//     }
+
+    
+
+//     pub fn write_serialized_scene(&self, path: Option<PathBuf>) {
+//         //write all scene data to path's file, create a new file or overwite an existing one if it exists for now
+//         let p = path.expect("Serialized scene requires a path to write to todo!()");
+
+//         let good_path = p.to_str().unwrap();
 
         
-        let mut data: Vec<serde_json::Value> = Vec::new();
+//         let mut data: Vec<serde_json::Value> = Vec::new();
 
-        for e in &self.layout {
-            info!("Gathering Entity for write: {:?}", e);
-            data.push(serde_json::to_value(e).unwrap());
-        }
+//         for e in &self.layout {
+//             info!("Gathering Entity for write: {:?}", e);
+//             data.push(serde_json::to_value(e).unwrap());
+//         }
 
-        let json_data = serde_json::to_string(&data).unwrap();
-        warn!("Saving Json payload:\n{}", json_data);
+//         let json_data = serde_json::to_string(&data).unwrap();
+//         warn!("Saving Json payload:\n{}", json_data);
 
-        write_json(&json_data, &good_path).expect("Issue Creating or Writing file");
+//         write_json(&json_data, &good_path).expect("Issue Creating or Writing file");
 
 
 
-        let write_result = std::fs::write(good_path.clone(), self.serialize());
-        match write_result {
-            Ok(_) => println!("Scene data written to file: {:?}", good_path),
-            Err(e) => println!("Error writing scene data to file: {e:?}"),
-        };
-    }
-}
+//         let write_result = std::fs::write(good_path.clone(), self.serialize());
+//         match write_result {
+//             Ok(_) => println!("Scene data written to file: {:?}", good_path),
+//             Err(e) => println!("Error writing scene data to file: {e:?}"),
+//         };
+//     }
+// }
 
-fn write_json(json_string: &str, file_path: &str) -> Result<(), std::io::Error> {
-    info!("Attempting to create file: {}", file_path);
-    std::fs::write(file_path, json_string.as_bytes())?;
-    info!("File Created Successfully");
-    Ok(())
-}
+// fn write_json(json_string: &str, file_path: &str) -> Result<(), std::io::Error> {
+//     info!("Attempting to create file: {}", file_path);
+//     std::fs::write(file_path, json_string.as_bytes())?;
+//     info!("File Created Successfully");
+//     Ok(())
+// }
 
 
 // #[derive(Component)]

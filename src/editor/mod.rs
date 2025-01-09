@@ -1,6 +1,7 @@
 mod tile;
 mod scene;
 
+use bevy::scene::*;
 pub use tile::*;
 pub use crate::consts::*;
 pub use crate::utilities::*;
@@ -39,10 +40,7 @@ fn initialize(mut commands: Commands) {
     println!(
         "Prompt to go here eventually to ask if the user would like to load a specific file, for now we will always just load from DEFAULT_SCENE_PATH"
     );
-    commands.spawn(scene::Scene::new(Some(PathBuf::from(DEFAULT_SCENE_PATH))));
-
-    //create grid
-    //a texture slightly larger than the window size? just keeps getting snapped to the nearest grid point... seems like it would work
+    commands.spawn(SceneRoot::default());
 }
 
 fn create_crosshair(mut commands: Commands, asset_server: Res<AssetServer>) {
@@ -76,7 +74,7 @@ fn keybinds(
     mut uiitems: Query<(&mut UIItem, &mut Transform), Without<Camera2d>>,
     mut cameras: Query<(&mut UIItem, &mut Transform, &Camera2d)>,
 
-    mut scenes: Query<&mut scene::Scene>
+    mut scenes: Query<&mut SceneInstance>
 ) {
     let scene = scenes.single_mut();
     //manage the editor state, you can switch between modes with ERTY except if you are attempting to save the document
@@ -124,7 +122,7 @@ fn keybinds(
         } else if state.get() == &EditorState::Saving {
             println!("Attempting to save scene");
 
-            scene.write_serialized_scene(Some(PathBuf::from(DEFAULT_SCENE_PATH)));
+            scene.
 
             next_state.set(EditorState::Normal);
             println!("Scene saved, returning to Normal Mode");
