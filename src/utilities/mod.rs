@@ -2,7 +2,6 @@ use bevy::prelude::*;
 use serde::{Serialize, Deserialize};
 
 pub mod resources;
-pub use resources::*;
 
 
 
@@ -16,7 +15,8 @@ pub fn despawn_all<T: Component>(mut commands: Commands, to_despawn: Query<Entit
 
 ///A Coordinate is a simple struct that holds two i64 values, x and y identifying a point in our editor
 /// most items are anchored to Bottom Left, so the x and y values (generally) define the bottom left corner of the object
-#[derive(Component, Deserialize, Serialize, Debug, Hash, Eq, PartialEq, Clone, Copy, Default)]
+#[derive(Component, Reflect, Deserialize, Serialize, Debug, Hash, Eq, PartialEq, Clone, Copy, Default)]
+#[reflect(Component)]
 pub struct Coordinate(pub i64, pub i64);
 impl Coordinate {
     pub fn from(v: Vec3) -> Self {
@@ -27,7 +27,8 @@ impl Coordinate {
 ///A TCoordinate, or a "typed coordinate" is a coordinate that also includes an identifying character, 
 ///this way the coordinate is unique, as no two objects of the same type can occupy the same space,
 /// and makes for an efficient Unique Identifier for the object
-#[derive(Component, Deserialize, Serialize, Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Component, Reflect, Deserialize, Serialize, Debug, Clone, PartialEq, Eq, Hash)]
+#[reflect(Component)]
 pub struct TCoordinate {
     pub object_type: char,
     pub coord: Coordinate,

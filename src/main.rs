@@ -15,7 +15,7 @@ fn main() {
                 .set(ImagePlugin::default_nearest())
                 .set(WindowPlugin {
                     primary_window: Some(Window {
-                        title: "Harken".into(),
+                        title: WINDOW_TITLE.to_string(),
                         resolution: (WINDOW_WIDTH, WINDOW_HEIGHT).into(),
                         resizable: false,
                         decorations: true,
