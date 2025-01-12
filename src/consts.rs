@@ -21,7 +21,7 @@ pub const TILE_SIZE: usize = 16;
 
 pub const SPRITESHEET_WIDTH: usize = 4;
 pub const MAX_SPRITESHEET_ITEMS: usize = 16;
-pub const DEFAULT_SCENE_PATH: &str = "assets/scenes/scene.json";
+pub const DEFAULT_SCENE_PATH: &str = "assets/scenes/scene";
 
 pub const UI_SCALE: usize = 10;
 

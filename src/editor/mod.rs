@@ -26,11 +26,11 @@ pub enum EditorState {
 
 pub fn editor_plugin(app: &mut App) {
     app.init_state::<EditorState>()
-        .add_plugins(ScenePlugin)
         .register_type::<EditorObject>()
 
         .add_systems(Startup, (initialize, create_crosshair))
-        .add_plugins((tile::tilemode_plugin, scene::scene_plugin))
+        .add_plugins(tile::tilemode_plugin)
+        // .add_plugins(scene::scene_plugin)
         // .add_systems(Update, move_camera)
         .add_systems(Update, keybinds);
     //placeholder resource for whatever tile we are trying to place
@@ -118,6 +118,8 @@ fn keybinds(
         if input.just_pressed(KeyCode::KeyN) || input.just_pressed(KeyCode::Escape) {
             next_state.set(EditorState::Normal);
             println!("Returning to Normal Mode");
+
+            commands.spawn(SceneSpawner::default());
         }
     }
 

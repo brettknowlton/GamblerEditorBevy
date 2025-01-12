@@ -27,10 +27,9 @@ fn main() {
                 .build(),
         )
 
-        .add_plugins(editor::editor_plugin)
-        
         .insert_resource(ClearColor(Color::from(WINDOW_DEFAULT_BACKGROUND_COLOR)))
         .insert_resource(Time::<Fixed>::from_hz(64.0))
+        .add_plugins(editor::editor_plugin)
         .run();
 }
 

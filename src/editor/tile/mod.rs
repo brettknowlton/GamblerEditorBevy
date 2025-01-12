@@ -1,6 +1,7 @@
 use bevy::gizmos::cross;
 use bevy::prelude::*;
 use bevy::sprite::Anchor;
+use bevy::state::reflect;
 use std::path::PathBuf;
 use crate::{ utilities::*, resources::*, EditorObject, TILE_SIZE };
 use crate::consts::*;
@@ -43,7 +44,7 @@ pub fn tilemode_plugin(app: &mut App) {
     //we could also take care of some post-exit cleanup here, like despawning all the UI elements by using the schedule OnEnter(EditorState::Inactive) and then despawning all the UI elements
 }
 
-fn ensure_unique_tiles(mut commands: Commands, mut tiles: Query<(Entity, &Tile)>) {
+fn ensure_unique_tiles(mut commands: Commands, tiles: Query<(Entity, &Tile)>) {
     let mut seen = std::collections::HashSet::new();
 
     for (e, t) in tiles.iter() {
@@ -176,28 +177,28 @@ fn tilemode_keybinds(
         );
     }
     //"L" handles removal of a tile from the scene, similar to placing one just doesnt need to worry about the tile creation part so much easier
-    if input.just_pressed(KeyCode::KeyL) {
-        let (t, c) = crosshairs.single();
-        let mut coord = Coordinate::from(t.translation);
+    // if input.just_pressed(KeyCode::KeyL) {
+    //     let (t, _) = crosshairs.single();
+        // let mut coord = Coordinate::from(t.translation);
 
-        //"floor" the coordinate to the nearest tile grid space in a way that (kind of) respects the negative coordinate space, just dont place anything more than 1000 tiles away from the origin until I can figure that out
-        let pushover = 1000 * ((TILE_SIZE * TILE_SCALE) as i64);
-        coord = Coordinate(
-            ((coord.0 + pushover) / ((TILE_SIZE * TILE_SCALE) as i64)) *
-                ((TILE_SIZE * TILE_SCALE) as i64) -
-                pushover,
-            ((coord.1 + pushover) / ((TILE_SIZE * TILE_SCALE) as i64)) *
-                ((TILE_SIZE * TILE_SCALE) as i64) -
-                pushover
-        );
+        // //"floor" the coordinate to the nearest tile grid space in a way that (kind of) respects the negative coordinate space, just dont place anything more than 1000 tiles away from the origin until I can figure that out
+        // let pushover = 1000 * ((TILE_SIZE * TILE_SCALE) as i64);
+        // coord = Coordinate(
+        //     ((coord.0 + pushover) / ((TILE_SIZE * TILE_SCALE) as i64)) *
+        //         ((TILE_SIZE * TILE_SCALE) as i64) -
+        //         pushover,
+        //     ((coord.1 + pushover) / ((TILE_SIZE * TILE_SCALE) as i64)) *
+        //         ((TILE_SIZE * TILE_SCALE) as i64) -
+        //         pushover
+        // );
 
-        let tiles_t_coord = TCoordinate::new('T', coord);
+        // let tiles_t_coord = TCoordinate::new('T', coord);
 
         // if let Some(item) = scene.get(&tiles_t_coord) {
         //     //remove the old tile
         //     commands.entity(*item).despawn();
         // }
-    }
+    // }
 
     if input.just_pressed(KeyCode::ArrowRight) {
         //cycles through the spritesheet to the right
@@ -309,16 +310,18 @@ fn exit_tilemode(mut commands: Commands, mut tile_state: ResMut<NextState<TileEd
 }
 
 /// A handle to the tilesheet image.
-#[derive(Resource, Default)]
+#[derive(Resource, Default, Reflect)]
+#[reflect(Resource)]
 struct TilesheetHandle(Handle<Image>);
 
 /// A component that marks an entity as part of the tile editing UI.
 #[derive(Component, Reflect)]
+#[reflect(Component)]
 #[require(UIItem)]
 struct TileModeUI;
 
 /// A component to track some basic info about a tile
-#[derive(Component, Reflect, Debug)]
+#[derive(Component, Reflect, Debug, Clone)]
 #[reflect(Component)]
 pub struct Tile {
     pub tile_type: u64,
