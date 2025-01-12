@@ -1,7 +1,5 @@
 mod tile;
 mod scene;
-
-use bevy::scene::*;
 pub use tile::*;
 pub use crate::consts::*;
 pub use crate::utilities::*;
@@ -14,10 +12,11 @@ pub enum EditorState {
     #[default]
     Inactive,
     Normal,
-    SaveAsk,
-    Saving,
     LoadAsk,
     Loading,
+    LoadEmpty,
+    SaveAsk,
+    Saving,
     Tile,
     Interactable,
     Actor,
@@ -30,9 +29,9 @@ pub fn editor_plugin(app: &mut App) {
 
         .add_systems(Startup, (initialize, create_crosshair))
         .add_plugins(tile::tilemode_plugin)
-        // .add_plugins(scene::scene_plugin)
+        .add_plugins(scene::scene_plugin)
         // .add_systems(Update, move_camera)
-        .add_systems(Update, keybinds);
+        .add_systems(Update, keybinds.run_if(not(in_state(EditorState::Inactive))));
     //placeholder resource for whatever tile we are trying to place
 }
 
@@ -75,7 +74,7 @@ fn keybinds(
     // m_input: Res<ButtonInput<MouseButton>>,
 
     mut uiitems: Query<(&mut UIItem, &mut Transform), Without<Camera2d>>,
-    mut cameras: Query<(&mut UIItem, &mut Transform, &Camera2d)>,
+    mut cameras: Query<(&mut UIItem, &mut Transform, &Camera2d)>
 ) {
     //manage the editor state, you can switch between modes with ERTY except if you are attempting to save the document
     //"E" enters editor mode and aborts any saving operation
@@ -110,16 +109,14 @@ fn keybinds(
             }
             next_state.set(EditorState::Actor);
         }
-    } else{
+    } else {
         if input.just_pressed(KeyCode::KeyY) || input.just_pressed(KeyCode::Enter) {
             next_state.set(EditorState::Loading);
             println!("Attempting to load scene");
         }
         if input.just_pressed(KeyCode::KeyN) || input.just_pressed(KeyCode::Escape) {
-            next_state.set(EditorState::Normal);
+            next_state.set(EditorState::LoadEmpty);
             println!("Returning to Normal Mode");
-
-            commands.spawn(SceneSpawner::default());
         }
     }
 
@@ -134,7 +131,6 @@ fn keybinds(
         } else if state.get() == &EditorState::SaveAsk {
             println!("Attempting to save scene");
             next_state.set(EditorState::Saving);
-            return;
         } else {
             next_state.set(EditorState::Normal);
             println!("Returning to Normal Mode");
@@ -198,7 +194,7 @@ struct UIItem {
     vel_y: f32,
 }
 
-#[derive(Component, Reflect,)]
+#[derive(Component, Reflect)]
 #[reflect(Component)]
 /// A component that marks an entity as a placeholder object, these are preview objects that are not yet placed into the scene.
 struct PlaceholderObject;
@@ -207,38 +203,35 @@ struct PlaceholderObject;
 #[derive(Component, Reflect, Default, Clone)]
 #[reflect(Component)]
 pub struct EditorObject {
-    major_type: char, //'T' for tile, 'E' for entity, 'P' for player, etc.
     internal_type: u64, //ultimatley an index into which style of tile or entity we are using within the major type
-    coordinate: TCoordinate,
+    coordinate: TCoordinate, //the coordinate of the object as well as the major type of the object
 }
 
 impl EditorObject {
-    fn new(mt: char, it: u64, coord: Coordinate) -> Self {
-        Self {
-            major_type: mt,
-            internal_type: it,
-            coordinate: TCoordinate::new(mt, coord),
-        }
-    }
+    // fn new(mt: char, it: u64, coord: Coordinate) -> Self {
+    //     Self {
+    //         internal_type: it,
+    //         coordinate: TCoordinate::new(mt, coord),
+    //     }
+    // }
 
-    fn get_object_type(&self) -> char {
-        self.major_type
-    }
-    fn get_internal_type(&self) -> u64 {
-        self.internal_type
-    }
-    fn get_coordinate(&self) -> TCoordinate {
-        self.coordinate.clone()
-    }
+    // fn get_object_type(&self) -> char {
+    //     self.coordinate.object_type
+    // }
+    // fn get_internal_type(&self) -> u64 {
+    //     self.internal_type
+    // }
+    // fn get_coordinate(&self) -> TCoordinate {
+    //     self.coordinate.clone()
+    // }
 
-    fn set_major_type(&mut self, v: char) {
-        self.major_type = v;
-    }
-    fn set_internal_type(&mut self, v: u64) {
-        self.internal_type = v;
-    }
-    fn set_coordinate(&mut self, coord: Coordinate) {
-        self.coordinate = TCoordinate::new(self.get_object_type(), coord);
-    }
+    // fn set_major_type(&mut self, v: char) {
+    //     self.coordinate.object_type = v;
+    // }
+    // fn set_internal_type(&mut self, v: u64) {
+    //     self.internal_type = v;
+    // }
+    // fn set_coordinate(&mut self, coord: Coordinate) {
+    //     self.coordinate = TCoordinate::new(self.get_object_type(), coord);
+    // }
 }
-

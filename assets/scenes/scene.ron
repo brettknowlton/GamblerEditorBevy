@@ -1,4 +1,82 @@
 (
   resources: {},
-  entities: {},
+  entities: {
+    4294967311: (
+      components: {
+        "gambler_bevy::editor::EditorObject": (
+          internal_type: 0,
+          coordinate: (
+            object_type: 'T',
+            coord: (64, 0),
+          ),
+        ),
+      },
+    ),
+    4294967313: (
+      components: {
+        "gambler_bevy::editor::EditorObject": (
+          internal_type: 0,
+          coordinate: (
+            object_type: 'T',
+            coord: (192, 0),
+          ),
+        ),
+      },
+    ),
+    4294967315: (
+      components: {
+        "gambler_bevy::editor::EditorObject": (
+          internal_type: 0,
+          coordinate: (
+            object_type: 'T',
+            coord: (192, 0),
+          ),
+        ),
+      },
+    ),
+    4294967316: (
+      components: {
+        "gambler_bevy::editor::EditorObject": (
+          internal_type: 0,
+          coordinate: (
+            object_type: 'T',
+            coord: (256, 0),
+          ),
+        ),
+      },
+    ),
+    4294967318: (
+      components: {
+        "gambler_bevy::editor::EditorObject": (
+          internal_type: 0,
+          coordinate: (
+            object_type: 'T',
+            coord: (192, -64),
+          ),
+        ),
+      },
+    ),
+    4294967320: (
+      components: {
+        "gambler_bevy::editor::EditorObject": (
+          internal_type: 0,
+          coordinate: (
+            object_type: 'T',
+            coord: (128, -64),
+          ),
+        ),
+      },
+    ),
+    4294967322: (
+      components: {
+        "gambler_bevy::editor::EditorObject": (
+          internal_type: 0,
+          coordinate: (
+            object_type: 'T',
+            coord: (64, -64),
+          ),
+        ),
+      },
+    ),
+  },
 )

@@ -1,7 +1,5 @@
-use bevy::gizmos::cross;
 use bevy::prelude::*;
 use bevy::sprite::Anchor;
-use bevy::state::reflect;
 use std::path::PathBuf;
 use crate::{ utilities::*, resources::*, EditorObject, TILE_SIZE };
 use crate::consts::*;
@@ -62,7 +60,7 @@ fn init_tilemode(
     asset_server: Res<AssetServer>,
     mut next_state: ResMut<NextState<TileEditorState>>,
 
-    crosshairs: Query<(&Transform, &Crosshair)>,
+    crosshairs: Query<(&Transform, &Crosshair)>
 ) {
     println!("Entering Tile Editing Mode");
     next_state.set(TileEditorState::Active);
@@ -73,7 +71,6 @@ fn init_tilemode(
 
     //offsets to make UI appear in the top left corner of the screen while still being anchored to the crosshair location
     let c = crosshairs.single();
-
 
     let x_off = -WINDOW_WIDTH / 2.0 + c.0.translation.x;
     let y_off = -WINDOW_HEIGHT / 2.0 + c.0.translation.y;
@@ -100,7 +97,7 @@ fn init_tilemode(
             translation: Vec3::new(x_off, y_off, 0.0),
             ..default()
         },
-        UIItem{
+        UIItem {
             ..default()
         },
         TileModeUI,
@@ -115,8 +112,6 @@ fn tilemode_keybinds(
     crosshairs: Query<(&Transform, &Crosshair)>,
     mut current_editor_object: ResMut<PlaceholderTile>
 ) {
-
-    
     //"P" handles placement of a tile and adding it to the scene
     if input.just_pressed(KeyCode::KeyP) {
         //clean up the bevy query overhead
@@ -138,66 +133,69 @@ fn tilemode_keybinds(
         let focused_item = &current_editor_object.0;
 
         //add the currently selected tile to the scene at this coordinate (Rounded to the nearest tile gridspace)
-        commands
-            .spawn((
-                Tile {
-                    tile_type: focused_item.tile_type,
-                    coordinate: coord,
-                },
-                //all sprites will use the same texture as a source, just change UV according to the current tile type
-                //spritesheet is always SPRITESHEET_WIDTH many tiles wide so SPRITESHEET_WIDTH*SPRITE_SIZE is the width of the texture, the height is determinable because we know the MAX_SPRITESHEET_ITEMS so stop loading if we reach that many
-                Sprite {
-                    image: spritesheet.0.clone(),
-                    //the UVs are the same for every tile, just change the offset by using the tiletype as a multiplier
-                    rect: Some(Rect {
-                        min: Vec2::new(
-                            (((focused_item.tile_type as usize) % SPRITESHEET_WIDTH) as f32) *
-                                (TILE_SIZE as f32),
-                            (((focused_item.tile_type as usize) / SPRITESHEET_WIDTH) as f32) *
-                                (TILE_SIZE as f32)
-                        ),
-                        max: Vec2::new(
-                            (((focused_item.tile_type as usize) % SPRITESHEET_WIDTH) as f32) *
-                                (TILE_SIZE as f32) +
-                                (TILE_SIZE as f32),
-                            (((focused_item.tile_type as usize) / SPRITESHEET_WIDTH) as f32) *
-                                (TILE_SIZE as f32) +
-                                (TILE_SIZE as f32)
-                        ),
-                    }),
-                    anchor: Anchor::BottomLeft,
-                    ..default()
-                },
-                Transform {
-                    translation: Vec3::new(coord.0 as f32, coord.1 as f32, 0.0),
-                    scale: Vec3::new(TILE_SCALE as f32, TILE_SCALE as f32, 1.0),
-                    ..default()
-                }
-            )
-        );
+        commands.spawn((
+            Tile {
+                tile_type: focused_item.tile_type,
+                coordinate: coord,
+            },
+            //all sprites will use the same texture as a source, just change UV according to the current tile type
+            //spritesheet is always SPRITESHEET_WIDTH many tiles wide so SPRITESHEET_WIDTH*SPRITE_SIZE is the width of the texture, the height is determinable because we know the MAX_SPRITESHEET_ITEMS so stop loading if we reach that many
+            Sprite {
+                image: spritesheet.0.clone(),
+                //the UVs are the same for every tile, just change the offset by using the tiletype as a multiplier
+                rect: Some(Rect {
+                    min: Vec2::new(
+                        (((focused_item.tile_type as usize) % SPRITESHEET_WIDTH) as f32) *
+                            (TILE_SIZE as f32),
+                        (((focused_item.tile_type as usize) / SPRITESHEET_WIDTH) as f32) *
+                            (TILE_SIZE as f32)
+                    ),
+                    max: Vec2::new(
+                        (((focused_item.tile_type as usize) % SPRITESHEET_WIDTH) as f32) *
+                            (TILE_SIZE as f32) +
+                            (TILE_SIZE as f32),
+                        (((focused_item.tile_type as usize) / SPRITESHEET_WIDTH) as f32) *
+                            (TILE_SIZE as f32) +
+                            (TILE_SIZE as f32)
+                    ),
+                }),
+                anchor: Anchor::BottomLeft,
+                ..default()
+            },
+            Transform {
+                translation: Vec3::new(coord.0 as f32, coord.1 as f32, 0.0),
+                scale: Vec3::new(TILE_SCALE as f32, TILE_SCALE as f32, 1.0),
+                ..default()
+            },
+        ));
+
+        commands.spawn(EditorObject {
+            coordinate: TCoordinate::new('T', coord),
+            internal_type: focused_item.tile_type,
+        });
     }
     //"L" handles removal of a tile from the scene, similar to placing one just doesnt need to worry about the tile creation part so much easier
     // if input.just_pressed(KeyCode::KeyL) {
     //     let (t, _) = crosshairs.single();
-        // let mut coord = Coordinate::from(t.translation);
+    // let mut coord = Coordinate::from(t.translation);
 
-        // //"floor" the coordinate to the nearest tile grid space in a way that (kind of) respects the negative coordinate space, just dont place anything more than 1000 tiles away from the origin until I can figure that out
-        // let pushover = 1000 * ((TILE_SIZE * TILE_SCALE) as i64);
-        // coord = Coordinate(
-        //     ((coord.0 + pushover) / ((TILE_SIZE * TILE_SCALE) as i64)) *
-        //         ((TILE_SIZE * TILE_SCALE) as i64) -
-        //         pushover,
-        //     ((coord.1 + pushover) / ((TILE_SIZE * TILE_SCALE) as i64)) *
-        //         ((TILE_SIZE * TILE_SCALE) as i64) -
-        //         pushover
-        // );
+    // //"floor" the coordinate to the nearest tile grid space in a way that (kind of) respects the negative coordinate space, just dont place anything more than 1000 tiles away from the origin until I can figure that out
+    // let pushover = 1000 * ((TILE_SIZE * TILE_SCALE) as i64);
+    // coord = Coordinate(
+    //     ((coord.0 + pushover) / ((TILE_SIZE * TILE_SCALE) as i64)) *
+    //         ((TILE_SIZE * TILE_SCALE) as i64) -
+    //         pushover,
+    //     ((coord.1 + pushover) / ((TILE_SIZE * TILE_SCALE) as i64)) *
+    //         ((TILE_SIZE * TILE_SCALE) as i64) -
+    //         pushover
+    // );
 
-        // let tiles_t_coord = TCoordinate::new('T', coord);
+    // let tiles_t_coord = TCoordinate::new('T', coord);
 
-        // if let Some(item) = scene.get(&tiles_t_coord) {
-        //     //remove the old tile
-        //     commands.entity(*item).despawn();
-        // }
+    // if let Some(item) = scene.get(&tiles_t_coord) {
+    //     //remove the old tile
+    //     commands.entity(*item).despawn();
+    // }
     // }
 
     if input.just_pressed(KeyCode::ArrowRight) {
@@ -229,7 +227,7 @@ fn tilemode_keybinds(
 
 fn update_placeholder(
     mut ui: Query<(&mut Sprite, &mut PlaceholderObject)>,
-    placeholder: ResMut<PlaceholderTile>,
+    placeholder: ResMut<PlaceholderTile>
 ) {
     for (mut sprite, _) in ui.iter_mut() {
         //update the placeholder tile to match the current tile type of our placeholderTile resource
@@ -252,16 +250,17 @@ fn update_placeholder(
         });
 
         //also move the placeholder tile to the current crosshair location
-
-
     }
 }
 
-fn show_placeholder(mut commands: Commands, spritesheet: Res<TilesheetHandle>, crosshairs: Query<(&Transform, &Crosshair)>) {
-
+fn show_placeholder(
+    mut commands: Commands,
+    spritesheet: Res<TilesheetHandle>,
+    crosshairs: Query<(&Transform, &Crosshair)>
+) {
     let c = crosshairs.single();
-    let x_off =c.0.translation.x;
-    let y_off =c.0.translation.y;
+    let x_off = c.0.translation.x;
+    let y_off = c.0.translation.y;
 
     let texpath = spritesheet.0.clone();
     //display the placeholder tile
@@ -282,7 +281,7 @@ fn show_placeholder(mut commands: Commands, spritesheet: Res<TilesheetHandle>, c
             translation: Vec3::new(x_off, y_off, 0.0),
             ..default()
         },
-        UIItem{
+        UIItem {
             ..default()
         },
         TileModeUI,
