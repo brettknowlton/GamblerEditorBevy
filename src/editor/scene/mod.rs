@@ -7,7 +7,7 @@ pub fn scene_plugin(app: &mut App){
     app
         .add_systems(OnEnter(EditorState::LoadEmpty), load_empty_scene)
         .add_systems(OnEnter(EditorState::Loading), return_state.after(load_empty_scene))
-        .add_systems(OnEnter(EditorState::Loading), load_scene)
+        .add_systems(OnEnter(EditorState::Loading), (load_scene, spawn_sprites))
         .add_systems(OnEnter(EditorState::Loading), return_state.after(load_scene))
         .add_systems(OnEnter(EditorState::Saving), save_items)
         .add_systems(OnEnter(EditorState::Saving), return_state.after(save_items));
@@ -17,6 +17,10 @@ pub fn scene_plugin(app: &mut App){
 fn load_scene(mut commands: Commands, asset_server: Res<AssetServer>) {
     //create scene manager component that will read/write our scene data between the enviornment and a json file
     commands.spawn(DynamicSceneRoot(asset_server.load(format!("{DEFAULT_SCENE_PATH}.ron"))));
+}
+
+fn spawn_sprites(){
+    //spawn the sprites for each tile
 }
 
 fn load_empty_scene(mut commands: Commands){
@@ -53,6 +57,7 @@ fn save_items(world: &mut World){
     //create a new scene from the new world that now only contains EditorObjects
     let scene = DynamicSceneBuilder::from_world(&new_world)
         .deny_all_resources()
+        .deny_component::<Sprite>()
         .extract_entities(new_world.iter_entities().map(|e| e.id()))
         .build();
     

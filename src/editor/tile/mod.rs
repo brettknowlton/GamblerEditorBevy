@@ -167,12 +167,11 @@ fn tilemode_keybinds(
                 scale: Vec3::new(TILE_SCALE as f32, TILE_SCALE as f32, 1.0),
                 ..default()
             },
+            EditorObject {
+                coordinate: TCoordinate::new('T', coord),
+                internal_type: focused_item.tile_type,
+            }
         ));
-
-        commands.spawn(EditorObject {
-            coordinate: TCoordinate::new('T', coord),
-            internal_type: focused_item.tile_type,
-        });
     }
     //"L" handles removal of a tile from the scene, similar to placing one just doesnt need to worry about the tile creation part so much easier
     // if input.just_pressed(KeyCode::KeyL) {
