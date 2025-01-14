@@ -1,16 +1,20 @@
 use std::{fs::File, io::Write};
 
 use super::*;
+use resources::*;
 use bevy::{prelude::*, tasks::IoTaskPool};
 
 pub fn scene_plugin(app: &mut App){
     app
         .add_systems(OnEnter(EditorState::LoadEmpty), load_empty_scene)
         .add_systems(OnEnter(EditorState::Loading), return_state.after(load_empty_scene))
-        .add_systems(OnEnter(EditorState::Loading), (load_scene, spawn_sprites))
+        .add_systems(OnEnter(EditorState::Loading), load_scene)
         .add_systems(OnEnter(EditorState::Loading), return_state.after(load_scene))
         .add_systems(OnEnter(EditorState::Saving), save_items)
-        .add_systems(OnEnter(EditorState::Saving), return_state.after(save_items));
+        .add_systems(OnEnter(EditorState::Saving), return_state.after(save_items))
+
+        .add_systems(Update, spawn_sprites.run_if(not(in_state(EditorState::LoadAsk))));
+
 }
 
 // struct MyGenericType<T>(PhantomData<T>);
@@ -19,8 +23,38 @@ fn load_scene(mut commands: Commands, asset_server: Res<AssetServer>) {
     commands.spawn(DynamicSceneRoot(asset_server.load(format!("{DEFAULT_SCENE_PATH}.ron"))));
 }
 
-fn spawn_sprites(){
-    //spawn the sprites for each tile
+fn spawn_sprites(mut tiles: Query<(Entity, &mut EditorObject), Without<Sprite>>, mut commands: Commands, spritesheet: Res<TilesheetHandle>){
+    //spawn the sprites for each tile, use the editorObject's tcoords to determine the sprite's position
+    //if the EditorObject has a tcoord beginning with 'T'
+    for (entity, eo) in tiles.iter_mut() {
+        let sprite: Sprite = Sprite {
+            image: spritesheet.0.clone(),
+            //the UVs are the same for every tile, just change the offset by using the tiletype as a multiplier
+            rect: Some(Rect {
+                min: Vec2::new(
+                    (((eo.get_internal_type() as usize) % SPRITESHEET_WIDTH) as f32) *
+                        (TILE_SIZE as f32),
+                    (((eo.get_internal_type() as usize) / SPRITESHEET_WIDTH) as f32) *
+                        (TILE_SIZE as f32)
+                ),
+                max: Vec2::new(
+                    (((eo.get_internal_type() as usize) % SPRITESHEET_WIDTH) as f32) *
+                        (TILE_SIZE as f32) +
+                        (TILE_SIZE as f32),
+                    (((eo.get_internal_type() as usize) / SPRITESHEET_WIDTH) as f32) *
+                        (TILE_SIZE as f32) +
+                        (TILE_SIZE as f32)
+                ),
+            }),
+            anchor: Anchor::BottomLeft,
+            ..default()
+        };
+        let coord = eo.get_coordinate().coord;
+        commands.entity(entity).insert(sprite).entry::<Transform>().and_modify(move |mut t| {
+            t.translation = Vec3::new( coord.0 as f32, coord.1 as f32, -5.);
+        });
+    }
+
 }
 
 fn load_empty_scene(mut commands: Commands){
@@ -50,7 +84,7 @@ fn save_items(world: &mut World){
 
     // despawn the entities from the new world that are not EditorObjects
     for t in filtered_objects.iter() {
-        println!("despawning entity: {} from the simulated world-to-save", t);
+        println!("despawning non-serializable entity: {t:?} from the simulated world-to-save");
        new_world.despawn(**t);
     }
 

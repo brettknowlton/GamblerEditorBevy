@@ -1,5 +1,6 @@
 mod tile;
 mod scene;
+use resources::*;
 pub use tile::*;
 pub use crate::consts::*;
 pub use crate::utilities::*;
@@ -26,11 +27,16 @@ pub enum EditorState {
 pub fn editor_plugin(app: &mut App) {
     app.init_state::<EditorState>()
         .register_type::<EditorObject>()
+        .add_event::<BottomBarUpdate>()
+
+        .init_resource::<EditorBottomBarDisplayed>()
+        .init_resource::<EditorBottomBarQueued>()
+
+        .add_systems(Update, update_bot_output.run_if(on_event::<BottomBarUpdate>,))
 
         .add_systems(Startup, (initialize, create_crosshair))
         .add_plugins(tile::tilemode_plugin)
         .add_plugins(scene::scene_plugin)
-        // .add_systems(Update, move_camera)
         .add_systems(Update, keybinds.run_if(not(in_state(EditorState::Inactive))));
     //placeholder resource for whatever tile we are trying to place
 }
@@ -60,10 +66,20 @@ fn create_crosshair(mut commands: Commands, asset_server: Res<AssetServer>) {
             ..default()
         },
         Transform {
-            scale: Vec3::new(TILE_SCALE as f32, TILE_SCALE as f32, 5.0),
+            scale: Vec3::new(TILE_SCALE as f32, TILE_SCALE as f32, 0.),
             ..default()
         },
     ));
+}
+
+//wow this is kind of dope if it work
+#[derive(Event)]
+struct BottomBarUpdate;
+
+
+fn update_bot_output(mut bottom_text: ResMut<EditorBottomBarDisplayed>, input_text: Res<EditorBottomBarQueued>) {
+    bottom_text.text = input_text.text.clone();
+    println!("Bottom_Text updated to: {}", bottom_text.text);
 }
 
 fn keybinds(
@@ -148,16 +164,16 @@ fn keybinds(
     let list = &mut uiitems.iter_mut();
     //WASD controls for crosshair movement
     if input.pressed(KeyCode::KeyW) && !input.pressed(KeyCode::KeyS) {
-        vel_y = 120.0;
+        vel_y = 200.0;
     }
     if input.pressed(KeyCode::KeyS) && !input.pressed(KeyCode::KeyW) {
-        vel_y = -120.0;
+        vel_y = -200.0;
     }
     if input.pressed(KeyCode::KeyD) && !input.pressed(KeyCode::KeyA) {
-        vel_x = 150.0;
+        vel_x = 200.0;
     }
     if input.pressed(KeyCode::KeyA) && !input.pressed(KeyCode::KeyD) {
-        vel_x = -150.0;
+        vel_x = -200.0;
     }
 
     //update anything with a UIItem component
@@ -218,12 +234,12 @@ impl EditorObject {
     // fn get_object_type(&self) -> char {
     //     self.coordinate.object_type
     // }
-    // fn get_internal_type(&self) -> u64 {
-    //     self.internal_type
-    // }
-    // fn get_coordinate(&self) -> TCoordinate {
-    //     self.coordinate.clone()
-    // }
+    fn get_internal_type(&self) -> u64 {
+        self.internal_type
+    }
+    fn get_coordinate(&self) -> TCoordinate {
+        self.coordinate.clone()
+    }
 
     // fn set_major_type(&mut self, v: char) {
     //     self.coordinate.object_type = v;

@@ -11,7 +11,7 @@ pub(crate)const
 pub const WINDOW_TITLE2:&str= "GamblerEditor";
 
 //Default color that the background will be replaced by if nothing is being rendered
-pub const WINDOW_DEFAULT_BACKGROUND_COLOR: Srgba = Srgba::new(0.05, 0.05, 0.2, 1.0);
+pub const WINDOW_DEFAULT_BACKGROUND_COLOR: Srgba = Srgba::new(0.31, 0.643, 0.722, 1.);
 
 
 pub const TILE_SCALE: usize = 4;
@@ -19,8 +19,8 @@ pub const TILE_SCALE_X: usize = TILE_SIZE * TILE_SCALE;
 pub const TILE_SCALE_Y: usize = TILE_SIZE * TILE_SCALE;
 pub const TILE_SIZE: usize = 16;
 
-pub const SPRITESHEET_WIDTH: usize = 4;
-pub const MAX_SPRITESHEET_ITEMS: usize = 16;
+pub const SPRITESHEET_WIDTH: usize = 8;
+pub const MAX_SPRITESHEET_ITEMS: usize = 32;
 pub const DEFAULT_SCENE_PATH: &str = "scenes/scene";
 
 pub const UI_SCALE: usize = 10;
