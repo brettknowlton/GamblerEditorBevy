@@ -3,7 +3,7 @@ use crate::Tile;
 
 
 #[derive(Resource, Debug, Component)]
-pub(crate) struct PlaceholderTile(pub Tile);
+pub struct PlaceholderTile(pub Tile);
 
 /// A handle to the tilesheet image.
 #[derive(Resource, Default, Reflect)]

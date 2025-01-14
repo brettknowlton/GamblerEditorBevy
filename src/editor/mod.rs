@@ -72,10 +72,11 @@ fn create_crosshair(mut commands: Commands, asset_server: Res<AssetServer>) {
     ));
 }
 
+
+
 //wow this is kind of dope if it work
 #[derive(Event)]
 struct BottomBarUpdate;
-
 
 fn update_bot_output(mut bottom_text: ResMut<EditorBottomBarDisplayed>, input_text: Res<EditorBottomBarQueued>) {
     bottom_text.text = input_text.text.clone();
@@ -200,7 +201,7 @@ fn keybinds(
 
 #[derive(Component)]
 #[require(UIItem)]
-struct Crosshair {}
+pub struct Crosshair {}
 
 #[derive(Component, Reflect, Default)]
 #[reflect(Component)]
@@ -213,7 +214,7 @@ struct UIItem {
 #[derive(Component, Reflect)]
 #[reflect(Component)]
 /// A component that marks an entity as a placeholder object, these are preview objects that are not yet placed into the scene.
-struct PlaceholderObject;
+pub struct PlaceholderObject;
 
 /// A component that marks an entity as a savable editor item.
 #[derive(Component, Reflect, Default, Clone)]
