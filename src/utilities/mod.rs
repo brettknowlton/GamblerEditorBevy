@@ -1,9 +1,7 @@
 use bevy::prelude::*;
-use serde::{Serialize, Deserialize};
+use serde::{ Serialize, Deserialize };
 
 pub mod resources;
-
-
 
 //Helper Functions
 pub fn despawn_all<T: Component>(mut commands: Commands, to_despawn: Query<Entity, With<T>>) {
@@ -12,10 +10,29 @@ pub fn despawn_all<T: Component>(mut commands: Commands, to_despawn: Query<Entit
     }
 }
 
+pub fn log_in_app(
+    msg: String,
+    level: char,
+    mut queue: ResMut<resources::EditorBottomBarQueuedMessages>,
+){
+    queue.messages.append(&mut vec![(Some(level), msg.clone())]);
+}
 
 ///A Coordinate is a simple struct that holds two i64 values, x and y identifying a point in our editor
 /// most items are anchored to Bottom Left, so the x and y values (generally) define the bottom left corner of the object
-#[derive(Component, Reflect, Deserialize, Serialize, Debug, Hash, Eq, PartialEq, Clone, Copy, Default)]
+#[derive(
+    Component,
+    Reflect,
+    Deserialize,
+    Serialize,
+    Debug,
+    Hash,
+    Eq,
+    PartialEq,
+    Clone,
+    Copy,
+    Default
+)]
 #[reflect(Component)]
 pub struct Coordinate(pub i64, pub i64);
 impl Coordinate {
@@ -24,7 +41,7 @@ impl Coordinate {
     }
 }
 
-///A TCoordinate, or a "typed coordinate" is a coordinate that also includes an identifying character, 
+///A TCoordinate, or a "typed coordinate" is a coordinate that also includes an identifying character,
 ///this way the coordinate is unique, as no two objects of the same type can occupy the same space,
 /// and makes for an efficient Unique Identifier for the object
 #[derive(Component, Reflect, Deserialize, Serialize, Debug, Clone, PartialEq, Eq, Hash)]

@@ -7,38 +7,42 @@ use crate::{ utilities::*, resources::*, EditorObject, TILE_SIZE };
 use crate::consts::*;
 use super::*;
 
-#[derive(Clone, Copy, Default, Eq, PartialEq, Debug, Hash, States)]
-pub enum TileEditorState {
-    #[default]
-    Inactive,
-    Active,
-}
+// #[derive(Clone, Copy, Default, Eq, PartialEq, Debug, Hash, States)]
+// pub enum TileEditorState {
+//     #[default]
+//     Inactive,
+//     Active,
+// }
 
 pub fn tilemode_plugin(app: &mut App) {
-    app.init_state::<TileEditorState>()
+    app
         .register_type::<Tile>()
         .register_type::<Coordinate>()
         .register_type::<TCoordinate>()
+        .register_type::<TileModeUI>()
         .insert_resource(PlaceholderTile(Tile::new()))
         //startup systems (may need to be moved from here to maintain order)
         .add_systems(Startup, load_spritesheet)
 
         //OnEnter systems
-        .add_systems(OnEnter(EditorState::Tile), (init_tilemode, ui::show_placeholder).chain())
+        .add_systems(OnEnter(EditorState::Editing(EditingMode::Tile)), (init_tilemode, ui::show_placeholder, ui::create_tilemode_ui).chain())
 
         //Update systems, that run only while TileEditor is active
         .add_systems(
             Update,
             (tilemode_keybinds, ui::update_placeholder)
                 .chain()
-                .run_if(in_state(TileEditorState::Active))
+                .run_if(in_state(EditorState::Editing(EditingMode::Tile)))
         )
 
         //OnExit systems
-        .add_systems(OnExit(EditorState::Tile), (
-            exit_tilemode.before(tilemode_keybinds),
-            despawn_all::<TileModeUI>.before(exit_tilemode),
-        ));
+        .add_systems(
+            OnExit(EditorState::Editing(EditingMode::Tile)), 
+            (
+                despawn_all::<TileModeUI>,
+                exit_tilemode
+            ).chain()
+        );
 
     //we could also take care of some post-exit cleanup here, like despawning all the UI elements by using the schedule OnEnter(EditorState::Inactive) and then despawning all the UI elements
 }
@@ -57,52 +61,9 @@ pub fn tilemode_plugin(app: &mut App) {
 // }
 
 fn init_tilemode(
-    mut commands: Commands,
-    asset_server: Res<AssetServer>,
-    mut next_state: ResMut<NextState<TileEditorState>>,
-
-    crosshairs: Query<(&Transform, &Crosshair)>
 ) {
     println!("Entering Tile Editing Mode");
-    next_state.set(TileEditorState::Active);
 
-    //display the "tilemode" menu
-    let texpath = PathBuf::from("textures/menus/menu1.png");
-    let tex1 = asset_server.load(texpath);
-
-    //offsets to make UI appear in the top left corner of the screen while still being anchored to the crosshair location
-    let c = crosshairs.single();
-
-    let x_off = -WINDOW_WIDTH / 2.0 + c.0.translation.x;
-    let y_off = -WINDOW_HEIGHT / 2.0 + c.0.translation.y;
-
-    //spawn tilemodeUI
-    commands.spawn((
-        Sprite {
-            image: tex1,
-            anchor: Anchor::BottomLeft,
-            custom_size: Some(Vec2::new(WINDOW_WIDTH / 6.0, WINDOW_HEIGHT)),
-            image_mode: bevy::sprite::SpriteImageMode::Sliced(TextureSlicer {
-                border: BorderRect {
-                    bottom: 4.0,
-                    left: 4.0,
-                    right: 4.0,
-                    top: 4.0,
-                },
-                sides_scale_mode: bevy::sprite::SliceScaleMode::Stretch,
-                ..default()
-            }),
-            ..default()
-        },
-        Transform {
-            translation: Vec3::new(x_off, y_off, 0.0),
-            ..default()
-        },
-        UIItem {
-            ..default()
-        },
-        TileModeUI,
-    ));
 }
 
 fn tilemode_keybinds(
@@ -176,6 +137,7 @@ fn tilemode_keybinds(
         }
     }
 
+
     if input.just_pressed(KeyCode::ArrowRight) {
         //cycles through the spritesheet to the right
         current_editor_object.0.tile_type =
@@ -210,8 +172,8 @@ fn load_spritesheet(mut commands: Commands, asset_server: Res<AssetServer>) {
     commands.insert_resource(TilesheetHandle(texture.clone()));
 }
 
-fn exit_tilemode(mut commands: Commands, mut tile_state: ResMut<NextState<TileEditorState>>) {
-    tile_state.set(TileEditorState::Inactive);
+fn exit_tilemode(mut commands: Commands, mut tile_state: ResMut<NextState<EditorState>>) {
+    tile_state.set(EditorState::Editing(EditingMode::None));
     println!("Exiting Tile Editing Mode");
 
     //remove the CurrentEditorObject resource

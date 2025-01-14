@@ -1,13 +1,17 @@
-mod tile;
-mod scene;
-use resources::*;
+pub mod ui;
 pub use tile::*;
 pub use crate::consts::*;
 pub use crate::utilities::*;
+
+mod tile;
+mod scene;
+use resources::*;
 pub use std::{ fmt::Debug, path::PathBuf };
+
 
 use bevy::{ prelude::*, sprite::Anchor };
 
+//EditorState is an enum that defines the different states the editor can be in, this is used to determine what the editor is currently doing
 #[derive(Clone, Copy, Default, Eq, PartialEq, Debug, Hash, States)]
 pub enum EditorState {
     #[default]
@@ -18,11 +22,18 @@ pub enum EditorState {
     LoadEmpty,
     SaveAsk,
     Saving,
-    Tile,
-    Interactable,
-    Actor,
-    Trigger,
+    Editing(EditingMode),
 }
+
+///The EditingMode enum is used to determine what type of object the user is currently trying to place in the scene, this is kind of like an "Internal Type" for the editor state. We will almost always be in EditorMode::Editing but its more granular than that
+#[derive(Clone, Copy, Default, Eq, PartialEq, Debug, Hash)]
+pub enum EditingMode {
+    #[default]
+    None,
+    Interactable,
+    Tile,
+    Actor,
+} 
 
 pub fn editor_plugin(app: &mut App) {
     app.init_state::<EditorState>()
@@ -31,18 +42,23 @@ pub fn editor_plugin(app: &mut App) {
 
         .init_resource::<EditorBottomBarDisplayed>()
         .init_resource::<EditorBottomBarQueued>()
+        .init_resource::<EditorBottomBarQueuedMessages>()
 
+        //The only true startup systems here:
+        .add_systems(Startup, (initialize, create_crosshair, ui::spawn_general_editor_ui).chain())
+
+        //begin update system to update the bottom bar text
         .add_systems(Update, update_bot_output.run_if(on_event::<BottomBarUpdate>,))
 
-        .add_systems(Startup, (initialize, create_crosshair))
+        .add_systems(Startup, )
         .add_plugins(tile::tilemode_plugin)
         .add_plugins(scene::scene_plugin)
         .add_systems(Update, keybinds.run_if(not(in_state(EditorState::Inactive))));
     //placeholder resource for whatever tile we are trying to place
 }
 
-fn initialize(mut commands: Commands, mut next_state: ResMut<NextState<EditorState>>) {
-    println!("Entering Gambler Editor");
+fn initialize(mut commands: Commands, mut next_state: ResMut<NextState<EditorState>>, message_queue: ResMut<EditorBottomBarQueuedMessages>) {
+    log_in_app(format!("Initializing the Editor"),'i', message_queue);
 
     //create camera and add a UIItem component to it
     commands.spawn((Camera2d::default(), UIItem::default()));
@@ -72,15 +88,26 @@ fn create_crosshair(mut commands: Commands, asset_server: Res<AssetServer>) {
     ));
 }
 
-
-
 //wow this is kind of dope if it work
 #[derive(Event)]
 struct BottomBarUpdate;
 
-fn update_bot_output(mut bottom_text: ResMut<EditorBottomBarDisplayed>, input_text: Res<EditorBottomBarQueued>) {
+fn update_bot_output(mut bottom_text: ResMut<EditorBottomBarDisplayed>, input_text: Res<EditorBottomBarQueued>, queue: ResMut<EditorBottomBarQueuedMessages>) {
     bottom_text.text = input_text.text.clone();
-    println!("Bottom_Text updated to: {}", bottom_text.text);
+
+    for (level, msg) in queue.messages.iter() {
+        if let Some(l) = level {
+            match l {
+                'e' => error!("{}", msg),
+                'w' => warn!("{}", msg),
+                'i' => info!("{}", msg),
+                'd' => debug!("{}", msg),
+                't' => trace!("{}", msg),
+    
+                _ => println!("{}", msg),
+            }
+        }
+    }
 }
 
 fn keybinds(
@@ -108,15 +135,15 @@ fn keybinds(
             if state.get() != &EditorState::SaveAsk {
                 println!("Saving aborted.");
             }
-            next_state.set(EditorState::Interactable);
+            next_state.set(EditorState::Editing(EditingMode::Interactable));
         }
 
         //"T" switches to tile mode and aborts any saving operation
         if input.just_pressed(KeyCode::KeyT) {
-            if state.get() != &EditorState::SaveAsk {
+            if state.get() == &EditorState::SaveAsk {
                 println!("Saving aborted.");
             }
-            next_state.set(EditorState::Tile);
+            next_state.set(EditorState::Editing(EditingMode::Tile));
         }
 
         //"Y" switches to actor mode and aborts any saving operation
@@ -124,7 +151,7 @@ fn keybinds(
             if state.get() != &EditorState::SaveAsk {
                 println!("Saving aborted.");
             }
-            next_state.set(EditorState::Actor);
+            next_state.set(EditorState::Editing(EditingMode::Actor));
         }
     } else {
         if input.just_pressed(KeyCode::KeyY) || input.just_pressed(KeyCode::Enter) {

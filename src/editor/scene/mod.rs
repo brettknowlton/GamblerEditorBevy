@@ -1,5 +1,5 @@
 use std::{fs::File, io::Write};
-
+use bevy::log::*;
 use super::*;
 use resources::*;
 use bevy::{prelude::*, tasks::IoTaskPool};
@@ -84,7 +84,7 @@ fn save_items(world: &mut World){
 
     // despawn the entities from the new world that are not EditorObjects
     for t in filtered_objects.iter() {
-        println!("despawning non-serializable entity: {t:?} from the simulated world-to-save");
+        debug!("despawning non-serializable entity: {t:?} from the simulated world-to-save");
        new_world.despawn(**t);
     }
 

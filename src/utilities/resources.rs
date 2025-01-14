@@ -19,6 +19,14 @@ impl Default for EditorBottomBarDisplayed {
 }
 
 #[derive(Resource)]
+pub struct EditorBottomBarQueuedMessages{pub messages: Vec<(Option<char>, String)>}
+impl Default for EditorBottomBarQueuedMessages {
+    fn default() -> Self {
+        Self{messages: vec![]}
+    }
+}
+
+#[derive(Resource)]
 pub struct EditorBottomBarQueued{pub text: String}
 impl Default for EditorBottomBarQueued {
     fn default() -> Self {
