@@ -1,59 +1,104 @@
-use std::path::PathBuf;
+pub mod ui;
 
 use bevy::prelude::*;
-
+use bevy::sprite::Anchor;
+use std::path::PathBuf;
+use crate::{ utilities::*, resources::*, EditorObject, TILE_SIZE };
 use crate::consts::*;
-use crate::utilities::*;
-use crate::utilities::resources::*;
 use super::*;
 
-use super::{ EditorObject, EditorMode };
-
 #[derive(Clone, Copy, Default, Eq, PartialEq, Debug, Hash, States)]
-pub enum TileModeState {
+pub enum TileEditorState {
     #[default]
     Inactive,
     Active,
 }
 
 pub fn tilemode_plugin(app: &mut App) {
-    app.init_state::<TileModeState>()
-        .add_systems(OnEnter(EditorMode::Tile), init_tilemode)
-        //placeholder for whatever tile we are trying to place
-        .insert_resource(CurrentEditorObject(TileData::new()))
+    app.init_state::<TileEditorState>()
+        .register_type::<Tile>()
+        .register_type::<Coordinate>()
+        .register_type::<TCoordinate>()
+        .insert_resource(PlaceholderTile(Tile::new()))
+        //startup systems (may need to be moved from here to maintain order)
+        .add_systems(Startup, load_spritesheet)
 
-        //create the pop up menu for tile options
+        //OnEnter systems
+        .add_systems(OnEnter(EditorState::Tile), (init_tilemode, ui::show_placeholder).chain())
 
-        //more keybinds for tile editing
-        .add_systems(Update, tilemode_keybinds.run_if(in_state(TileModeState::Active)))
-        .add_systems(OnExit(EditorMode::Tile), (
+        //Update systems, that run only while TileEditor is active
+        .add_systems(
+            Update,
+            (tilemode_keybinds, ui::update_placeholder)
+                .chain()
+                .run_if(in_state(TileEditorState::Active))
+        )
+
+        //OnExit systems
+        .add_systems(OnExit(EditorState::Tile), (
             exit_tilemode.before(tilemode_keybinds),
             despawn_all::<TileModeUI>.before(exit_tilemode),
         ));
+
+    //we could also take care of some post-exit cleanup here, like despawning all the UI elements by using the schedule OnEnter(EditorState::Inactive) and then despawning all the UI elements
 }
 
-#[derive(Component)]
-struct TileModeUI;
+// fn ensure_unique_tiles(mut commands: Commands, tiles: Query<(Entity, &Tile)>) {
+//     let mut seen = std::collections::HashSet::new();
+
+//     for (e, t) in tiles.iter() {
+//         if seen.contains(&t.coordinate) {
+//             //remove the older of the two tiles
+//             commands.entity(e).despawn();
+//         } else {
+//             seen.insert(&t.coordinate);
+//         }
+//     }
+// }
 
 fn init_tilemode(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
-    mut state: ResMut<NextState<TileModeState>>
+    mut next_state: ResMut<NextState<TileEditorState>>,
+
+    crosshairs: Query<(&Transform, &Crosshair)>
 ) {
     println!("Entering Tile Editing Mode");
-    state.set(TileModeState::Active);
+    next_state.set(TileEditorState::Active);
 
     //display the "tilemode" menu
     let texpath = PathBuf::from("textures/menus/menu1.png");
     let tex1 = asset_server.load(texpath);
 
+    //offsets to make UI appear in the top left corner of the screen while still being anchored to the crosshair location
+    let c = crosshairs.single();
+
+    let x_off = -WINDOW_WIDTH / 2.0 + c.0.translation.x;
+    let y_off = -WINDOW_HEIGHT / 2.0 + c.0.translation.y;
+
+    //spawn tilemodeUI
     commands.spawn((
         Sprite {
             image: tex1,
+            anchor: Anchor::BottomLeft,
+            custom_size: Some(Vec2::new(WINDOW_WIDTH / 6.0, WINDOW_HEIGHT)),
+            image_mode: bevy::sprite::SpriteImageMode::Sliced(TextureSlicer {
+                border: BorderRect {
+                    bottom: 4.0,
+                    left: 4.0,
+                    right: 4.0,
+                    top: 4.0,
+                },
+                sides_scale_mode: bevy::sprite::SliceScaleMode::Stretch,
+                ..default()
+            }),
             ..default()
         },
         Transform {
-            translation: Vec3::new(WINDOW_WIDTH / 2.0, WINDOW_HEIGHT / 2.0, 0.0),
+            translation: Vec3::new(x_off, y_off, 0.0),
+            ..default()
+        },
+        UIItem {
             ..default()
         },
         TileModeUI,
@@ -63,102 +108,139 @@ fn init_tilemode(
 fn tilemode_keybinds(
     mut commands: Commands,
     input: Res<ButtonInput<KeyCode>>,
-    crosshair: Query<&Crosshair>,
 
-    mut state: ResMut<NextState<EditorMode>>,
-    mut focused_item: ResMut<CurrentEditorObject>
+    crosshairs: Query<(&Transform, &Crosshair)>,
+    mut current_editor_object: ResMut<PlaceholderTile>,
+    tiles: Query<(Entity, &Tile)>
 ) {
+    //"P" handles placement of a tile and adding it to the scene
     if input.just_pressed(KeyCode::KeyP) {
-        //get current location of the cursor and round to the nearest tile to get location of the new tile
-        let location = crosshair.single().location;
-        let coord = crosshair.single().location;
-        //add the currently selected tile to the scene at this location
+        //clean up the bevy query overhead
+        let (t, _) = crosshairs.single();
+        let focused_item = &current_editor_object.0;
+        let mut coord = Coordinate::from(t.translation);
+        let pushover = 1000 * ((TILE_SIZE * TILE_SCALE) as i64); //this effectively offsets all my tiles 1000 to the right and down, so that negative coordinates arent a problem and rounds to the nearest integer
+        coord = Coordinate(
+            ((coord.0 + pushover) / ((TILE_SIZE * TILE_SCALE) as i64)) *
+                ((TILE_SIZE * TILE_SCALE) as i64) -
+                pushover,
+            ((coord.1 + pushover) / ((TILE_SIZE * TILE_SCALE) as i64)) *
+                ((TILE_SIZE * TILE_SCALE) as i64) -
+                pushover
+        );
+
+        // println!("coords: {}{}", coord.0, coord.1);
+
+        //check if a tile already exists at this location and remove it if it does
+        if let Some(item) = tiles.iter().find(|(_, t)| t.coordinate == coord) {
+            //remove the old tile
+            commands.entity(item.0).despawn();
+        }
         commands.spawn((
-            Tile{
-                tile_type: focused_item.0.tile_type,
-                coordinate: coord
+            Tile {
+                tile_type: focused_item.tile_type,
+                coordinate: coord,
             },
-            Sprite{
-                
-            }
+            Transform {
+                translation: Vec3::new(coord.0 as f32, coord.1 as f32, -5.0),
+                scale: Vec3::new(TILE_SCALE as f32, TILE_SCALE as f32, 1.0),
+                ..default()
+            },
+            EditorObject {
+                coordinate: TCoordinate::new('T', coord),
+                internal_type: focused_item.tile_type,
+            },
         ));
     }
+    // "L" handles removal of a tile from the scene, similar to placing one just doesnt need to worry about the tile creation part afterwards
     if input.just_pressed(KeyCode::KeyL) {
-        scene.single_mut().remove(focused_item.0.coordinate);
+        let (t, _) = crosshairs.single();
+        let mut coord = Coordinate::from(t.translation);
+        //"floor" the coordinate to the nearest tile grid space in a way that (kind of) respects the negative coordinate space, just dont place anything more than 1000 tiles away from the origin until I can figure that out
+        let pushover = 1000 * ((TILE_SIZE * TILE_SCALE) as i64);
+        coord = Coordinate(
+            ((coord.0 + pushover) / ((TILE_SIZE * TILE_SCALE) as i64)) *
+                ((TILE_SIZE * TILE_SCALE) as i64) -
+                pushover,
+            ((coord.1 + pushover) / ((TILE_SIZE * TILE_SCALE) as i64)) *
+                ((TILE_SIZE * TILE_SCALE) as i64) -
+                pushover
+        );
+
+        // println!("coords: {}{}", coord.0, coord.1);
+
+        //check if a tile already exists at this location and remove it if it does
+        if let Some(item) = tiles.iter().find(|(_, t)| t.coordinate == coord) {
+            //remove the old tile
+            commands.entity(item.0).despawn();
+        }
+    }
+
+    if input.just_pressed(KeyCode::ArrowRight) {
+        //cycles through the spritesheet to the right
+        current_editor_object.0.tile_type =
+            (current_editor_object.0.tile_type + 1) % (MAX_SPRITESHEET_ITEMS as u64);
+    }
+    if input.just_pressed(KeyCode::ArrowLeft) {
+        //cycles through the spritesheet to the left
+        current_editor_object.0.tile_type =
+            (current_editor_object.0.tile_type + (MAX_SPRITESHEET_ITEMS as u64) - 1) %
+            (MAX_SPRITESHEET_ITEMS as u64);
+    }
+    if input.just_pressed(KeyCode::ArrowUp) {
+        //cycles through the spritesheet up
+        current_editor_object.0.tile_type = (MAX_SPRITESHEET_ITEMS - SPRITESHEET_WIDTH) as u64 + (current_editor_object.0.tile_type % SPRITESHEET_WIDTH as u64);
+    }
+    if input.just_pressed(KeyCode::ArrowDown) {
+        //cycles through the spritesheet down
+        current_editor_object.0.tile_type =
+            (current_editor_object.0.tile_type + (SPRITESHEET_WIDTH as u64)) %
+            (MAX_SPRITESHEET_ITEMS as u64);
     }
 }
 
-fn exit_tilemode(
-    mut commands: Commands,
-    mut tile_mode_uiitems: Query<&TileModeUI>,
-    mut state: ResMut<NextState<EditorMode>>
-) {
-    state.set(EditorMode::Inactive);
+fn load_spritesheet(mut commands: Commands, asset_server: Res<AssetServer>) {
+    //load the tilesheet for this mode
+    let tex_path = PathBuf::from("textures/tiles/tilesheet.png");
+
+    //load happens here
+    let texture = asset_server.load(tex_path);
+
+    //insert the texture handle into the resources for easy access later
+    commands.insert_resource(TilesheetHandle(texture.clone()));
+}
+
+fn exit_tilemode(mut commands: Commands, mut tile_state: ResMut<NextState<TileEditorState>>) {
+    tile_state.set(TileEditorState::Inactive);
     println!("Exiting Tile Editing Mode");
 
     //remove the CurrentEditorObject resource
-    commands.insert_resource(CurrentEditorObject(Tile::new()));
+    commands.insert_resource(PlaceholderTile(Tile::new()));
 }
 
-#[derive(Component)]
+/// A component that marks an entity as part of the tile editing UI.
+#[derive(Component, Reflect)]
+#[reflect(Component)]
+#[require(UIItem)]
+struct TileModeUI;
+
+/// A component to track some basic info about a tile
+#[derive(Component, Reflect, Debug, Clone)]
+#[reflect(Component)]
 pub struct Tile {
-    tile_type: u64,
-    coordinate: Coordinate
+    pub tile_type: u64,
+    pub coordinate: Coordinate,
 }
 impl Tile {
-    fn new() -> Self{
-        Self{
+    fn new() -> Self {
+        Self {
             tile_type: 0,
-            coordinate: Coordinate(0,0)
+            coordinate: Coordinate(0, 0),
         }
     }
 }
-
-// #[derive(Component, Debug, Eq, PartialEq, Hash, Copy, Clone, Default)]
-// pub struct TileData {
-//     pub tile_type: u64,
-//     pub coordinate: Coordinate,
-// }
-
-// impl TileData {
-//     pub fn new() -> Self {
-//         Self {
-//             tile_type: 0,
-//             coordinate: Coordinate(0, 0),
-//         }
-//     }
-
-//     /**
-//      * Takes a coordinate of the currently
-//      * selected tile via the hovered crosshair
-//      * and adds it to the scene.
-//      */
-//     fn place(&self, coordinate: Coordinate, id: u64) {
-//         todo!()
-//     }
-
-//     fn get_coordinate(&self) -> Coordinate {
-//         todo!()
-//     }
-
-//     /**
-//      * This will be a file that we will parse through
-//      * the file at a given tile size some sprites,
-//      * we will ID them based on order received, which will
-//      * not ever change throughout the game unless we want to
-//      * change what the tile looks like
-//      */
-//     fn get_sprite(&mut self, tile_type: u64) -> anyhow::Result<Sprite, anyhow::Error> {
-//         todo!()
-//     }
-// }
-
-// impl EditorObject for TileData {
-//     fn get_goid(&self) -> String {
-//         format!("X{}Y{}O{}S{}", self.coordinate.0, self.coordinate.1, 'T', self.tile_type)
-//     }
-
-//     fn get_coordinate(&self) -> Coordinate {
-//         self.coordinate
-//     }
-// }
+impl Default for Tile {
+    fn default() -> Self {
+        Self::new()
+    }
+}
