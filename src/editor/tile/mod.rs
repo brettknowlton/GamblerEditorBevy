@@ -26,6 +26,7 @@ pub fn tilemode_plugin(app: &mut App) {
 
         //OnEnter systems
         .add_systems(OnEnter(EditorState::Editing(EditingMode::Tile)), (init_tilemode, ui::show_placeholder, ui::create_tilemode_ui).chain())
+        .add_systems(OnEnter(EditorState::Editing { editing_mode: EditingMode::Tile }), (init_tilemode, ui::show_placeholder).chain())
 
         //Update systems, that run only while TileEditor is active
         .add_systems(
@@ -43,6 +44,10 @@ pub fn tilemode_plugin(app: &mut App) {
                 exit_tilemode
             ).chain()
         );
+        .add_systems(OnExit(EditorState::Editing { editing_mode: EditingMode::Tile }), (
+            exit_tilemode.before(tilemode_keybinds),
+            despawn_all::<TileModeUI>.before(exit_tilemode),
+        ));
 
     //we could also take care of some post-exit cleanup here, like despawning all the UI elements by using the schedule OnEnter(EditorState::Inactive) and then despawning all the UI elements
 }

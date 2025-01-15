@@ -261,6 +261,9 @@ impl EditorObject {
     //     }
     // }
 
+    fn get_major_type(&self) -> char {
+        self.coordinate.type_char
+    }
     fn get_internal_type(&self) -> u64 {
         self.internal_type
     }
