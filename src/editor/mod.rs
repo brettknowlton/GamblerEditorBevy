@@ -49,8 +49,6 @@ pub fn editor_plugin(app: &mut App) {
 
         //begin update system to update the bottom bar text
         .add_systems(Update, update_bot_output.run_if(on_event::<BottomBarUpdate>,))
-
-        .add_systems(Startup, )
         .add_plugins(tile::tilemode_plugin)
         .add_plugins(scene::scene_plugin)
         .add_systems(Update, keybinds.run_if(not(in_state(EditorState::Inactive))));

@@ -933,7 +933,7 @@
     ),
     4294967338: (
       components: {
-        "bevy_hierarchy::components::parent::Parent": (4294967306),
+        "bevy_hierarchy::components::parent::Parent": (146028888107),
         "bevy_render::primitives::Aabb": (
           center: (8.0, 8.0, 0.0),
           half_extents: (8.0, 8.0, 0.0),
