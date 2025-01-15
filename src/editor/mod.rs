@@ -247,8 +247,10 @@ pub struct PlaceholderObject;
 #[derive(Component, Reflect, Default, Clone)]
 #[reflect(Component)]
 pub struct EditorObject {
-    internal_type: u64, //ultimatley an index into which style of tile or entity we are using within the major type
-    coordinate: TCoordinate, //the coordinate of the object as well as the major type of the object
+    ///ultimatley an index into which style of tile or entity we are using within the major type, extra specificiation we can use to fine tune what object we are loading in this space.
+    internal_type: u64, 
+    //the coordinate of the object as well as the major type of the object combined into a neat little package
+    coordinate: TCoordinate, 
 }
 
 impl EditorObject {
@@ -259,9 +261,6 @@ impl EditorObject {
     //     }
     // }
 
-    // fn get_object_type(&self) -> char {
-    //     self.coordinate.object_type
-    // }
     fn get_internal_type(&self) -> u64 {
         self.internal_type
     }
