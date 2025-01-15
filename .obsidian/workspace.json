@@ -1,24 +1,24 @@
 {
   "main": {
-    "id": "c81f6f946b21a90d",
+    "id": "c8a5dcb9a628c929",
     "type": "split",
     "children": [
       {
-        "id": "d028cc4503ae9219",
+        "id": "b5cbe0195742fa0f",
         "type": "tabs",
         "children": [
           {
-            "id": "ba189d7821e57909",
+            "id": "ad2d4c31e83d99a3",
             "type": "leaf",
             "state": {
               "type": "markdown",
               "state": {
-                "file": "planning/Root.md",
+                "file": "planning/Mechanic Breakdowns/Context Menu.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "Root"
+              "title": "Context Menu"
             }
           }
         ]
@@ -27,15 +27,15 @@
     "direction": "vertical"
   },
   "left": {
-    "id": "9e0c4cabfef8657e",
+    "id": "e4dbb6038445413e",
     "type": "split",
     "children": [
       {
-        "id": "7c4d738febc90ad5",
+        "id": "330d2a6bf6b45bc5",
         "type": "tabs",
         "children": [
           {
-            "id": "06022fb6bd05d116",
+            "id": "2e616ea53fb13ed6",
             "type": "leaf",
             "state": {
               "type": "file-explorer",
@@ -47,7 +47,7 @@
             }
           },
           {
-            "id": "723185f04aebafdd",
+            "id": "f537b2bae52ceb69",
             "type": "leaf",
             "state": {
               "type": "search",
@@ -64,7 +64,7 @@
             }
           },
           {
-            "id": "1fd8028451cd1f3c",
+            "id": "08e59c97a16b0ed0",
             "type": "leaf",
             "state": {
               "type": "bookmarks",
@@ -80,20 +80,20 @@
     "width": 300
   },
   "right": {
-    "id": "f9bb423e2f82331e",
+    "id": "bbec0168ba624e88",
     "type": "split",
     "children": [
       {
-        "id": "b1741ef3b3faa005",
+        "id": "6e16b934daa2cb72",
         "type": "tabs",
         "children": [
           {
-            "id": "108b4216a89b5fa7",
+            "id": "e0123e31856dda55",
             "type": "leaf",
             "state": {
               "type": "backlink",
               "state": {
-                "file": "planning/Root.md",
+                "file": "planning/Mechanic Breakdowns/Context Menu.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -103,25 +103,25 @@
                 "unlinkedCollapsed": true
               },
               "icon": "links-coming-in",
-              "title": "Backlinks for Root"
+              "title": "Backlinks for Context Menu"
             }
           },
           {
-            "id": "7f48e6afcf446a86",
+            "id": "b9a2e7bfc60670e6",
             "type": "leaf",
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "planning/Root.md",
+                "file": "planning/Mechanic Breakdowns/Context Menu.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               },
               "icon": "links-going-out",
-              "title": "Outgoing links from Root"
+              "title": "Outgoing links from Context Menu"
             }
           },
           {
-            "id": "89c58303335061f1",
+            "id": "c669732047f0a6d5",
             "type": "leaf",
             "state": {
               "type": "tag",
@@ -134,15 +134,15 @@
             }
           },
           {
-            "id": "aa63329b215a05f1",
+            "id": "689f317034001b43",
             "type": "leaf",
             "state": {
               "type": "outline",
               "state": {
-                "file": "planning/Root.md"
+                "file": "planning/Mechanic Breakdowns/Context Menu.md"
               },
               "icon": "lucide-list",
-              "title": "Outline of Root"
+              "title": "Outline of Context Menu"
             }
           }
         ]
@@ -162,8 +162,26 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "ba189d7821e57909",
+  "active": "ad2d4c31e83d99a3",
   "lastOpenFiles": [
-    "planning/Root.md"
+    "target/debug/deps/gambler_bevy-1cc2ff3bf7e3691d",
+    "target/debug/deps/gambler_bevy-1cc2ff3bf7e3691d.tmp80a905e",
+    "target/debug/incremental/gambler_bevy-3jq1gyo0cljhc/s-h3pij788l4-1lfverf-1qdlzcva72gxp8m0hfpg1esdv/work-products.bin",
+    "target/debug/incremental/gambler_bevy-3jq1gyo0cljhc/s-h3pij788l4-1lfverf-1qdlzcva72gxp8m0hfpg1esdv/query-cache.bin",
+    "target/debug/incremental/gambler_bevy-3jq1gyo0cljhc/s-h3pij788l4-1lfverf-1qdlzcva72gxp8m0hfpg1esdv/f4uvkfbdhqzavz73zgzpk1j10.o",
+    "target/debug/incremental/gambler_bevy-3jq1gyo0cljhc/s-h3pij788l4-1lfverf-1qdlzcva72gxp8m0hfpg1esdv/f3gx2b9uti46o819gjbxxuhpx.o",
+    "target/debug/incremental/gambler_bevy-3jq1gyo0cljhc/s-h3pij788l4-1lfverf-1qdlzcva72gxp8m0hfpg1esdv/ezjvyoivhof9e2scg9tc380pp.o",
+    "target/debug/incremental/gambler_bevy-3jq1gyo0cljhc/s-h3pij788l4-1lfverf-1qdlzcva72gxp8m0hfpg1esdv/esbcq1efahdi9dd05zruwhnp9.o",
+    "target/debug/incremental/gambler_bevy-3jq1gyo0cljhc/s-h3pij788l4-1lfverf-1qdlzcva72gxp8m0hfpg1esdv/er7q7v3l7m56te2bjp7j2i9wj.o",
+    "target/debug/incremental/gambler_bevy-3jq1gyo0cljhc/s-h3pij788l4-1lfverf-1qdlzcva72gxp8m0hfpg1esdv/emjzsteh3h0vj0c0abes2h7vt.o",
+    "target/debug/incremental/gambler_bevy-3jq1gyo0cljhc/s-h3pij788l4-1lfverf-1qdlzcva72gxp8m0hfpg1esdv/elnblead2hrvc5fsvotonssld.o",
+    "planning/Mechanic Breakdowns/Rectangle Tool.md",
+    "planning/Mechanic Breakdowns/Context Menu.md",
+    "planning/Mechanics.md",
+    "planning/art concepts/zughy32.png",
+    "planning/art concepts/rosy-42-palette-example-by-s-203792.png",
+    "planning/Root.md",
+    "assets/textures/cards/H1.png",
+    "assets/textures/cards/H0.png"
   ]
 }

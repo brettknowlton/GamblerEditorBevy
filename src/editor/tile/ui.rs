@@ -64,7 +64,6 @@ pub fn show_placeholder(
     ));
 }
 
-
 pub fn create_tilemode_ui(mut commands: Commands, asset_server: Res<AssetServer>, crosshairs: Query<(&Transform, &Crosshair)>, tilesheet_handle: Res<TilesheetHandle>) {
     
     //display the "tilemode" menu
@@ -118,7 +117,6 @@ pub fn create_tilemode_ui(mut commands: Commands, asset_server: Res<AssetServer>
             Sprite {
                 image: tex,
                 anchor: Anchor::BottomLeft,
-                custom_size: Some(Vec2::new(WINDOW_WIDTH / 6.0, WINDOW_HEIGHT)),
                 image_mode: bevy::sprite::SpriteImageMode::Sliced(TextureSlicer {
                     border: BorderRect {
                         bottom: 4.0,
@@ -132,9 +130,11 @@ pub fn create_tilemode_ui(mut commands: Commands, asset_server: Res<AssetServer>
                 ..default()
             },
             Transform {
-                translation: Vec3::new(ui_x_off + (ui_x / 2.), ui_y_off, 0.0),
+                translation: Vec3::new(ui_x_off + (ui_x / 2.), ui_y_off, -0.01),
+                scale: Vec3::new(1., 1., 0.),
                 ..default()
             },
+            TileModeUI
         )
     );
 }
