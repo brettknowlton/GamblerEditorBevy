@@ -1,3 +1,5 @@
+
+#[macro_use]
 pub mod ui;
 pub use tile::*;
 pub use crate::consts::*;
@@ -41,29 +43,30 @@ pub fn editor_plugin(app: &mut App) {
         .add_event::<BottomBarUpdate>()
 
         .init_resource::<EditorBottomBarDisplayed>()
-        .init_resource::<EditorBottomBarQueued>()
+        .init_resource::<EditorBottomBarMessage>()
         .init_resource::<EditorBottomBarQueuedMessages>()
 
         //The only true startup systems here:
         .add_systems(Startup, (initialize, create_crosshair, ui::spawn_general_editor_ui).chain())
 
         //begin update system to update the bottom bar text
-        .add_systems(Update, update_bot_output.run_if(on_event::<BottomBarUpdate>,))
+        .add_systems(Update, ui::send_messages)
         .add_plugins(tile::tilemode_plugin)
         .add_plugins(scene::scene_plugin)
-        .add_systems(Update, keybinds.run_if(not(in_state(EditorState::Inactive))));
+        .add_systems(Update, stateful_keybinds.run_if(not(in_state(EditorState::Inactive))));
     //placeholder resource for whatever tile we are trying to place
 }
 
-fn initialize(mut commands: Commands, mut next_state: ResMut<NextState<EditorState>>, message_queue: ResMut<EditorBottomBarQueuedMessages>) {
-    log_in_app(format!("Initializing the Editor"),'i', message_queue);
+fn initialize(mut commands: Commands, mut next_state: ResMut<NextState<EditorState>>, mut message_queue: ResMut<EditorBottomBarQueuedMessages>) {
 
     //create camera and add a UIItem component to it
     commands.spawn((Camera2d::default(), UIItem::default()));
 
-    //create scene manager component that will read/write our scene data between the enviornment and a json file
-    println!("Would you like to load a scene? Y/N");
+    //set the state to ask about loading a scene
     next_state.set(EditorState::LoadAsk);
+
+    //push a message to the bottom bar that asks the user if they would like to load a scene
+    send_message!(Some('i'), message_queue, "Would you like to load a scene? Yenter/Noscape");
 }
 
 fn create_crosshair(mut commands: Commands, asset_server: Res<AssetServer>) {
@@ -90,98 +93,94 @@ fn create_crosshair(mut commands: Commands, asset_server: Res<AssetServer>) {
 #[derive(Event)]
 struct BottomBarUpdate;
 
-fn update_bot_output(mut bottom_text: ResMut<EditorBottomBarDisplayed>, input_text: Res<EditorBottomBarQueued>, queue: ResMut<EditorBottomBarQueuedMessages>) {
-    bottom_text.text = input_text.text.clone();
-
-    for (level, msg) in queue.messages.iter() {
-        if let Some(l) = level {
-            match l {
-                'e' => error!("{}", msg),
-                'w' => warn!("{}", msg),
-                'i' => info!("{}", msg),
-                'd' => debug!("{}", msg),
-                't' => trace!("{}", msg),
-    
-                _ => println!("{}", msg),
-            }
-        }
-    }
-}
-
-fn keybinds(
+fn stateful_keybinds(
     mut next_state: ResMut<NextState<EditorState>>,
     state: ResMut<State<EditorState>>,
     time: Res<Time>,
     input: Res<ButtonInput<KeyCode>>,
+    mut message_queue: ResMut<EditorBottomBarQueuedMessages>,
     // m_input: Res<ButtonInput<MouseButton>>,
 
     mut uiitems: Query<(&mut UIItem, &mut Transform), Without<Camera2d>>,
     mut cameras: Query<(&mut UIItem, &mut Transform, &Camera2d)>
 ) {
+    let messages = &mut message_queue;
     //manage the editor state, you can switch between modes with ERTY except if you are attempting to save the document
     //"E" enters editor mode and aborts any saving operation
     if state.get() != &EditorState::LoadAsk {
-        if input.just_pressed(KeyCode::KeyE) {
+        if input.just_pressed(KeyCode::KeyE) || input.just_pressed(KeyCode::Digit1)  || input.just_pressed(KeyCode::Numpad1) {
             if state.get() == &EditorState::SaveAsk {
-                println!("Saving aborted.");
+                send_message!(Some('w'), messages, "Saving aborted.");
             }
+            send_message!(Some('i'), messages, "Returning to Normal Mode");
             next_state.set(EditorState::Normal);
         }
 
-        //"R" switches to interactable mode and aborts any saving operation
-        if input.just_pressed(KeyCode::KeyR) {
-            if state.get() != &EditorState::SaveAsk {
-                println!("Saving aborted.");
-            }
-            next_state.set(EditorState::Editing(EditingMode::Interactable));
-        }
-
         //"T" switches to tile mode and aborts any saving operation
-        if input.just_pressed(KeyCode::KeyT) {
+        if input.just_pressed(KeyCode::KeyT) || input.just_pressed(KeyCode::Digit2) || input.just_pressed(KeyCode::Numpad2) {
             if state.get() == &EditorState::SaveAsk {
-                println!("Saving aborted.");
+                send_message!(Some('w'), messages, "Saving aborted.");
             }
+            send_message!(Some('i'), messages, "Switching to Tile Mode");
             next_state.set(EditorState::Editing(EditingMode::Tile));
         }
 
-        //"Y" switches to actor mode and aborts any saving operation
-        if input.just_pressed(KeyCode::KeyY) {
+        //"R" switches to interactable mode and aborts any saving operation
+        if input.just_pressed(KeyCode::KeyR) || input.just_pressed(KeyCode::Digit3) || input.just_pressed(KeyCode::Numpad3) {
             if state.get() != &EditorState::SaveAsk {
-                println!("Saving aborted.");
+                send_message!(Some('w'), messages, "Saving aborted.");
             }
+            send_message!(Some('i'), messages, "Switching to Interactable Mode");
+            next_state.set(EditorState::Editing(EditingMode::Interactable));
+        }
+
+        //"Y" switches to actor mode and aborts any saving operation
+        if input.just_pressed(KeyCode::KeyY) || input.just_pressed(KeyCode::Digit4) || input.just_pressed(KeyCode::Numpad4) {
+            if state.get() != &EditorState::SaveAsk {
+                send_message!(Some('w'), messages, "Saving aborted.");
+            }
+            send_message!(Some('i'), messages, "Switching to Actor Mode");
             next_state.set(EditorState::Editing(EditingMode::Actor));
         }
     } else {
         if input.just_pressed(KeyCode::KeyY) || input.just_pressed(KeyCode::Enter) {
             next_state.set(EditorState::Loading);
-            println!("Attempting to load scene");
+            send_message!(Some('i'), messages, "Attempting to load scene");
         }
         if input.just_pressed(KeyCode::KeyN) || input.just_pressed(KeyCode::Escape) {
             next_state.set(EditorState::LoadEmpty);
-            println!("Returning to Normal Mode");
+            send_message!(Some('w'), messages, "No scene loaded");
+        }
+    }
+
+    if state.get() == &EditorState::SaveAsk {
+        // "Y" will save the scene if the user is in saving mode, 'N" will abort the save
+        if input.just_pressed(KeyCode::KeyY) || input.just_pressed(KeyCode::Enter) {
+            next_state.set(EditorState::Saving);
+            send_message!(Some('i'), messages, "Saving scene...");
+        } else if input.just_pressed(KeyCode::KeyN) || input.just_pressed(KeyCode::Escape) {
+            next_state.set(EditorState::Normal);
+            send_message!(Some('w'), messages, "Saving aborted.");
         }
     }
 
     // "Q" will prompt the user to save the scene if they are in normal mode,
-    // This action will put the editor into "saving" mode- pressing "Q" again will save the scene
-    // otherwise "Q"" will return to normal mode if in any mode other than normal or saving
-    if input.just_pressed(KeyCode::KeyQ) {
+    // otherwise "Q"" will return to normal mode if in any mode other than normal
+    if input.just_pressed(KeyCode::KeyQ) || input.all_pressed(vec!(KeyCode::ControlLeft, KeyCode::KeyS)) {
         if state.get() == &EditorState::Normal {
             //pressing q will enter "saving" mode if we are already in normal mode:
             next_state.set(EditorState::SaveAsk);
-            println!("Would you like to save the current scene?");
-        } else if state.get() == &EditorState::SaveAsk {
-            println!("Attempting to save scene");
-            next_state.set(EditorState::Saving);
+            send_message!(Some('i'), messages, "Would you like to save the scene? Yenter/Noscape");
         } else {
             next_state.set(EditorState::Normal);
-            println!("Returning to Normal Mode");
+            send_message!(Some('i'), messages, "Returning to Normal Mode");
         }
     }
 
     //"E" (and escape) is used for switching back to editor mode from any other mode
     if input.just_pressed(KeyCode::KeyE) || input.just_pressed(KeyCode::Escape) {
         next_state.set(EditorState::Normal);
+        send_message!(Some('i'), messages, "Returning to Normal Mode");
     }
 
     let mut vel_y = 0.0;
@@ -239,10 +238,10 @@ struct UIItem {
 #[derive(Component, Reflect)]
 #[reflect(Component)]
 /// A component that marks an entity as a placeholder object, these are preview objects that are not yet placed into the scene.
-pub struct PlaceholderObject;
+pub struct PlaceholderObjectTag;
 
 /// A component that marks an entity as a savable editor item.
-#[derive(Component, Reflect, Default, Clone)]
+#[derive(Component, Reflect, Debug, Default, Clone)]
 #[reflect(Component)]
 pub struct EditorObject {
     internal_type: u64, //ultimatley an index into which style of tile or entity we are using within the major type

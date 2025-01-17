@@ -16,16 +16,16 @@ use super::*;
 
 pub fn tilemode_plugin(app: &mut App) {
     app
-        .register_type::<Tile>()
+        .register_type::<Collier>()
         .register_type::<Coordinate>()
         .register_type::<TCoordinate>()
         .register_type::<TileModeUI>()
-        .insert_resource(PlaceholderObject(EditorObject::default()))
+        .insert_resource(PlaceholderTile(Tile::new()))
         //startup systems (may need to be moved from here to maintain order)
         .add_systems(Startup, load_spritesheet)
 
         //OnEnter systems
-        .add_systems(OnEnter(EditorState::Editing(EditingMode::Tile)), (init_tilemode, ui::show_tile_placeholder, ui::create_tilemode_ui).chain())
+        .add_systems(OnEnter(EditorState::Editing(EditingMode::Tile)), (init_tilemode, ui::show_placeholder, ui::create_tilemode_ui).chain())
 
         //Update systems, that run only while TileEditor is active
         .add_systems(
@@ -71,7 +71,7 @@ fn tilemode_keybinds(
     input: Res<ButtonInput<KeyCode>>,
 
     crosshairs: Query<(&Transform, &Crosshair)>,
-    mut current_editor_object: ResMut<PlaceholderObject>,
+    mut current_editor_object: ResMut<PlaceholderTile>,
     tiles: Query<(Entity, &Tile)>
 ) {
     //"P" handles placement of a tile and adding it to the scene
@@ -99,7 +99,7 @@ fn tilemode_keybinds(
         }
         commands.spawn((
             Tile {
-                tile_type: focused_item.internal_type,
+                tile_type: focused_item.tile_type,
                 coordinate: coord,
             },
             Transform {
@@ -109,7 +109,7 @@ fn tilemode_keybinds(
             },
             EditorObject {
                 coordinate: TCoordinate::new('T', coord),
-                internal_type: focused_item.internal_type,
+                internal_type: focused_item.tile_type,
             },
         ));
     }
@@ -140,23 +140,23 @@ fn tilemode_keybinds(
 
     if input.just_pressed(KeyCode::ArrowRight) {
         //cycles through the spritesheet to the right
-        current_editor_object.0.internal_type =
-            (current_editor_object.0.get_internal_type() + 1) % (MAX_SPRITESHEET_ITEMS as u64);
+        current_editor_object.0.tile_type =
+            (current_editor_object.0.tile_type + 1) % (MAX_SPRITESHEET_ITEMS as u64);
     }
     if input.just_pressed(KeyCode::ArrowLeft) {
         //cycles through the spritesheet to the left
-        current_editor_object.0.internal_type =
-            (current_editor_object.0.get_internal_type() + (MAX_SPRITESHEET_ITEMS as u64) - 1) %
+        current_editor_object.0.tile_type =
+            (current_editor_object.0.tile_type + (MAX_SPRITESHEET_ITEMS as u64) - 1) %
             (MAX_SPRITESHEET_ITEMS as u64);
     }
     if input.just_pressed(KeyCode::ArrowUp) {
         //cycles through the spritesheet up
-        current_editor_object.0.internal_type = (MAX_SPRITESHEET_ITEMS - SPRITESHEET_WIDTH) as u64 + (current_editor_object.0.get_internal_type() % SPRITESHEET_WIDTH as u64);
+        current_editor_object.0.tile_type = (MAX_SPRITESHEET_ITEMS - SPRITESHEET_WIDTH) as u64 + (current_editor_object.0.tile_type % SPRITESHEET_WIDTH as u64);
     }
     if input.just_pressed(KeyCode::ArrowDown) {
         //cycles through the spritesheet down
-        current_editor_object.0.internal_type =
-            (current_editor_object.0.get_internal_type() + (SPRITESHEET_WIDTH as u64)) %
+        current_editor_object.0.tile_type =
+            (current_editor_object.0.tile_type + (SPRITESHEET_WIDTH as u64)) %
             (MAX_SPRITESHEET_ITEMS as u64);
     }
 }
@@ -177,7 +177,7 @@ fn exit_tilemode(mut commands: Commands, mut tile_state: ResMut<NextState<Editor
     println!("Exiting Tile Editing Mode");
 
     //remove the CurrentEditorObject resource
-    commands.insert_resource(PlaceholderObject(EditorObject::default()));
+    commands.insert_resource(PlaceholderTile(Tile::new()));
 }
 
 /// A component that marks an entity as part of the tile editing UI.

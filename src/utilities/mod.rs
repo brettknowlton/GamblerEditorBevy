@@ -10,13 +10,10 @@ pub fn despawn_all<T: Component>(mut commands: Commands, to_despawn: Query<Entit
     }
 }
 
-pub fn log_in_app(
-    msg: String,
-    level: char,
-    mut queue: ResMut<resources::EditorBottomBarQueuedMessages>,
-){
-    queue.messages.append(&mut vec![(Some(level), msg.clone())]);
-}
+
+
+
+
 
 ///A Coordinate is a simple struct that holds two i64 values, x and y identifying a point in our editor
 /// most items are anchored to Bottom Left, so the x and y values (generally) define the bottom left corner of the object
@@ -40,6 +37,11 @@ impl Coordinate {
         Self(v.x as i64, v.y as i64)
     }
 }
+
+
+
+
+
 
 ///A TCoordinate, or a "typed coordinate" is a coordinate that also includes an identifying character,
 ///this way the coordinate is unique, as no two objects of the same type can occupy the same space,

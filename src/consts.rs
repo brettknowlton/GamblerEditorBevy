@@ -21,14 +21,19 @@ pub const TILE_SIZE: usize = 16;
 
 pub const SPRITESHEET_WIDTH: usize = 8;
 pub const MAX_SPRITESHEET_ITEMS: usize = 32;
-pub const DEFAULT_SCENE_PATH: &str = "scenes/scene";
+
 
 pub const UI_SCALE: usize = 10;
+pub const UI_Z_LAYER: f32 = 10.;
 
-pub const WINDOW_WIDTH: f32 = 1200.;
-pub const WINDOW_HEIGHT: f32 = 800.;
+
+pub const DEFAULT_WINDOW_WIDTH: f32 = 1200.;
+pub const DEFAULT_WINDOW_HEIGHT: f32 = 800.;
+
+
 pub const ASSETS_PATH: &str = "assets/";
 pub const TEXTURES_PATH: &str = "assets/textures/";
+pub const DEFAULT_SCENE_PATH: &str = "scenes/scene";
 
 
 /*

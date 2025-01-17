@@ -1,24 +1,24 @@
 use super::*;
 
 pub fn update_placeholder(
-    mut ui: Query<(&mut Sprite, &mut PlaceholderObject)>,
-    placeholder: ResMut<PlaceholderTile>
+    mut ui: Query<(&mut Sprite, &mut PlaceholderObjectTag)>,
+    placeholder: ResMut<PlaceholderObject>
 ) {
     for (mut sprite, _) in ui.iter_mut() {
         //update the placeholder tile to match the current tile type of our placeholderTile resource
         //do this by updating the UVs of the sprite
         sprite.rect = Some(Rect {
             min: Vec2::new(
-                (((placeholder.0.tile_type as usize) % SPRITESHEET_WIDTH) as f32) *
+                (((placeholder.0.internal_type as usize) % SPRITESHEET_WIDTH) as f32) *
                     (TILE_SIZE as f32),
-                (((placeholder.0.tile_type as usize) / SPRITESHEET_WIDTH) as f32) *
+                (((placeholder.0.internal_type as usize) / SPRITESHEET_WIDTH) as f32) *
                     (TILE_SIZE as f32)
             ),
             max: Vec2::new(
-                (((placeholder.0.tile_type as usize) % SPRITESHEET_WIDTH) as f32) *
+                (((placeholder.0.internal_type as usize) % SPRITESHEET_WIDTH) as f32) *
                     (TILE_SIZE as f32) +
                     (TILE_SIZE as f32),
-                (((placeholder.0.tile_type as usize) / SPRITESHEET_WIDTH) as f32) *
+                (((placeholder.0.internal_type as usize) / SPRITESHEET_WIDTH) as f32) *
                     (TILE_SIZE as f32) +
                     (TILE_SIZE as f32)
             ),
@@ -28,7 +28,7 @@ pub fn update_placeholder(
     }
 }
 
-pub fn show_placeholder(
+pub fn show_tile_placeholder(
     mut commands: Commands,
     spritesheet: Res<TilesheetHandle>,
     crosshairs: Query<(&Transform, &Crosshair)>
@@ -60,7 +60,7 @@ pub fn show_placeholder(
             ..default()
         },
         TileModeUI,
-        PlaceholderObject,
+        PlaceholderObjectTag,
     ));
 }
 
@@ -73,11 +73,12 @@ pub fn create_tilemode_ui(mut commands: Commands, asset_server: Res<AssetServer>
     //offsets to make UI appear in the top left corner of the screen while still being anchored to the crosshair location
     let c = crosshairs.single();
 
-    let ui_x_off = -WINDOW_WIDTH / 2.0 + c.0.translation.x;
-    let ui_y_off = -WINDOW_HEIGHT / 2.0 + c.0.translation.y;
+    let ui_x_off = -DEFAULT_WINDOW_WIDTH / 2.0 + c.0.translation.x;
+    let ui_y_off = -DEFAULT_WINDOW_HEIGHT / 2.0 + c.0.translation.y;
 
-    let ui_x = WINDOW_WIDTH / 6.0;
-    let ui_y = WINDOW_HEIGHT;
+    let ui_x = DEFAULT_WINDOW_WIDTH / 6.0;
+    let ui_y = DEFAULT_WINDOW_HEIGHT;
+    let ui_border = 4.0;
 
     //spawn tilemodeUI
     commands.spawn((
@@ -87,10 +88,10 @@ pub fn create_tilemode_ui(mut commands: Commands, asset_server: Res<AssetServer>
             custom_size: Some(Vec2::new(ui_x, ui_y)),
             image_mode: bevy::sprite::SpriteImageMode::Sliced(TextureSlicer {
                 border: BorderRect {
-                    bottom: 4.0,
-                    left: 4.0,
-                    right: 4.0,
-                    top: 4.0,
+                    bottom: ui_border,
+                    left: ui_border,
+                    right: ui_border,
+                    top: ui_border,
                 },
                 sides_scale_mode: bevy::sprite::SliceScaleMode::Stretch,
                 ..default()
@@ -107,7 +108,7 @@ pub fn create_tilemode_ui(mut commands: Commands, asset_server: Res<AssetServer>
         TileModeUI,
     ));
 
-
+    //spawn the display tilesheet, align with the top right of the UI, inset by the border of the UI
     let tex = tilesheet_handle.0.clone();
     commands.spawn(
         (
@@ -117,6 +118,7 @@ pub fn create_tilemode_ui(mut commands: Commands, asset_server: Res<AssetServer>
             Sprite {
                 image: tex,
                 anchor: Anchor::BottomLeft,
+                custom_size: Some(Vec2::new(DEFAULT_WINDOW_WIDTH / 6.0, DEFAULT_WINDOW_HEIGHT)),
                 image_mode: bevy::sprite::SpriteImageMode::Sliced(TextureSlicer {
                     border: BorderRect {
                         bottom: 4.0,

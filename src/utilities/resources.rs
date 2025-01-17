@@ -1,9 +1,10 @@
 use bevy::prelude::*;
-use crate::Tile;
+use crate::{EditorObject, Tile};
 
 
 #[derive(Resource, Debug, Component)]
-pub struct PlaceholderTile(pub Tile);
+pub struct PlaceholderObject(pub EditorObject);
+
 
 /// A handle to the tilesheet image.
 #[derive(Resource, Default, Reflect)]
@@ -27,8 +28,8 @@ impl Default for EditorBottomBarQueuedMessages {
 }
 
 #[derive(Resource)]
-pub struct EditorBottomBarQueued{pub text: String}
-impl Default for EditorBottomBarQueued {
+pub struct EditorBottomBarMessage{pub text: String}
+impl Default for EditorBottomBarMessage {
     fn default() -> Self {
         Self{text: "".to_string()}
     }

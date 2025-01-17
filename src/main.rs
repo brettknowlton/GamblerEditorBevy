@@ -15,8 +15,8 @@ fn main() {
                 .set(ImagePlugin::default_nearest())
                 .set(WindowPlugin {
                     primary_window: Some(Window {
-                        title: WINDOW_TITLE.to_string(),
-                        resolution: (WINDOW_WIDTH, WINDOW_HEIGHT).into(),
+                        title: WINDOW_TITLE2.to_string(),
+                        resolution: (DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT).into(),
                         resizable: false,
                         decorations: true,
                         visible: true,
