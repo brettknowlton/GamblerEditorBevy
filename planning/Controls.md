@@ -19,8 +19,9 @@ Pretty basic so far but this is the idea:
 
 <H3>Universal Keypresses</H3>
 <H4>Tools</H4>
-P: **(P)lace** *//Note: We should look into making place a repetetive action every few frames if it is still being held down.*
+U: Use //uses the current tool basically, this will use the last placed placeholder
 
+P: **(P)lace** *//Note: We should look into making place a repetitive action every few frames if it is still being held down.*
 L: **De(L)ete**
 M: Recta(m)gle?
 

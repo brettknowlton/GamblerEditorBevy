@@ -3,7 +3,7 @@
   entities: {
     4294967310: (
       components: {
-        "bevy_hierarchy::components::parent::Parent": (4294967337),
+        "bevy_hierarchy::components::parent::Parent": (4294967345),
         "bevy_render::primitives::Aabb": (
           center: (8.0, 8.0, 0.0),
           half_extents: (8.0, 8.0, 0.0),
@@ -33,7 +33,7 @@
     ),
     4294967311: (
       components: {
-        "bevy_hierarchy::components::parent::Parent": (4294967337),
+        "bevy_hierarchy::components::parent::Parent": (4294967345),
         "bevy_render::primitives::Aabb": (
           center: (8.0, 8.0, 0.0),
           half_extents: (8.0, 8.0, 0.0),
@@ -63,7 +63,7 @@
     ),
     4294967312: (
       components: {
-        "bevy_hierarchy::components::parent::Parent": (4294967337),
+        "bevy_hierarchy::components::parent::Parent": (4294967345),
         "bevy_render::primitives::Aabb": (
           center: (8.0, 8.0, 0.0),
           half_extents: (8.0, 8.0, 0.0),
@@ -93,7 +93,7 @@
     ),
     4294967313: (
       components: {
-        "bevy_hierarchy::components::parent::Parent": (4294967337),
+        "bevy_hierarchy::components::parent::Parent": (4294967345),
         "bevy_render::primitives::Aabb": (
           center: (8.0, 8.0, 0.0),
           half_extents: (8.0, 8.0, 0.0),
@@ -123,7 +123,7 @@
     ),
     4294967314: (
       components: {
-        "bevy_hierarchy::components::parent::Parent": (4294967337),
+        "bevy_hierarchy::components::parent::Parent": (4294967345),
         "bevy_render::primitives::Aabb": (
           center: (8.0, 8.0, 0.0),
           half_extents: (8.0, 8.0, 0.0),
@@ -153,7 +153,7 @@
     ),
     4294967315: (
       components: {
-        "bevy_hierarchy::components::parent::Parent": (30064771113),
+        "bevy_hierarchy::components::parent::Parent": (30064771121),
         "bevy_render::primitives::Aabb": (
           center: (8.0, 8.0, 0.0),
           half_extents: (8.0, 8.0, 0.0),
@@ -183,7 +183,7 @@
     ),
     4294967316: (
       components: {
-        "bevy_hierarchy::components::parent::Parent": (30064771113),
+        "bevy_hierarchy::components::parent::Parent": (30064771121),
         "bevy_render::primitives::Aabb": (
           center: (8.0, 8.0, 0.0),
           half_extents: (8.0, 8.0, 0.0),
@@ -213,7 +213,7 @@
     ),
     4294967317: (
       components: {
-        "bevy_hierarchy::components::parent::Parent": (30064771113),
+        "bevy_hierarchy::components::parent::Parent": (30064771121),
         "bevy_render::primitives::Aabb": (
           center: (8.0, 8.0, 0.0),
           half_extents: (8.0, 8.0, 0.0),
@@ -243,7 +243,7 @@
     ),
     4294967318: (
       components: {
-        "bevy_hierarchy::components::parent::Parent": (30064771113),
+        "bevy_hierarchy::components::parent::Parent": (30064771121),
         "bevy_render::primitives::Aabb": (
           center: (8.0, 8.0, 0.0),
           half_extents: (8.0, 8.0, 0.0),
@@ -273,7 +273,7 @@
     ),
     4294967319: (
       components: {
-        "bevy_hierarchy::components::parent::Parent": (30064771113),
+        "bevy_hierarchy::components::parent::Parent": (30064771121),
         "bevy_render::primitives::Aabb": (
           center: (8.0, 8.0, 0.0),
           half_extents: (8.0, 8.0, 0.0),
@@ -303,7 +303,7 @@
     ),
     4294967320: (
       components: {
-        "bevy_hierarchy::components::parent::Parent": (30064771113),
+        "bevy_hierarchy::components::parent::Parent": (30064771121),
         "bevy_render::primitives::Aabb": (
           center: (8.0, 8.0, 0.0),
           half_extents: (8.0, 8.0, 0.0),
@@ -333,7 +333,7 @@
     ),
     4294967321: (
       components: {
-        "bevy_hierarchy::components::parent::Parent": (30064771113),
+        "bevy_hierarchy::components::parent::Parent": (30064771121),
         "bevy_render::primitives::Aabb": (
           center: (8.0, 8.0, 0.0),
           half_extents: (8.0, 8.0, 0.0),
@@ -363,7 +363,7 @@
     ),
     4294967322: (
       components: {
-        "bevy_hierarchy::components::parent::Parent": (30064771113),
+        "bevy_hierarchy::components::parent::Parent": (30064771121),
         "bevy_render::primitives::Aabb": (
           center: (8.0, 8.0, 0.0),
           half_extents: (8.0, 8.0, 0.0),
@@ -393,7 +393,7 @@
     ),
     4294967323: (
       components: {
-        "bevy_hierarchy::components::parent::Parent": (30064771113),
+        "bevy_hierarchy::components::parent::Parent": (30064771121),
         "bevy_render::primitives::Aabb": (
           center: (8.0, 8.0, 0.0),
           half_extents: (8.0, 8.0, 0.0),
@@ -423,7 +423,7 @@
     ),
     4294967324: (
       components: {
-        "bevy_hierarchy::components::parent::Parent": (30064771113),
+        "bevy_hierarchy::components::parent::Parent": (30064771121),
         "bevy_render::primitives::Aabb": (
           center: (8.0, 8.0, 0.0),
           half_extents: (8.0, 8.0, 0.0),
@@ -453,7 +453,7 @@
     ),
     4294967325: (
       components: {
-        "bevy_hierarchy::components::parent::Parent": (30064771113),
+        "bevy_hierarchy::components::parent::Parent": (30064771121),
         "bevy_render::primitives::Aabb": (
           center: (8.0, 8.0, 0.0),
           half_extents: (8.0, 8.0, 0.0),
@@ -483,7 +483,7 @@
     ),
     4294967326: (
       components: {
-        "bevy_hierarchy::components::parent::Parent": (30064771113),
+        "bevy_hierarchy::components::parent::Parent": (30064771121),
         "bevy_render::primitives::Aabb": (
           center: (8.0, 8.0, 0.0),
           half_extents: (8.0, 8.0, 0.0),
@@ -513,7 +513,7 @@
     ),
     4294967327: (
       components: {
-        "bevy_hierarchy::components::parent::Parent": (30064771113),
+        "bevy_hierarchy::components::parent::Parent": (30064771121),
         "bevy_render::primitives::Aabb": (
           center: (8.0, 8.0, 0.0),
           half_extents: (8.0, 8.0, 0.0),
@@ -543,7 +543,7 @@
     ),
     4294967328: (
       components: {
-        "bevy_hierarchy::components::parent::Parent": (30064771113),
+        "bevy_hierarchy::components::parent::Parent": (30064771121),
         "bevy_render::primitives::Aabb": (
           center: (8.0, 8.0, 0.0),
           half_extents: (8.0, 8.0, 0.0),
@@ -573,7 +573,7 @@
     ),
     4294967329: (
       components: {
-        "bevy_hierarchy::components::parent::Parent": (30064771113),
+        "bevy_hierarchy::components::parent::Parent": (30064771121),
         "bevy_render::primitives::Aabb": (
           center: (8.0, 8.0, 0.0),
           half_extents: (8.0, 8.0, 0.0),
@@ -603,7 +603,7 @@
     ),
     4294967330: (
       components: {
-        "bevy_hierarchy::components::parent::Parent": (30064771113),
+        "bevy_hierarchy::components::parent::Parent": (30064771121),
         "bevy_render::primitives::Aabb": (
           center: (8.0, 8.0, 0.0),
           half_extents: (8.0, 8.0, 0.0),
@@ -633,7 +633,7 @@
     ),
     4294967331: (
       components: {
-        "bevy_hierarchy::components::parent::Parent": (30064771113),
+        "bevy_hierarchy::components::parent::Parent": (30064771121),
         "bevy_render::primitives::Aabb": (
           center: (8.0, 8.0, 0.0),
           half_extents: (8.0, 8.0, 0.0),
@@ -663,7 +663,7 @@
     ),
     4294967332: (
       components: {
-        "bevy_hierarchy::components::parent::Parent": (30064771113),
+        "bevy_hierarchy::components::parent::Parent": (30064771121),
         "bevy_render::primitives::Aabb": (
           center: (8.0, 8.0, 0.0),
           half_extents: (8.0, 8.0, 0.0),
@@ -693,7 +693,7 @@
     ),
     4294967333: (
       components: {
-        "bevy_hierarchy::components::parent::Parent": (30064771113),
+        "bevy_hierarchy::components::parent::Parent": (30064771121),
         "bevy_render::primitives::Aabb": (
           center: (8.0, 8.0, 0.0),
           half_extents: (8.0, 8.0, 0.0),
@@ -723,7 +723,7 @@
     ),
     4294967334: (
       components: {
-        "bevy_hierarchy::components::parent::Parent": (30064771113),
+        "bevy_hierarchy::components::parent::Parent": (30064771121),
         "bevy_render::primitives::Aabb": (
           center: (8.0, 8.0, 0.0),
           half_extents: (8.0, 8.0, 0.0),
@@ -753,7 +753,7 @@
     ),
     4294967335: (
       components: {
-        "bevy_hierarchy::components::parent::Parent": (30064771113),
+        "bevy_hierarchy::components::parent::Parent": (30064771121),
         "bevy_render::primitives::Aabb": (
           center: (8.0, 8.0, 0.0),
           half_extents: (8.0, 8.0, 0.0),
@@ -783,7 +783,7 @@
     ),
     4294967336: (
       components: {
-        "bevy_hierarchy::components::parent::Parent": (30064771113),
+        "bevy_hierarchy::components::parent::Parent": (30064771121),
         "bevy_render::primitives::Aabb": (
           center: (8.0, 8.0, 0.0),
           half_extents: (8.0, 8.0, 0.0),
