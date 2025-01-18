@@ -1,4 +1,3 @@
-
 #[macro_use]
 pub mod ui;
 pub use tile::*;
@@ -11,7 +10,6 @@ mod scene;
 mod tools;
 use resources::*;
 pub use std::{ fmt::Debug, path::PathBuf };
-
 
 use bevy::{ prelude::*, sprite::Anchor };
 
@@ -39,7 +37,7 @@ pub enum EditingMode {
     Collider,
     Interactable,
     Tile,
-} 
+}
 
 pub fn editor_plugin(app: &mut App) {
     app.init_state::<EditorState>()
@@ -49,7 +47,6 @@ pub fn editor_plugin(app: &mut App) {
         .init_resource::<EditorBottomBarDisplayed>()
         .init_resource::<EditorBottomBarMessage>()
         .init_resource::<EditorBottomBarQueuedMessages>()
-
 
         //begin update system to update the bottom bar text
         .add_systems(Update, ui::send_messages)
@@ -63,8 +60,11 @@ pub fn editor_plugin(app: &mut App) {
     //placeholder resource for whatever tile we are trying to place
 }
 
-fn initialize(mut commands: Commands, mut next_state: ResMut<NextState<EditorState>>, mut message_queue: ResMut<EditorBottomBarQueuedMessages>) {
-
+fn initialize(
+    mut commands: Commands,
+    mut next_state: ResMut<NextState<EditorState>>,
+    mut message_queue: ResMut<EditorBottomBarQueuedMessages>
+) {
     //create camera and add a UIItem component to it
     commands.spawn((Camera2d::default(), UIItem::default()));
 
@@ -89,7 +89,7 @@ fn create_crosshair(mut commands: Commands, asset_server: Res<AssetServer>) {
             ..default()
         },
         Transform {
-            scale: Vec3::new(TILE_SCALE as f32, TILE_SCALE as f32, 0.),
+            scale: Vec3::new(TILE_SCALE as f32, TILE_SCALE as f32, 0.0),
             ..default()
         },
     ));
@@ -112,7 +112,6 @@ fn stateful_keybinds(
 ) {
     let messages = &mut message_queue;
     //manage the editor state, you can switch between modes with their letter call or number keys except if you are attempting to save/load the document
-
 
     //Universal keys, not dependant on state:
     //Camera Controls
@@ -160,27 +159,31 @@ fn stateful_keybinds(
         send_message!(Some('i'), messages, "Returning to Normal Mode");
     }
 
-    //CTRL + S will enter saveAsk mode
-    if input.all_pressed(vec!(KeyCode::ControlLeft, KeyCode::KeyS)) {
-        next_state.set(EditorState::SaveAsk);
-        send_message!(Some('i'), messages, "Would you like to save the scene? Yenter/Noscape");
+    //CTRL 
+    if input.pressed(KeyCode::ControlLeft) {
+        //+ S will enter saveAsk mode
+        if input.just_pressed(KeyCode::KeyS) {
+            next_state.set(EditorState::SaveAsk);
+            send_message!(Some('i'), messages, "Would you like to save the scene? Yenter/Noscape");
+        }
+
+        //+ L will enter loadAsk mode
+        if input.just_pressed(KeyCode::KeyL) {
+            next_state.set(EditorState::LoadAsk);
+            send_message!(Some('i'), messages, "Would you like to load a scene? Yenter/Noscape");
+        }
+
+        //+ Q will enter QuitAsk mode
+        if input.just_pressed(KeyCode::KeyQ) {
+            next_state.set(EditorState::QuitAsk);
+            send_message!(Some('i'), messages, "Would you like to exit the editor? Yenter/Noscape");
+        }
     }
 
-    //CTRL + L will enter loadAsk mode
-    if input.all_pressed(vec!(KeyCode::ControlLeft, KeyCode::KeyL)) {
-        next_state.set(EditorState::LoadAsk);
-        send_message!(Some('i'), messages, "Would you like to load a scene? Yenter/Noscape");
-    }
-
-    //CTRL + Q will enter QuitAsk mode
-    if input.all_pressed(vec!(KeyCode::ControlLeft, KeyCode::KeyQ)) {
-        next_state.set(EditorState::QuitAsk);
-        send_message!(Some('i'), messages, "Would you like to exit the editor? Yenter/Noscape");
-    }
-
+    
     //state specific keybinds
-    match state.get(){
-        EditorState::Normal =>{
+    match state.get() {
+        EditorState::Normal => {
             // 1 will switch to tile mode
             if input.just_pressed(KeyCode::Digit1) || input.just_pressed(KeyCode::Numpad1) {
                 send_message!(Some('i'), messages, "Switching to Tile Mode");
@@ -214,7 +217,10 @@ fn stateful_keybinds(
         }
         EditorState::Editing(_) => {
             //in any editing mode, Q will bring us back to normal mode
-            if input.just_pressed(KeyCode::KeyQ) || input.all_pressed(vec!(KeyCode::ControlLeft, KeyCode::KeyS)) {
+            if
+                input.just_pressed(KeyCode::KeyQ) ||
+                input.all_pressed(vec![KeyCode::ControlLeft, KeyCode::KeyS])
+            {
                 next_state.set(EditorState::Normal);
                 send_message!(Some('i'), messages, "Returning to Normal Mode");
             }
@@ -346,7 +352,6 @@ fn stateful_keybinds(
     //         send_message!(Some('i'), messages, "Would you like to exit the editor? Yenter/Noscape");
     //     }
     // }
-    
 
     // let mut vel_y = 0.0;
     // let mut vel_x = 0.0;
