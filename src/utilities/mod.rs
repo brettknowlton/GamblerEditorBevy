@@ -49,14 +49,14 @@ impl Coordinate {
 #[derive(Component, Reflect, Deserialize, Serialize, Debug, Clone, PartialEq, Eq, Hash)]
 #[reflect(Component)]
 pub struct TCoordinate {
-    pub object_type: char,
+    pub type_char: char,
     pub coord: Coordinate,
 }
 
 impl TCoordinate {
     pub fn new(object_type: char, coord: Coordinate) -> Self {
         Self {
-            object_type,
+            type_char: object_type,
             coord,
         }
     }
@@ -65,7 +65,7 @@ impl TCoordinate {
 impl Default for TCoordinate {
     fn default() -> Self {
         Self {
-            object_type: ' ',
+            type_char: ' ',
             coord: Coordinate(0, 0),
         }
     }

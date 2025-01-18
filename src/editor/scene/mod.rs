@@ -27,7 +27,8 @@ fn spawn_sprites(mut tiles: Query<(Entity, &mut EditorObject), Without<Sprite>>,
     //spawn the sprites for each tile, use the editorObject's tcoords to determine the sprite's position
     //if the EditorObject has a tcoord beginning with 'T'
     for (entity, eo) in tiles.iter_mut() {
-        let sprite: Sprite = Sprite {
+        if eo.get_major_type() == 'T' {
+            let sprite: Sprite = Sprite {
             image: spritesheet.0.clone(),
             //the UVs are the same for every tile, just change the offset by using the tiletype as a multiplier
             rect: Some(Rect {
@@ -48,11 +49,19 @@ fn spawn_sprites(mut tiles: Query<(Entity, &mut EditorObject), Without<Sprite>>,
             }),
             anchor: Anchor::BottomLeft,
             ..default()
-        };
-        let coord = eo.get_coordinate().coord;
-        commands.entity(entity).insert(sprite).entry::<Transform>().and_modify(move |mut t| {
-            t.translation = Vec3::new( coord.0 as f32, coord.1 as f32, -5.);
-        });
+            };
+            
+            let coord = eo.get_coordinate().coord;
+
+            commands
+                .entity(entity)
+                .insert(sprite)
+                .entry::<Transform>().and_modify(move |mut t| {
+                    t.translation = Vec3::new( coord.0 as f32, coord.1 as f32, -5.);
+                }
+            );
+
+        }
     }
 
 }

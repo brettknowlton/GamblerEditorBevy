@@ -162,26 +162,4 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "ad2d4c31e83d99a3",
-  "lastOpenFiles": [
-    "target/debug/deps/gambler_bevy-1cc2ff3bf7e3691d",
-    "target/debug/deps/gambler_bevy-1cc2ff3bf7e3691d.tmp80a905e",
-    "target/debug/incremental/gambler_bevy-3jq1gyo0cljhc/s-h3pij788l4-1lfverf-1qdlzcva72gxp8m0hfpg1esdv/work-products.bin",
-    "target/debug/incremental/gambler_bevy-3jq1gyo0cljhc/s-h3pij788l4-1lfverf-1qdlzcva72gxp8m0hfpg1esdv/query-cache.bin",
-    "target/debug/incremental/gambler_bevy-3jq1gyo0cljhc/s-h3pij788l4-1lfverf-1qdlzcva72gxp8m0hfpg1esdv/f4uvkfbdhqzavz73zgzpk1j10.o",
-    "target/debug/incremental/gambler_bevy-3jq1gyo0cljhc/s-h3pij788l4-1lfverf-1qdlzcva72gxp8m0hfpg1esdv/f3gx2b9uti46o819gjbxxuhpx.o",
-    "target/debug/incremental/gambler_bevy-3jq1gyo0cljhc/s-h3pij788l4-1lfverf-1qdlzcva72gxp8m0hfpg1esdv/ezjvyoivhof9e2scg9tc380pp.o",
-    "target/debug/incremental/gambler_bevy-3jq1gyo0cljhc/s-h3pij788l4-1lfverf-1qdlzcva72gxp8m0hfpg1esdv/esbcq1efahdi9dd05zruwhnp9.o",
-    "target/debug/incremental/gambler_bevy-3jq1gyo0cljhc/s-h3pij788l4-1lfverf-1qdlzcva72gxp8m0hfpg1esdv/er7q7v3l7m56te2bjp7j2i9wj.o",
-    "target/debug/incremental/gambler_bevy-3jq1gyo0cljhc/s-h3pij788l4-1lfverf-1qdlzcva72gxp8m0hfpg1esdv/emjzsteh3h0vj0c0abes2h7vt.o",
-    "target/debug/incremental/gambler_bevy-3jq1gyo0cljhc/s-h3pij788l4-1lfverf-1qdlzcva72gxp8m0hfpg1esdv/elnblead2hrvc5fsvotonssld.o",
-    "planning/Mechanic Breakdowns/Rectangle Tool.md",
-    "planning/Mechanic Breakdowns/Context Menu.md",
-    "planning/Mechanics.md",
-    "planning/art concepts/zughy32.png",
-    "planning/art concepts/rosy-42-palette-example-by-s-203792.png",
-    "planning/Root.md",
-    "assets/textures/cards/H1.png",
-    "assets/textures/cards/H0.png"
-  ]
 }
