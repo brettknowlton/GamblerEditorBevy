@@ -113,114 +113,9 @@ fn stateful_keybinds(
     let messages = &mut message_queue;
     //manage the editor state, you can switch between modes with their letter call or number keys except if you are attempting to save/load the document
 
-    //keybinds for mode switching will kick in only after the user has decided wether or not to load a scene
-    if state.get() != &EditorState::LoadAsk {
-        //"E" enters editor mode and aborts any saving operation
-        if input.just_pressed(KeyCode::KeyE) || input.just_pressed(KeyCode::Digit1)  || input.just_pressed(KeyCode::Numpad1) {
-            if state.get() == &EditorState::SaveAsk {
-                send_message!(Some('w'), messages, "Saving aborted.");
-            }
-            send_message!(Some('i'), messages, "Returning to Normal Mode");
-            next_state.set(EditorState::Normal);
-        }
 
-        //"T" switches to tile mode and aborts any saving operation
-        if input.just_pressed(KeyCode::KeyT) || input.just_pressed(KeyCode::Digit2) || input.just_pressed(KeyCode::Numpad2) {
-            if state.get() == &EditorState::SaveAsk {
-                send_message!(Some('w'), messages, "Saving aborted.");
-            }
-            send_message!(Some('i'), messages, "Switching to Tile Mode");
-            next_state.set(EditorState::Editing(EditingMode::Tile));
-        }
-
-        //"C" switches to collider mode and aborts any saving operation
-        if input.just_pressed(KeyCode::KeyC) || input.just_pressed(KeyCode::Digit3) || input.just_pressed(KeyCode::Numpad3) {
-            if state.get() == &EditorState::SaveAsk {
-                send_message!(Some('w'), messages, "Saving aborted.");
-            }
-            send_message!(Some('i'), messages, "Switching to Collider Mode");
-            next_state.set(EditorState::Editing(EditingMode::Collider));
-        }
-
-        //"R" switches to interactable mode and aborts any saving operation
-        if input.just_pressed(KeyCode::KeyR) || input.just_pressed(KeyCode::Digit5) || input.just_pressed(KeyCode::Numpad5) {
-            if state.get() != &EditorState::SaveAsk {
-                send_message!(Some('w'), messages, "Saving aborted.");
-            }
-            send_message!(Some('i'), messages, "Switching to Interactable Mode");
-            next_state.set(EditorState::Editing(EditingMode::Interactable));
-        }
-
-        //"Y" switches to actor mode and aborts any saving operation
-        if input.just_pressed(KeyCode::KeyY) || input.just_pressed(KeyCode::Digit4) || input.just_pressed(KeyCode::Numpad4) {
-            if state.get() != &EditorState::SaveAsk {
-                send_message!(Some('w'), messages, "Saving aborted.");
-            }
-            send_message!(Some('i'), messages, "Switching to Actor Mode");
-            next_state.set(EditorState::Editing(EditingMode::Actor));
-        }
-    } else {
-        if input.just_pressed(KeyCode::KeyY) || input.just_pressed(KeyCode::Enter) {
-            next_state.set(EditorState::Loading);
-            send_message!(Some('i'), messages, "Attempting to load scene");
-        }
-        if input.just_pressed(KeyCode::KeyN) || input.just_pressed(KeyCode::Escape) {
-            next_state.set(EditorState::LoadingEmpty);
-            send_message!(Some('w'), messages, "No scene loaded");
-        }
-    }
-
-    if state.get() == &EditorState::SaveAsk {
-        // "Y" will save the scene if the user is in saving mode, 'N" will abort the save
-        if input.just_pressed(KeyCode::KeyY) || input.just_pressed(KeyCode::Enter) {
-            next_state.set(EditorState::Saving);
-            send_message!(Some('i'), messages, "Saving scene...");
-        } else if input.just_pressed(KeyCode::KeyN) || input.just_pressed(KeyCode::Escape) {
-            next_state.set(EditorState::Normal);
-            send_message!(Some('w'), messages, "Saving aborted.");
-        }
-    }
-
-    if state.get() == &EditorState::QuitAsk {
-        // "Y" will exit the editor if the user is in quitting mode, 'N" will abort the exit
-        if input.just_pressed(KeyCode::KeyY) || input.just_pressed(KeyCode::Enter) {
-            next_state.set(EditorState::Inactive);
-            send_message!(Some('i'), messages, "Exiting the editor...");
-        } else if input.just_pressed(KeyCode::KeyN) || input.just_pressed(KeyCode::Escape) {
-            next_state.set(EditorState::Normal);
-            send_message!(Some('w'), messages, "Exiting aborted.");
-        }
-    }
-
-    // "Q" will prompt the user to save the scene if they are in normal mode,
-    // otherwise "Q"" will return to normal mode if in any mode other than normal
-    if input.just_pressed(KeyCode::KeyQ) || input.all_pressed(vec!(KeyCode::ControlLeft, KeyCode::KeyS)) {
-        if state.get() == &EditorState::Normal {
-            //pressing q will enter "saving" mode if we are already in normal mode:
-            next_state.set(EditorState::SaveAsk);
-            send_message!(Some('i'), messages, "Would you like to save the scene? Yenter/Noscape");
-        } else {
-            next_state.set(EditorState::Normal);
-            send_message!(Some('i'), messages, "Returning to Normal Mode");
-        }
-    }
-
-    if state.get() != &EditorState::Normal{
-        //"E" (and escape) is used for switching back to editor mode from any other mode
-        if input.just_pressed(KeyCode::KeyE) || input.just_pressed(KeyCode::Escape) {
-            next_state.set(EditorState::Normal);
-            send_message!(Some('i'), messages, "Returning to Normal Mode");
-        }
-    }
-    else {
-        //in normal mode: "E" (and escape) will ask the user if they want to exit the editor
-        if input.just_pressed(KeyCode::KeyE) || input.just_pressed(KeyCode::Escape) {
-            next_state.set(EditorState::QuitAsk);
-            send_message!(Some('i'), messages, "Would you like to exit the editor? Yenter/Noscape");
-        }
-    }
-    
-
+    //Universal keys, not dependant on state:
+    //Camera Controls
     let mut vel_y = 0.0;
     let mut vel_x = 0.0;
 
@@ -259,6 +154,238 @@ fn stateful_keybinds(
         ui.vel_x *= 0.99;
         ui.vel_y *= 0.99;
     }
+    // Q brings us back to normal mode
+    if input.just_pressed(KeyCode::KeyQ) {
+        next_state.set(EditorState::Normal);
+        send_message!(Some('i'), messages, "Returning to Normal Mode");
+    }
+
+    //CTRL + S will enter saveAsk mode
+    if input.all_pressed(vec!(KeyCode::ControlLeft, KeyCode::KeyS)) {
+        next_state.set(EditorState::SaveAsk);
+        send_message!(Some('i'), messages, "Would you like to save the scene? Yenter/Noscape");
+    }
+
+    //CTRL + L will enter loadAsk mode
+    if input.all_pressed(vec!(KeyCode::ControlLeft, KeyCode::KeyL)) {
+        next_state.set(EditorState::LoadAsk);
+        send_message!(Some('i'), messages, "Would you like to load a scene? Yenter/Noscape");
+    }
+
+    //CTRL + Q will enter QuitAsk mode
+    if input.all_pressed(vec!(KeyCode::ControlLeft, KeyCode::KeyQ)) {
+        next_state.set(EditorState::QuitAsk);
+        send_message!(Some('i'), messages, "Would you like to exit the editor? Yenter/Noscape");
+    }
+
+    //state specific keybinds
+    match state.get(){
+        EditorState::Normal =>{
+            // 1 will switch to tile mode
+            if input.just_pressed(KeyCode::Digit1) || input.just_pressed(KeyCode::Numpad1) {
+                send_message!(Some('i'), messages, "Switching to Tile Mode");
+                next_state.set(EditorState::Editing(EditingMode::Tile));
+            }
+
+            // 2 will switch to collider mode
+            if input.just_pressed(KeyCode::Digit2) || input.just_pressed(KeyCode::Numpad2) {
+                send_message!(Some('i'), messages, "Switching to Collider Mode");
+                next_state.set(EditorState::Editing(EditingMode::Collider));
+            }
+        }
+        EditorState::LoadAsk => {
+            if input.just_pressed(KeyCode::KeyY) || input.just_pressed(KeyCode::Enter) {
+                next_state.set(EditorState::Loading);
+                send_message!(Some('i'), messages, "Attempting to load scene");
+            }
+            if input.just_pressed(KeyCode::KeyN) || input.just_pressed(KeyCode::Escape) {
+                next_state.set(EditorState::LoadingEmpty);
+                send_message!(Some('w'), messages, "No scene loaded");
+            }
+        }
+        EditorState::Loading => {
+            //do nothing, we are waiting for the scene to load
+        }
+        EditorState::LoadingEmpty => {
+            //do nothing, we are waiting for the scene to load
+        }
+        EditorState::Saving => {
+            //do nothing, we are waiting for the scene to save
+        }
+        EditorState::Editing(_) => {
+            //in any editing mode, Q will bring us back to normal mode
+            if input.just_pressed(KeyCode::KeyQ) || input.all_pressed(vec!(KeyCode::ControlLeft, KeyCode::KeyS)) {
+                next_state.set(EditorState::Normal);
+                send_message!(Some('i'), messages, "Returning to Normal Mode");
+            }
+        }
+
+        EditorState::SaveAsk => {
+            if input.just_pressed(KeyCode::KeyY) || input.just_pressed(KeyCode::Enter) {
+                next_state.set(EditorState::Saving);
+                send_message!(Some('i'), messages, "Saving scene...");
+            } else if input.just_pressed(KeyCode::KeyN) || input.just_pressed(KeyCode::Escape) {
+                next_state.set(EditorState::Normal);
+                send_message!(Some('w'), messages, "Saving aborted.");
+            }
+        }
+        EditorState::QuitAsk => {
+            if input.just_pressed(KeyCode::KeyY) || input.just_pressed(KeyCode::Enter) {
+                next_state.set(EditorState::Inactive);
+                send_message!(Some('i'), messages, "Exiting the editor...");
+            } else if input.just_pressed(KeyCode::KeyN) || input.just_pressed(KeyCode::Escape) {
+                next_state.set(EditorState::Normal);
+                send_message!(Some('w'), messages, "Exiting aborted.");
+            }
+        }
+        _ => {}
+    }
+    //keybinds for mode switching will kick in only after the user has decided wether or not to load a scene
+    // if state.get() != &EditorState::LoadAsk {
+    //     //"E" enters editor mode and aborts any saving operation
+    //     if input.just_pressed(KeyCode::KeyE) || input.just_pressed(KeyCode::Digit1)  || input.just_pressed(KeyCode::Numpad1) {
+    //         if state.get() == &EditorState::SaveAsk {
+    //             send_message!(Some('w'), messages, "Saving aborted.");
+    //         }
+    //         send_message!(Some('i'), messages, "Returning to Normal Mode");
+    //         next_state.set(EditorState::Normal);
+    //     }
+
+    //     //"T" switches to tile mode and aborts any saving operation
+    //     if input.just_pressed(KeyCode::KeyT) || input.just_pressed(KeyCode::Digit2) || input.just_pressed(KeyCode::Numpad2) {
+    //         if state.get() == &EditorState::SaveAsk {
+    //             send_message!(Some('w'), messages, "Saving aborted.");
+    //         }
+    //         send_message!(Some('i'), messages, "Switching to Tile Mode");
+    //         next_state.set(EditorState::Editing(EditingMode::Tile));
+    //     }
+
+    //     //"C" switches to collider mode and aborts any saving operation
+    //     if input.just_pressed(KeyCode::KeyC) || input.just_pressed(KeyCode::Digit3) || input.just_pressed(KeyCode::Numpad3) {
+    //         if state.get() == &EditorState::SaveAsk {
+    //             send_message!(Some('w'), messages, "Saving aborted.");
+    //         }
+    //         send_message!(Some('i'), messages, "Switching to Collider Mode");
+    //         next_state.set(EditorState::Editing(EditingMode::Collider));
+    //     }
+
+    //     //"R" switches to interactable mode and aborts any saving operation
+    //     if input.just_pressed(KeyCode::KeyR) || input.just_pressed(KeyCode::Digit5) || input.just_pressed(KeyCode::Numpad5) {
+    //         if state.get() != &EditorState::SaveAsk {
+    //             send_message!(Some('w'), messages, "Saving aborted.");
+    //         }
+    //         send_message!(Some('i'), messages, "Switching to Interactable Mode");
+    //         next_state.set(EditorState::Editing(EditingMode::Interactable));
+    //     }
+
+    //     //"Y" switches to actor mode and aborts any saving operation
+    //     if input.just_pressed(KeyCode::KeyY) || input.just_pressed(KeyCode::Digit4) || input.just_pressed(KeyCode::Numpad4) {
+    //         if state.get() != &EditorState::SaveAsk {
+    //             send_message!(Some('w'), messages, "Saving aborted.");
+    //         }
+    //         send_message!(Some('i'), messages, "Switching to Actor Mode");
+    //         next_state.set(EditorState::Editing(EditingMode::Actor));
+    //     }
+    // } else {
+    //     if input.just_pressed(KeyCode::KeyY) || input.just_pressed(KeyCode::Enter) {
+    //         next_state.set(EditorState::Loading);
+    //         send_message!(Some('i'), messages, "Attempting to load scene");
+    //     }
+    //     if input.just_pressed(KeyCode::KeyN) || input.just_pressed(KeyCode::Escape) {
+    //         next_state.set(EditorState::LoadingEmpty);
+    //         send_message!(Some('w'), messages, "No scene loaded");
+    //     }
+    // }
+
+    // if state.get() == &EditorState::SaveAsk {
+    //     // "Y" will save the scene if the user is in saving mode, 'N" will abort the save
+    //     if input.just_pressed(KeyCode::KeyY) || input.just_pressed(KeyCode::Enter) {
+    //         next_state.set(EditorState::Saving);
+    //         send_message!(Some('i'), messages, "Saving scene...");
+    //     } else if input.just_pressed(KeyCode::KeyN) || input.just_pressed(KeyCode::Escape) {
+    //         next_state.set(EditorState::Normal);
+    //         send_message!(Some('w'), messages, "Saving aborted.");
+    //     }
+    // }
+
+    // if state.get() == &EditorState::QuitAsk {
+    //     // "Y" will exit the editor if the user is in quitting mode, 'N" will abort the exit
+    //     if input.just_pressed(KeyCode::KeyY) || input.just_pressed(KeyCode::Enter) {
+    //         next_state.set(EditorState::Inactive);
+    //         send_message!(Some('i'), messages, "Exiting the editor...");
+    //     } else if input.just_pressed(KeyCode::KeyN) || input.just_pressed(KeyCode::Escape) {
+    //         next_state.set(EditorState::Normal);
+    //         send_message!(Some('w'), messages, "Exiting aborted.");
+    //     }
+    // }
+
+    // // "Q" will prompt the user to save the scene if they are in normal mode,
+    // // otherwise "Q"" will return to normal mode if in any mode other than normal
+    // if input.just_pressed(KeyCode::KeyQ) || input.all_pressed(vec!(KeyCode::ControlLeft, KeyCode::KeyS)) {
+    //     if state.get() == &EditorState::Normal {
+    //         //pressing q will enter "saving" mode if we are already in normal mode:
+    //         next_state.set(EditorState::SaveAsk);
+    //         send_message!(Some('i'), messages, "Would you like to save the scene? Yenter/Noscape");
+    //     } else {
+    //         next_state.set(EditorState::Normal);
+    //         send_message!(Some('i'), messages, "Returning to Normal Mode");
+    //     }
+    // }
+
+    // if state.get() != &EditorState::Normal{
+    //     //"E" (and escape) is used for switching back to editor mode from any other mode
+    //     if input.just_pressed(KeyCode::KeyE) || input.just_pressed(KeyCode::Escape) {
+    //         next_state.set(EditorState::Normal);
+    //         send_message!(Some('i'), messages, "Returning to Normal Mode");
+    //     }
+    // }
+    // else {
+    //     //in normal mode: "E" (and escape) will ask the user if they want to exit the editor
+    //     if input.just_pressed(KeyCode::KeyE) || input.just_pressed(KeyCode::Escape) {
+    //         next_state.set(EditorState::QuitAsk);
+    //         send_message!(Some('i'), messages, "Would you like to exit the editor? Yenter/Noscape");
+    //     }
+    // }
+    
+
+    // let mut vel_y = 0.0;
+    // let mut vel_x = 0.0;
+
+    // let list = &mut uiitems.iter_mut();
+    // //WASD controls for crosshair movement
+    // if input.pressed(KeyCode::KeyW) && !input.pressed(KeyCode::KeyS) {
+    //     vel_y = 200.0;
+    // }
+    // if input.pressed(KeyCode::KeyS) && !input.pressed(KeyCode::KeyW) {
+    //     vel_y = -200.0;
+    // }
+    // if input.pressed(KeyCode::KeyD) && !input.pressed(KeyCode::KeyA) {
+    //     vel_x = 200.0;
+    // }
+    // if input.pressed(KeyCode::KeyA) && !input.pressed(KeyCode::KeyD) {
+    //     vel_x = -200.0;
+    // }
+
+    // //update anything with a UIItem component
+    // for (mut ui, mut t) in list {
+    //     ui.vel_x = vel_x;
+    //     ui.vel_y = vel_y;
+    //     t.translation.x += ui.vel_x * time.delta_secs();
+    //     t.translation.y += ui.vel_y * time.delta_secs();
+    //     //apply frictoin -1% of the velocity per frame
+    //     ui.vel_x *= 0.99;
+    //     ui.vel_y *= 0.99;
+    // }
+    // //update the camera in the same way
+    // for (mut ui, mut t, _) in cameras.iter_mut() {
+    //     ui.vel_x = vel_x;
+    //     ui.vel_y = vel_y;
+    //     t.translation.x += ui.vel_x * time.delta_secs();
+    //     t.translation.y += ui.vel_y * time.delta_secs();
+    //     //apply frictoin -1% of the velocity per frame
+    //     ui.vel_x *= 0.99;
+    //     ui.vel_y *= 0.99;
+    // }
 }
 
 #[derive(Component)]

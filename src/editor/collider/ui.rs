@@ -112,7 +112,7 @@ pub fn create_collidermode_ui(mut commands: Commands, asset_server: Res<AssetSer
     commands.spawn((
         ColliderModeUI,
         Text {
-            0: "...".to_string(),
+            0: "Collider Mode".to_string(),
 
             ..default()
         },

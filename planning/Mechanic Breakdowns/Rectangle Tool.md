@@ -1,9 +1,9 @@
 walkthrough logic:
 press a key "r", on the keypress it will spawn a rect with one corner on the location pressed and another corner always moving to the "selected_point_position" which may need to be a resource? you cant have more than one selected point so that would probably work
 
-next the idea would be on the release of that key: listen for the key to be released and then spawn a "selectedArea" entity that uses the keypressed point and the keyreleassed point as it's bounding corners.
+next the idea would be on the release of that key: listen for the key to be released and then spawn a "selectedArea" entity that uses the keypressed point and the keyreleased point as it's bounding corners.
 
-"mode" enum should maybe be tied into types generically if I can make it work- I would like this rectangle to be implemented for EACH EditorObject type, maybe it would be worth while to implemet a GameObject Trait to accomplish this.
+"mode" Enum should maybe be tied into types generically if I can make it work- I would like this rectangle to be implemented for EACH EditorObject type, maybe it would be worth while to implement a GameObject Trait to accomplish this.
 
 	fn keybinds(...){
 		...

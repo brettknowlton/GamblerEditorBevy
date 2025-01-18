@@ -148,6 +148,7 @@ fn load_spritesheet(mut commands: Commands, asset_server: Res<AssetServer>, mut 
 
 fn exit_tilemode(mut commands: Commands, mut tile_state: ResMut<NextState<EditorState>>, mut message_queue: ResMut<EditorBottomBarQueuedMessages>) {
     tile_state.set(EditorState::Editing(EditingMode::None));
+    tile_state.set(EditorState::Normal);
 
     //remove the CurrentEditorObject resource
     commands.insert_resource(PlaceholderObject(EditorObject::default()));

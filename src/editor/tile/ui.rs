@@ -1,3 +1,5 @@
+use bevy::asset;
+
 use super::*;
 
 pub fn update_placeholder(
@@ -82,6 +84,7 @@ pub fn create_tilemode_ui(mut commands: Commands, asset_server: Res<AssetServer>
 
     //spawn tilemodeUI
     commands.spawn((
+        TileModeUI,
         Sprite {
             image: tex1,
             anchor: Anchor::BottomLeft,
@@ -105,20 +108,20 @@ pub fn create_tilemode_ui(mut commands: Commands, asset_server: Res<AssetServer>
         UIItem {
             ..default()
         },
-        TileModeUI,
     ));
 
     //spawn the display tilesheet, align with the top right of the UI, inset by the border of the UI
-    let tex = tilesheet_handle.0.clone();
+    let tex_path = PathBuf::from("textures/tiles/tilesheet.png");
+    let tex = asset_server.load(tex_path);
     commands.spawn(
         (
+            TileModeUI,
             UIItem {
                 ..default()
             },
             Sprite {
                 image: tex,
                 anchor: Anchor::BottomLeft,
-                custom_size: Some(Vec2::new(DEFAULT_WINDOW_WIDTH / 6.0, DEFAULT_WINDOW_HEIGHT)),
                 image_mode: bevy::sprite::SpriteImageMode::Sliced(TextureSlicer {
                     border: BorderRect {
                         bottom: 4.0,
@@ -126,17 +129,34 @@ pub fn create_tilemode_ui(mut commands: Commands, asset_server: Res<AssetServer>
                         right: 4.0,
                         top: 4.0,
                     },
+                    center_scale_mode: bevy::sprite::SliceScaleMode::Stretch,
                     sides_scale_mode: bevy::sprite::SliceScaleMode::Stretch,
                     ..default()
                 }),
                 ..default()
             },
             Transform {
-                translation: Vec3::new(ui_x_off + (ui_x / 2.), ui_y_off, -0.01),
+                translation: Vec3::new(ui_x_off + (ui_x / 2.) 
+                , ui_y_off + (ui_y / 2.), -0.01),
                 scale: Vec3::new(1., 1., 0.),
                 ..default()
             },
-            TileModeUI
         )
     );
+
+    commands.spawn((
+        TileModeUI,
+        Text {
+            0: "Tile Mode".to_string(),
+
+            ..default()
+        },
+        Node{
+            position_type: PositionType::Absolute,
+            top: Val::Px(3.0),
+            left: Val::Px(3.0),
+            ..default()
+        },
+        UIItem::default(),
+    ));
 }

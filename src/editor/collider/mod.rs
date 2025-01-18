@@ -7,12 +7,6 @@ use crate::{ utilities::*, EditorObject, TILE_SIZE };
 use crate::consts::*;
 use super::*;
 
-// #[derive(Clone, Copy, Default, Eq, PartialEq, Debug, Hash, States)]
-// pub enum TileEditorState {
-//     #[default]
-//     Inactive,
-//     Active,
-// }
 
 pub fn collidermode_plugin(app: &mut App) {
     app
@@ -25,7 +19,7 @@ pub fn collidermode_plugin(app: &mut App) {
         //startup systems (may need to be moved from here to maintain order)
 
         //OnEnter systems
-        .add_systems(OnEnter(EditorState::Editing(EditingMode::Tile)), (init_collidermode, ui::show_collider_placeholder, ui::create_collidermode_ui).chain())
+        .add_systems(OnEnter(EditorState::Editing(EditingMode::Collider)), (init_collidermode, ui::show_collider_placeholder, ui::create_collidermode_ui).chain())
 
         //Update systems, that run only while TileEditor is active
         .add_systems(
@@ -43,22 +37,7 @@ pub fn collidermode_plugin(app: &mut App) {
                 exit_collidermode
             ).chain()
         );
-
-    //we could also take care of some post-exit cleanup here, like despawning all the UI elements by using the schedule OnEnter(EditorState::Inactive) and then despawning all the UI elements
 }
-
-// fn ensure_unique_tiles(mut commands: Commands, tiles: Query<(Entity, &Tile)>) {
-//     let mut seen = std::collections::HashSet::new();
-
-//     for (e, t) in tiles.iter() {
-//         if seen.contains(&t.coordinate) {
-//             //remove the older of the two tiles
-//             commands.entity(e).despawn();
-//         } else {
-//             seen.insert(&t.coordinate);
-//         }
-//     }
-// }
 
 fn init_collidermode(mut message_queue: ResMut<EditorBottomBarQueuedMessages>
 ) {
@@ -125,7 +104,10 @@ fn collidermode_keybinds(
 
 fn exit_collidermode(mut commands: Commands, mut tile_state: ResMut<NextState<EditorState>>, mut message_queue: ResMut<EditorBottomBarQueuedMessages>) {
     tile_state.set(EditorState::Editing(EditingMode::None));
+    tile_state.set(EditorState::Normal);
+
     send_message!(Some('i'), message_queue, "Exiting Collider Editing Mode".to_string());
+
     //remove the CurrentEditorObject resource
     commands.insert_resource(PlaceholderObject(EditorObject::default()));
 }
@@ -189,9 +171,3 @@ impl SignificantComponent for Collider {
         todo!();
     }
 }
-// impl SignificantComponent for Tile {
-//     fn use_rectangle_tool(rect: Rect) {
-//         //make a tile like normal in this rect, but use sliced tiles over the sprite sheet selection
-//         todo!();
-//     }
-// }
