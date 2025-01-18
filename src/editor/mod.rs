@@ -6,7 +6,9 @@ pub use crate::consts::*;
 pub use crate::utilities::*;
 
 mod tile;
+mod collider;
 mod scene;
+mod tools;
 use resources::*;
 pub use std::{ fmt::Debug, path::PathBuf };
 
@@ -21,9 +23,10 @@ pub enum EditorState {
     Normal,
     LoadAsk,
     Loading,
-    LoadEmpty,
+    LoadingEmpty,
     SaveAsk,
     Saving,
+    QuitAsk,
     Editing(EditingMode),
 }
 
@@ -32,9 +35,10 @@ pub enum EditorState {
 pub enum EditingMode {
     #[default]
     None,
+    Actor,
+    Collider,
     Interactable,
     Tile,
-    Actor,
 } 
 
 pub fn editor_plugin(app: &mut App) {
@@ -46,13 +50,15 @@ pub fn editor_plugin(app: &mut App) {
         .init_resource::<EditorBottomBarMessage>()
         .init_resource::<EditorBottomBarQueuedMessages>()
 
-        //The only true startup systems here:
-        .add_systems(Startup, (initialize, create_crosshair, ui::spawn_general_editor_ui).chain())
 
         //begin update system to update the bottom bar text
         .add_systems(Update, ui::send_messages)
         .add_plugins(tile::tilemode_plugin)
+        .add_plugins(collider::collidermode_plugin)
         .add_plugins(scene::scene_plugin)
+
+        //The only true startup systems here:
+        .add_systems(Startup, (initialize, create_crosshair, ui::spawn_general_editor_ui).chain())
         .add_systems(Update, stateful_keybinds.run_if(not(in_state(EditorState::Inactive))));
     //placeholder resource for whatever tile we are trying to place
 }
@@ -105,9 +111,11 @@ fn stateful_keybinds(
     mut cameras: Query<(&mut UIItem, &mut Transform, &Camera2d)>
 ) {
     let messages = &mut message_queue;
-    //manage the editor state, you can switch between modes with ERTY except if you are attempting to save the document
-    //"E" enters editor mode and aborts any saving operation
+    //manage the editor state, you can switch between modes with their letter call or number keys except if you are attempting to save/load the document
+
+    //keybinds for mode switching will kick in only after the user has decided wether or not to load a scene
     if state.get() != &EditorState::LoadAsk {
+        //"E" enters editor mode and aborts any saving operation
         if input.just_pressed(KeyCode::KeyE) || input.just_pressed(KeyCode::Digit1)  || input.just_pressed(KeyCode::Numpad1) {
             if state.get() == &EditorState::SaveAsk {
                 send_message!(Some('w'), messages, "Saving aborted.");
@@ -125,8 +133,17 @@ fn stateful_keybinds(
             next_state.set(EditorState::Editing(EditingMode::Tile));
         }
 
+        //"C" switches to collider mode and aborts any saving operation
+        if input.just_pressed(KeyCode::KeyC) || input.just_pressed(KeyCode::Digit3) || input.just_pressed(KeyCode::Numpad3) {
+            if state.get() == &EditorState::SaveAsk {
+                send_message!(Some('w'), messages, "Saving aborted.");
+            }
+            send_message!(Some('i'), messages, "Switching to Collider Mode");
+            next_state.set(EditorState::Editing(EditingMode::Collider));
+        }
+
         //"R" switches to interactable mode and aborts any saving operation
-        if input.just_pressed(KeyCode::KeyR) || input.just_pressed(KeyCode::Digit3) || input.just_pressed(KeyCode::Numpad3) {
+        if input.just_pressed(KeyCode::KeyR) || input.just_pressed(KeyCode::Digit5) || input.just_pressed(KeyCode::Numpad5) {
             if state.get() != &EditorState::SaveAsk {
                 send_message!(Some('w'), messages, "Saving aborted.");
             }
@@ -148,7 +165,7 @@ fn stateful_keybinds(
             send_message!(Some('i'), messages, "Attempting to load scene");
         }
         if input.just_pressed(KeyCode::KeyN) || input.just_pressed(KeyCode::Escape) {
-            next_state.set(EditorState::LoadEmpty);
+            next_state.set(EditorState::LoadingEmpty);
             send_message!(Some('w'), messages, "No scene loaded");
         }
     }
@@ -161,6 +178,17 @@ fn stateful_keybinds(
         } else if input.just_pressed(KeyCode::KeyN) || input.just_pressed(KeyCode::Escape) {
             next_state.set(EditorState::Normal);
             send_message!(Some('w'), messages, "Saving aborted.");
+        }
+    }
+
+    if state.get() == &EditorState::QuitAsk {
+        // "Y" will exit the editor if the user is in quitting mode, 'N" will abort the exit
+        if input.just_pressed(KeyCode::KeyY) || input.just_pressed(KeyCode::Enter) {
+            next_state.set(EditorState::Inactive);
+            send_message!(Some('i'), messages, "Exiting the editor...");
+        } else if input.just_pressed(KeyCode::KeyN) || input.just_pressed(KeyCode::Escape) {
+            next_state.set(EditorState::Normal);
+            send_message!(Some('w'), messages, "Exiting aborted.");
         }
     }
 
@@ -177,11 +205,21 @@ fn stateful_keybinds(
         }
     }
 
-    //"E" (and escape) is used for switching back to editor mode from any other mode
-    if input.just_pressed(KeyCode::KeyE) || input.just_pressed(KeyCode::Escape) {
-        next_state.set(EditorState::Normal);
-        send_message!(Some('i'), messages, "Returning to Normal Mode");
+    if state.get() != &EditorState::Normal{
+        //"E" (and escape) is used for switching back to editor mode from any other mode
+        if input.just_pressed(KeyCode::KeyE) || input.just_pressed(KeyCode::Escape) {
+            next_state.set(EditorState::Normal);
+            send_message!(Some('i'), messages, "Returning to Normal Mode");
+        }
     }
+    else {
+        //in normal mode: "E" (and escape) will ask the user if they want to exit the editor
+        if input.just_pressed(KeyCode::KeyE) || input.just_pressed(KeyCode::Escape) {
+            next_state.set(EditorState::QuitAsk);
+            send_message!(Some('i'), messages, "Would you like to exit the editor? Yenter/Noscape");
+        }
+    }
+    
 
     let mut vel_y = 0.0;
     let mut vel_x = 0.0;

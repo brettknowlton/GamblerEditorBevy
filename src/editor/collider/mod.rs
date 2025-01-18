@@ -1,9 +1,9 @@
 pub mod ui;
 
 use bevy::prelude::*;
-use bevy::sprite::Anchor;
+use tools::SignificantComponent;
 use std::path::PathBuf;
-use crate::{ utilities::*, resources::*, EditorObject, TILE_SIZE };
+use crate::{ utilities::*, EditorObject, TILE_SIZE };
 use crate::consts::*;
 use super::*;
 
@@ -14,33 +14,33 @@ use super::*;
 //     Active,
 // }
 
-pub fn tilemode_plugin(app: &mut App) {
+pub fn collidermode_plugin(app: &mut App) {
     app
-        .register_type::<Collier>()
+        .register_type::<Collider>()
         .register_type::<Coordinate>()
         .register_type::<TCoordinate>()
-        .register_type::<TileModeUI>()
-        .insert_resource(PlaceholderTile(Tile::new()))
+        .register_type::<ColliderModeUI>()
+        .insert_resource(PlaceholderObject(EditorObject::default()))
+
         //startup systems (may need to be moved from here to maintain order)
-        .add_systems(Startup, load_spritesheet)
 
         //OnEnter systems
-        .add_systems(OnEnter(EditorState::Editing(EditingMode::Tile)), (init_tilemode, ui::show_placeholder, ui::create_tilemode_ui).chain())
+        .add_systems(OnEnter(EditorState::Editing(EditingMode::Tile)), (init_collidermode, ui::show_collider_placeholder, ui::create_collidermode_ui).chain())
 
         //Update systems, that run only while TileEditor is active
         .add_systems(
             Update,
-            (tilemode_keybinds, ui::update_placeholder)
+            (collidermode_keybinds, ui::update_placeholder)
                 .chain()
-                .run_if(in_state(EditorState::Editing(EditingMode::Tile)))
+                .run_if(in_state(EditorState::Editing(EditingMode::Collider)))
         )
 
         //OnExit systems
         .add_systems(
-            OnExit(EditorState::Editing(EditingMode::Tile)), 
+            OnExit(EditorState::Editing(EditingMode::Collider)), 
             (
-                despawn_all::<TileModeUI>,
-                exit_tilemode
+                despawn_all::<ColliderModeUI>,
+                exit_collidermode
             ).chain()
         );
 
@@ -60,21 +60,20 @@ pub fn tilemode_plugin(app: &mut App) {
 //     }
 // }
 
-fn init_tilemode(
+fn init_collidermode(mut message_queue: ResMut<EditorBottomBarQueuedMessages>
 ) {
-    println!("Entering Tile Editing Mode");
-
+    send_message!(Some('i'), message_queue, "Entering Collider Editing Mode".to_string());
 }
 
-fn tilemode_keybinds(
+fn collidermode_keybinds(
     mut commands: Commands,
     input: Res<ButtonInput<KeyCode>>,
 
     crosshairs: Query<(&Transform, &Crosshair)>,
-    mut current_editor_object: ResMut<PlaceholderTile>,
-    tiles: Query<(Entity, &Tile)>
+    colliders: Query<(Entity, &Collider)>,
+    current_editor_object: Res<PlaceholderObject>
 ) {
-    //"P" handles placement of a tile and adding it to the scene
+    //"P" handles placement of a collider and adding it to the scene
     if input.just_pressed(KeyCode::KeyP) {
         //clean up the bevy query overhead
         let (t, _) = crosshairs.single();
@@ -93,27 +92,16 @@ fn tilemode_keybinds(
         // println!("coords: {}{}", coord.0, coord.1);
 
         //check if a tile already exists at this location and remove it if it does
-        if let Some(item) = tiles.iter().find(|(_, t)| t.coordinate == coord) {
+        if let Some(item) = colliders.iter().find(|(_, c)| c.coordinate == coord) {
             //remove the old tile
             commands.entity(item.0).despawn();
         }
-        commands.spawn((
-            Tile {
-                tile_type: focused_item.tile_type,
-                coordinate: coord,
-            },
-            Transform {
-                translation: Vec3::new(coord.0 as f32, coord.1 as f32, -5.0),
-                scale: Vec3::new(TILE_SCALE as f32, TILE_SCALE as f32, 1.0),
-                ..default()
-            },
-            EditorObject {
-                coordinate: TCoordinate::new('T', coord),
-                internal_type: focused_item.tile_type,
-            },
-        ));
+
+        Collider::place(&mut commands, focused_item.clone(), coord);
     }
-    // "L" handles removal of a tile from the scene, similar to placing one just doesnt need to worry about the tile creation part afterwards
+
+
+    // "L" handles removal of a collider from the scene, similar to placing one just doesnt need to worry about the tile creation part afterwards
     if input.just_pressed(KeyCode::KeyL) {
         let (t, _) = crosshairs.single();
         let mut coord = Coordinate::from(t.translation);
@@ -130,80 +118,75 @@ fn tilemode_keybinds(
 
         // println!("coords: {}{}", coord.0, coord.1);
 
-        //check if a tile already exists at this location and remove it if it does
-        if let Some(item) = tiles.iter().find(|(_, t)| t.coordinate == coord) {
-            //remove the old tile
-            commands.entity(item.0).despawn();
-        }
+        Collider::remove(&mut commands, coord, colliders);
     }
 
-
-    if input.just_pressed(KeyCode::ArrowRight) {
-        //cycles through the spritesheet to the right
-        current_editor_object.0.tile_type =
-            (current_editor_object.0.tile_type + 1) % (MAX_SPRITESHEET_ITEMS as u64);
-    }
-    if input.just_pressed(KeyCode::ArrowLeft) {
-        //cycles through the spritesheet to the left
-        current_editor_object.0.tile_type =
-            (current_editor_object.0.tile_type + (MAX_SPRITESHEET_ITEMS as u64) - 1) %
-            (MAX_SPRITESHEET_ITEMS as u64);
-    }
-    if input.just_pressed(KeyCode::ArrowUp) {
-        //cycles through the spritesheet up
-        current_editor_object.0.tile_type = (MAX_SPRITESHEET_ITEMS - SPRITESHEET_WIDTH) as u64 + (current_editor_object.0.tile_type % SPRITESHEET_WIDTH as u64);
-    }
-    if input.just_pressed(KeyCode::ArrowDown) {
-        //cycles through the spritesheet down
-        current_editor_object.0.tile_type =
-            (current_editor_object.0.tile_type + (SPRITESHEET_WIDTH as u64)) %
-            (MAX_SPRITESHEET_ITEMS as u64);
-    }
 }
 
-fn load_spritesheet(mut commands: Commands, asset_server: Res<AssetServer>) {
-    //load the tilesheet for this mode
-    let tex_path = PathBuf::from("textures/tiles/tilesheet.png");
-
-    //load happens here
-    let texture = asset_server.load(tex_path);
-
-    //insert the texture handle into the resources for easy access later
-    commands.insert_resource(TilesheetHandle(texture.clone()));
-}
-
-fn exit_tilemode(mut commands: Commands, mut tile_state: ResMut<NextState<EditorState>>) {
+fn exit_collidermode(mut commands: Commands, mut tile_state: ResMut<NextState<EditorState>>, mut message_queue: ResMut<EditorBottomBarQueuedMessages>) {
     tile_state.set(EditorState::Editing(EditingMode::None));
-    println!("Exiting Tile Editing Mode");
-
+    send_message!(Some('i'), message_queue, "Exiting Collider Editing Mode".to_string());
     //remove the CurrentEditorObject resource
-    commands.insert_resource(PlaceholderTile(Tile::new()));
+    commands.insert_resource(PlaceholderObject(EditorObject::default()));
 }
 
-/// A component that marks an entity as part of the tile editing UI.
+/// A component that marks an entity as part 
+/// 
+/// of the tile editing UI.
 #[derive(Component, Reflect)]
 #[reflect(Component)]
 #[require(UIItem)]
-struct TileModeUI;
+struct ColliderModeUI;
 
 /// A component to track some basic info about a tile
 #[derive(Component, Reflect, Debug, Clone)]
 #[reflect(Component)]
-pub struct Tile {
-    pub tile_type: u64,
+pub struct Collider {
+    pub internal_type: u64,
     pub coordinate: Coordinate,
+    pub rect: Rect,
 }
-impl Tile {
+impl Collider {
     fn new() -> Self {
         Self {
-            tile_type: 0,
+            internal_type: 0,
             coordinate: Coordinate(0, 0),
+            rect: Rect::new(0.0, 0.0, 1.0, 1.0),
         }
     }
 }
-impl Default for Tile {
+impl Default for Collider {
     fn default() -> Self {
         Self::new()
+    }
+}
+impl SignificantComponent for Collider {
+    fn get_coordinate(&self) -> Coordinate {
+        self.coordinate
+    }
+    
+    fn place(commands: &mut Commands, item: EditorObject, coord: Coordinate){
+        commands.spawn((
+            Collider {
+                internal_type: item.internal_type,
+                coordinate: coord,
+                rect: Rect::new(0.0, 0.0, 1.0, 1.0),
+            },
+            Transform {
+                translation: Vec3::new(coord.0 as f32, coord.1 as f32, -5.0),
+                scale: Vec3::new(TILE_SCALE as f32, TILE_SCALE as f32, 1.0),
+                ..default()
+            },
+            EditorObject {
+                coordinate: TCoordinate::new('T', coord),
+                internal_type: item.internal_type,
+            },
+        ));
+    }
+
+    fn use_rectangle_tool(_rect: Rect) {
+        //make a tile like normal in this rect, but use sliced tiles over the sprite sheet selection
+        todo!();
     }
 }
 // impl SignificantComponent for Tile {

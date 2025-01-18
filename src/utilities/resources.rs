@@ -1,5 +1,5 @@
 use bevy::prelude::*;
-use crate::{EditorObject, Tile};
+use crate::EditorObject;
 
 
 #[derive(Resource, Debug, Component)]

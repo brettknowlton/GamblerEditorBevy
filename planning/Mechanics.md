@@ -1,1 +1,1 @@
-[[Rectangle Tool]]
+[[SignificantComponent Trait]]

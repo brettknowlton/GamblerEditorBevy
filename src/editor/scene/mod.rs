@@ -6,7 +6,7 @@ use bevy::{prelude::*, tasks::IoTaskPool};
 
 pub fn scene_plugin(app: &mut App){
     app
-        .add_systems(OnEnter(EditorState::LoadEmpty), load_empty_scene)
+        .add_systems(OnEnter(EditorState::LoadingEmpty), load_empty_scene)
         .add_systems(OnEnter(EditorState::Loading), return_state.after(load_empty_scene))
         .add_systems(OnEnter(EditorState::Loading), load_scene)
         .add_systems(OnEnter(EditorState::Loading), return_state.after(load_scene))
@@ -62,10 +62,10 @@ fn load_empty_scene(mut commands: Commands){
     commands.spawn(DynamicSceneRoot(Handle::default()));
 }
 
-fn return_state(mut next_state: ResMut<NextState<EditorState>>) {
+fn return_state(mut next_state: ResMut<NextState<EditorState>>, mut message_queue: ResMut<EditorBottomBarQueuedMessages>) {
     //change the state
     next_state.set(EditorState::Normal);
-    println!("Saving operations complete, returning to normal state");
+    send_message!(Some('i'), message_queue, "FileIO Operations completed successfullly, returning to Normal Mode".to_string());
 }
 
 fn save_items(world: &mut World){

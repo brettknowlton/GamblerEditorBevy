@@ -4,7 +4,7 @@ use bevy::color::Srgba;
 //disable dead code warnings with #[warn(dead...)]
 
 pub(crate)const 
-                        WINDOW_TITLE:                                                                   &str
+                        _WINDOW_TITLE:                                                                   &str
                         =
                             "Gambler";
 ///////////////////////////////////////
