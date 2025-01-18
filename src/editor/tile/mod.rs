@@ -43,11 +43,6 @@ pub fn tilemode_plugin(app: &mut App) {
             OnExit(EditorState::Editing(EditingMode::Tile)),
             (despawn_all::<TileModeUI>, exit_tilemode).chain()
         );
-        .add_systems(OnExit(EditorState::Editing { editing_mode: EditingMode::Tile }), (
-            exit_tilemode.before(tilemode_keybinds),
-            despawn_all::<TileModeUI>.before(exit_tilemode),
-        ));
-
     //we could also take care of some post-exit cleanup here, like despawning all the UI elements by using the schedule OnEnter(EditorState::Inactive) and then despawning all the UI elements
 }
 
