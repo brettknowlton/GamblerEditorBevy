@@ -160,7 +160,7 @@ impl SignificantComponent for Collider {
                 ..default()
             },
             EditorObject {
-                coordinate: TCoordinate::new('T', coord),
+                coordinate: TCoordinate::new('C', coord),
                 internal_type: item.internal_type,
             },
         ));
