@@ -26,7 +26,7 @@ pub fn tilemode_plugin(app: &mut App) {
 
         //OnEnter systems
         .add_systems(
-            OnEnter(EditorState::Editing(EditingMode::Tile)),
+            OnEnter(EditorState::Editing(EditingComponent::Tile)),
             (init_tilemode, ui::show_tile_placeholder, ui::create_tilemode_ui).chain()
         )
 
@@ -35,12 +35,12 @@ pub fn tilemode_plugin(app: &mut App) {
             Update,
             (tilemode_keybinds, ui::update_placeholder)
                 .chain()
-                .run_if(in_state(EditorState::Editing(EditingMode::Tile)))
+                .run_if(in_state(EditorState::Editing(EditingComponent::Tile)))
         )
 
         //OnExit systems
         .add_systems(
-            OnExit(EditorState::Editing(EditingMode::Tile)),
+            OnExit(EditorState::Editing(EditingComponent::Tile)),
             (despawn_all::<TileModeUI>, exit_tilemode).chain()
         );
     //we could also take care of some post-exit cleanup here, like despawning all the UI elements by using the schedule OnEnter(EditorState::Inactive) and then despawning all the UI elements
@@ -67,16 +67,8 @@ fn tilemode_keybinds(
         let (t, _) = crosshairs.single();
         let focused_item = current_editor_object.0.clone();
 
-        let coord = Coordinate::from(t.translation);
-        let pushover = 1000 * ((TILE_SIZE * TILE_SCALE) as i64); //this effectively offsets all my tiles 1000 to the right and down, so that negative coordinates arent a problem and rounds to the nearest integer
-        let coord = Coordinate(
-            ((coord.0 + pushover) / ((TILE_SIZE * TILE_SCALE) as i64)) *
-                ((TILE_SIZE * TILE_SCALE) as i64) -
-                pushover,
-            ((coord.1 + pushover) / ((TILE_SIZE * TILE_SCALE) as i64)) *
-                ((TILE_SIZE * TILE_SCALE) as i64) -
-                pushover
-        );
+        let mut coord = Coordinate::from(t.translation);
+        coord = snap_coordinate_to_grid(coord);
 
         //check if a tile already exists at this location and remove it if it does
         if let Some(item) = tiles.iter().find(|(_, t)| t.coordinate == coord) {
@@ -93,16 +85,7 @@ fn tilemode_keybinds(
     if input.just_pressed(KeyCode::KeyL) {
         let (t, _) = crosshairs.single();
         let mut coord = Coordinate::from(t.translation);
-        //"floor" the coordinate to the nearest tile grid space in a way that (kind of) respects the negative coordinate space, just dont place anything more than 1000 tiles away from the origin until I can figure that out
-        let pushover = 1000 * ((TILE_SIZE * TILE_SCALE) as i64);
-        coord = Coordinate(
-            ((coord.0 + pushover) / ((TILE_SIZE * TILE_SCALE) as i64)) *
-                ((TILE_SIZE * TILE_SCALE) as i64) -
-                pushover,
-            ((coord.1 + pushover) / ((TILE_SIZE * TILE_SCALE) as i64)) *
-                ((TILE_SIZE * TILE_SCALE) as i64) -
-                pushover
-        );
+        coord = snap_coordinate_to_grid(coord);
 
         Tile::remove::<Tile>(&mut commands, coord, tiles);
         send_message!(Some('i'), message_queue, format!("Removing tiles at: ({}, {})", coord.0, coord.1));
@@ -145,9 +128,9 @@ fn load_spritesheet(mut commands: Commands, asset_server: Res<AssetServer>, mut 
     commands.insert_resource(TilesheetHandle(texture.clone()));
 }
 
-fn exit_tilemode(mut commands: Commands, mut tile_state: ResMut<NextState<EditorState>>, mut message_queue: ResMut<EditorBottomBarQueuedMessages>) {
-    tile_state.set(EditorState::Editing(EditingMode::None));
-    tile_state.set(EditorState::Normal);
+fn exit_tilemode(mut commands: Commands, mut message_queue: ResMut<EditorBottomBarQueuedMessages>) {
+    // tile_state.set(EditorState::Editing(EditingComponent::None));
+    // tile_state.set(EditorState::Normal);
 
     //remove the CurrentEditorObject resource
     commands.insert_resource(PlaceholderObject(EditorObject::default()));

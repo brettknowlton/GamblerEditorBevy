@@ -30,36 +30,43 @@ pub fn update_placeholder(
 
 pub fn show_collider_placeholder(
     mut commands: Commands,
-    spritesheet: Res<TilesheetHandle>,
-    crosshairs: Query<(&Transform, &Crosshair)>
+    crosshairs: Query<(&Transform, &Crosshair)>,
+    asset_server: Res<AssetServer>,
 ) {
     let c = crosshairs.single();
     let x_off = c.0.translation.x;
     let y_off = c.0.translation.y;
 
-    let texpath = spritesheet.0.clone();
+    let texpath = PathBuf::from("textures/tiles/collider_debug.png");
+    let tex = asset_server.load(texpath);
+
+
     //display the placeholder tile
     commands.spawn((
-        Tile {
-            tile_type: 0,
-            coordinate: Coordinate(0, 0),
+        Collider {
+            ..default()
         },
+
         Sprite {
-            image: texpath,
+            image: tex,
             rect: Some(Rect {
                 min: Vec2::new(0.0, 0.0),
                 max: Vec2::new(TILE_SIZE as f32, TILE_SIZE as f32),
             }),
             ..default()
         },
+
         Transform {
             translation: Vec3::new(x_off, y_off, 0.0),
             ..default()
         },
+
         UIItem {
             ..default()
         },
+        
         ColliderModeUI,
+
         PlaceholderObjectTag,
     ));
 }
@@ -80,7 +87,7 @@ pub fn create_collidermode_ui(mut commands: Commands, asset_server: Res<AssetSer
     let ui_y = DEFAULT_WINDOW_HEIGHT;
     let ui_border = 4.0;
 
-    //spawn tilemodeUI
+    //spawn collidermode UI
     commands.spawn((
         Sprite {
             image: tex1,

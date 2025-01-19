@@ -19,19 +19,19 @@ pub fn collidermode_plugin(app: &mut App) {
         //startup systems (may need to be moved from here to maintain order)
 
         //OnEnter systems
-        .add_systems(OnEnter(EditorState::Editing(EditingMode::Collider)), (init_collidermode, ui::show_collider_placeholder, ui::create_collidermode_ui).chain())
+        .add_systems(OnEnter(EditorState::Editing(EditingComponent::Collider)), (init_collidermode, ui::show_collider_placeholder, ui::create_collidermode_ui).chain())
 
         //Update systems, that run only while TileEditor is active
         .add_systems(
             Update,
             (collidermode_keybinds, ui::update_placeholder)
                 .chain()
-                .run_if(in_state(EditorState::Editing(EditingMode::Collider)))
+                .run_if(in_state(EditorState::Editing(EditingComponent::Collider)))
         )
 
         //OnExit systems
         .add_systems(
-            OnExit(EditorState::Editing(EditingMode::Collider)), 
+            OnExit(EditorState::Editing(EditingComponent::Collider)), 
             (
                 despawn_all::<ColliderModeUI>,
                 exit_collidermode
@@ -103,8 +103,6 @@ fn collidermode_keybinds(
 }
 
 fn exit_collidermode(mut commands: Commands, mut tile_state: ResMut<NextState<EditorState>>, mut message_queue: ResMut<EditorBottomBarQueuedMessages>) {
-    tile_state.set(EditorState::Editing(EditingMode::None));
-    tile_state.set(EditorState::Normal);
 
     send_message!(Some('i'), message_queue, "Exiting Collider Editing Mode".to_string());
 

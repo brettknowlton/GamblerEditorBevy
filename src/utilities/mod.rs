@@ -1,9 +1,10 @@
 use bevy::prelude::*;
 use serde::{ Serialize, Deserialize };
 
+use crate::{ TILE_SCALE, TILE_SIZE };
+
 pub mod resources;
 pub mod tools;
-
 
 //Helper Functions
 pub fn despawn_all<T: Component>(mut commands: Commands, to_despawn: Query<Entity, With<T>>) {
@@ -12,10 +13,15 @@ pub fn despawn_all<T: Component>(mut commands: Commands, to_despawn: Query<Entit
     }
 }
 
+pub fn snap_value_to_grid(coord: Coordinate, grid_size: i64) -> Coordinate {
+    let x = (coord.0 / grid_size) * grid_size;
+    let y = (coord.1 / grid_size) * grid_size;
+    Coordinate(x, y)
+}
 
-
-
-
+pub fn snap_coordinate_to_grid(coord: Coordinate) -> Coordinate {
+    snap_value_to_grid(coord, (TILE_SIZE * TILE_SCALE) as i64)
+}
 
 ///A Coordinate is a simple struct that holds two i64 values, x and y identifying a point in our editor
 /// most items are anchored to Bottom Left, so the x and y values (generally) define the bottom left corner of the object
@@ -44,11 +50,6 @@ impl Into<bevy::prelude::Vec2> for Coordinate {
         Vec2::new(self.0 as f32, self.1 as f32)
     }
 }
-
-
-
-
-
 
 ///A TCoordinate, or a "typed coordinate" is a coordinate that also includes an identifying character,
 ///this way the coordinate is unique, as no two objects of the same type can occupy the same space,

@@ -8,10 +8,8 @@ pub fn scene_plugin(app: &mut App){
     app
         .add_systems(OnEnter(EditorState::LoadingEmpty), load_empty_scene)
         .add_systems(OnEnter(EditorState::Loading), return_state.after(load_empty_scene))
-        .add_systems(OnEnter(EditorState::Loading), load_scene)
-        .add_systems(OnEnter(EditorState::Loading), return_state.after(load_scene))
-        .add_systems(OnEnter(EditorState::Saving), save_items)
-        .add_systems(OnEnter(EditorState::Saving), return_state.after(save_items))
+        .add_systems(OnEnter(EditorState::Loading), (load_scene, return_state.after(load_scene)))
+        .add_systems(OnEnter(EditorState::Saving),( save_items,return_state.after(save_items)))
 
         .add_systems(Update, spawn_sprites.run_if(not(in_state(EditorState::LoadAsk))));
 

@@ -1,17 +1,18 @@
 use bevy::prelude::*;
+use tools::SignificantComponent;
 
 use super::*;
 
 pub fn spawn_general_editor_ui(mut commands: Commands, asset_server: Res<AssetServer>) {
     //spawn a bar on the bottom using our default UI menu sprite
-    let ui_texpath = PathBuf::from("textures/menus/menu1.png");
 
     let x_offset = -DEFAULT_WINDOW_WIDTH / 2.0;
     let y_offset = -DEFAULT_WINDOW_HEIGHT / 2.0;
 
     let x_size = DEFAULT_WINDOW_WIDTH;
     let y_size = 30.0;
-
+    
+    let ui_texpath = PathBuf::from("textures/menus/menu1.png");
     let ui_tex = asset_server.load(ui_texpath);
     commands.spawn((
         UIItem::default(),
@@ -90,7 +91,15 @@ macro_rules! send_message {
     };
 }
 
-
+// #[derive(Component)]
+// pub struct NormalModeObject{
+    
+// };
+// impl SignificantComponent for NormalModeObject {
+//     fn get_coordinate(&self) -> Coordinate {
+//         Coordinate(0, 0)
+//     }
+// }
 
 #[derive(Component)]
 pub struct DisplayMessage;

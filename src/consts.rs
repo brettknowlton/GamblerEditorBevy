@@ -14,10 +14,11 @@ pub const WINDOW_TITLE2:&str= "GamblerEditor";
 pub const WINDOW_DEFAULT_BACKGROUND_COLOR: Srgba = Srgba::new(0.31, 0.643, 0.722, 1.);
 
 
-pub const TILE_SCALE: usize = 4;
-pub const TILE_SCALE_X: usize = TILE_SIZE * TILE_SCALE;
-pub const TILE_SCALE_Y: usize = TILE_SIZE * TILE_SCALE;
-pub const TILE_SIZE: usize = 16;
+pub const TILE_SCALE: usize = 4;//scale factor of tiles
+pub const TILE_SIZE: usize = 32;//number of pixels wide the tile source image is
+
+pub const SCALED_TILE_WIDTH: usize = TILE_SIZE * TILE_SCALE;
+pub const SCALED_TILE_HEIGHT: usize = TILE_SIZE * TILE_SCALE;
 
 pub const SPRITESHEET_WIDTH: usize = 8;
 pub const MAX_SPRITESHEET_ITEMS: usize = 32;
