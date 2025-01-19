@@ -2,6 +2,8 @@ use bevy::prelude::*;
 use serde::{ Serialize, Deserialize };
 
 pub mod resources;
+pub mod tools;
+
 
 //Helper Functions
 pub fn despawn_all<T: Component>(mut commands: Commands, to_despawn: Query<Entity, With<T>>) {
@@ -35,6 +37,11 @@ pub struct Coordinate(pub i64, pub i64);
 impl Coordinate {
     pub fn from(v: Vec3) -> Self {
         Self(v.x as i64, v.y as i64)
+    }
+}
+impl Into<bevy::prelude::Vec2> for Coordinate {
+    fn into(self) -> Vec2 {
+        Vec2::new(self.0 as f32, self.1 as f32)
     }
 }
 

@@ -199,7 +199,7 @@ impl SignificantComponent for Tile {
         ));
     }
 
-    fn use_rectangle_tool(_rect: Rect) {
+    fn use_rectangle_tool(_rect: Rect, _commands: Commands) {
         //make a tile like normal in this rect, but use sliced tiles over the sprite sheet selection
         todo!();
     }

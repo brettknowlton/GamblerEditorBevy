@@ -85,6 +85,9 @@ macro_rules! send_message {
     ($key:expr, $messages:expr, $message:expr) => {
         $messages.messages.push(($key, $message.to_string()));
     };
+    (_) => {
+        $messages.messages.push((None, " ".to_string()));
+    };
 }
 
 

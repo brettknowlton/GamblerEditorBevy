@@ -3,12 +3,11 @@ pub mod ui;
 pub use tile::*;
 pub use crate::consts::*;
 pub use crate::utilities::*;
+use resources::*;
 
 mod tile;
 mod collider;
 mod scene;
-mod tools;
-use resources::*;
 pub use std::{ fmt::Debug, path::PathBuf };
 
 use bevy::{ prelude::*, sprite::Anchor };
@@ -47,6 +46,7 @@ pub fn editor_plugin(app: &mut App) {
         .init_resource::<EditorBottomBarDisplayed>()
         .init_resource::<EditorBottomBarMessage>()
         .init_resource::<EditorBottomBarQueuedMessages>()
+        .init_resource::<ActiveSelection>()
 
         //begin update system to update the bottom bar text
         .add_systems(Update, ui::send_messages)
@@ -105,10 +105,12 @@ fn stateful_keybinds(
     time: Res<Time>,
     input: Res<ButtonInput<KeyCode>>,
     mut message_queue: ResMut<EditorBottomBarQueuedMessages>,
+    mut active_selection: ResMut<ActiveSelection>,
     // m_input: Res<ButtonInput<MouseButton>>,
 
     mut uiitems: Query<(&mut UIItem, &mut Transform), Without<Camera2d>>,
-    mut cameras: Query<(&mut UIItem, &mut Transform, &Camera2d)>
+    mut cameras: Query<(&mut UIItem, &mut Transform, &Camera2d)>,
+    mut crosshairs: Query<(&mut Crosshair, &mut Transform), Without<Camera2d>>,
 ) {
     let messages = &mut message_queue;
     //manage the editor state, you can switch between modes with their letter call or number keys except if you are attempting to save/load the document
@@ -176,6 +178,30 @@ fn stateful_keybinds(
     if input.all_pressed(vec![KeyCode::KeyQ, KeyCode::ControlLeft]) && state.get() != &EditorState::QuitAsk {
         next_state.set(EditorState::QuitAsk);
         send_message!(Some('i'), messages, "Would you like to exit the editor? Yenter/Noscape");
+    }
+
+
+    //O is the main button to directly use the Rectangle Tool
+    if input.just_pressed(KeyCode::KeyO){
+            //use crosshair's coordinate as start
+            let (_, t) = crosshairs.single();
+            let coord = Coordinate{0: t.translation.x as i64, 1: t.translation.y as i64};
+
+            active_selection.selection_rect = Some(SelectionRect::start(coord));
+
+        send_message!(Some('i'), messages, "Rectangling.....");
+    }else if input.just_released(KeyCode::KeyO){
+        
+        //use crosshair's coordinate as end
+        let (_, t) = crosshairs.single();
+        let coord = Coordinate{0: t.translation.x as i64, 1: t.translation.y as i64};
+
+        active_selection.selection_rect = active_selection.selection_rect.clone().map(|mut r| {
+            r.end(coord);
+            r
+        });
+
+        send_message!(Some('i'), messages, format!("Selection Rect: {:?}", active_selection.selection_rect));
     }
 
     //state specific keybinds

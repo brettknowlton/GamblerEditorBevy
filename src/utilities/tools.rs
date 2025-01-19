@@ -1,12 +1,12 @@
+use crate::EditorObject;
+
 use super::*;
 use bevy::math::Rect;
-
-
 
 pub trait SignificantComponent {
     fn get_coordinate(&self) -> Coordinate;
 
-    fn use_rectangle_tool(rect: Rect);
+    fn use_rectangle_tool(rect: Rect, commands: Commands);
     fn place(commands: &mut Commands, item: EditorObject, coord: Coordinate);
     fn remove<T: SignificantComponent + Component>(commands: &mut Commands, coord: Coordinate, from: Query<(Entity, &T)>){
         //check if a tile already exists at this location and remove it if it does
@@ -16,3 +16,4 @@ pub trait SignificantComponent {
         }
     }
 }
+

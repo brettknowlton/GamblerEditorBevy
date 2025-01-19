@@ -4,21 +4,17 @@
     "type": "split",
     "children": [
       {
-        "id": "b5cbe0195742fa0f",
+        "id": "462ab7a153a02dfc",
         "type": "tabs",
         "children": [
           {
-            "id": "ad2d4c31e83d99a3",
+            "id": "5164161d9a27d8a0",
             "type": "leaf",
             "state": {
-              "type": "markdown",
-              "state": {
-                "file": "planning/Mechanic Breakdowns/Context Menu.md",
-                "mode": "source",
-                "source": false
-              },
+              "type": "empty",
+              "state": {},
               "icon": "lucide-file",
-              "title": "Context Menu"
+              "title": "New tab"
             }
           }
         ]
@@ -93,7 +89,6 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "planning/Mechanic Breakdowns/Context Menu.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -103,7 +98,7 @@
                 "unlinkedCollapsed": true
               },
               "icon": "links-coming-in",
-              "title": "Backlinks for Context Menu"
+              "title": "Backlinks"
             }
           },
           {
@@ -112,12 +107,11 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "planning/Mechanic Breakdowns/Context Menu.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               },
               "icon": "links-going-out",
-              "title": "Outgoing links from Context Menu"
+              "title": "Outgoing links"
             }
           },
           {
@@ -138,11 +132,9 @@
             "type": "leaf",
             "state": {
               "type": "outline",
-              "state": {
-                "file": "planning/Mechanic Breakdowns/Context Menu.md"
-              },
+              "state": {},
               "icon": "lucide-list",
-              "title": "Outline of Context Menu"
+              "title": "Outline"
             }
           }
         ]
@@ -162,4 +154,41 @@
       "command-palette:Open command palette": false
     }
   },
+  "active": "5164161d9a27d8a0",
+  "lastOpenFiles": [
+    "planning/Mechanic Breakdowns/Mechanics.md",
+    "planning/Gambler Editor.md",
+    "GamblerEditorBevy/planning/Mechanic Breakdowns/Mechanics.md",
+    "planning/To-Do's.md",
+    "planning/Mechanic Breakdowns/Rectangle Tool.md",
+    "planning/Mechanic Breakdowns/SignificantComponent Trait.md",
+    "GamblerEditorBevy/planning/Mechanic Breakdowns",
+    "GamblerEditorBevy/planning",
+    "GamblerEditorBevy",
+    "planning/Mechanic Breakdowns/Context Menu.md",
+    "target/debug/deps/gambler_bevy-1cc2ff3bf7e3691d",
+    "target/debug/incremental/gambler_bevy-3jq1gyo0cljhc/s-h3sloxlltu-0hxif88-1k7ldpqgqp8m7nv757fu97xdk/work-products.bin",
+    "target/debug/incremental/gambler_bevy-3jq1gyo0cljhc/s-h3sloxlltu-0hxif88-1k7ldpqgqp8m7nv757fu97xdk/query-cache.bin",
+    "target/debug/incremental/gambler_bevy-3jq1gyo0cljhc/s-h3sloxlltu-0hxif88-1k7ldpqgqp8m7nv757fu97xdk/f4uvkfbdhqzavz73zgzpk1j10.o",
+    "target/debug/incremental/gambler_bevy-3jq1gyo0cljhc/s-h3sloxlltu-0hxif88-1k7ldpqgqp8m7nv757fu97xdk/f3gx2b9uti46o819gjbxxuhpx.o",
+    "target/debug/incremental/gambler_bevy-3jq1gyo0cljhc/s-h3sloxlltu-0hxif88-1k7ldpqgqp8m7nv757fu97xdk/ezjvyoivhof9e2scg9tc380pp.o",
+    "target/debug/incremental/gambler_bevy-3jq1gyo0cljhc/s-h3sloxlltu-0hxif88-1k7ldpqgqp8m7nv757fu97xdk/etg0d41cz2kt1ya4pjf6qytfr.o",
+    "planning/Mechanic Breakdowns/Yenter-Noscape.md",
+    "planning/Mechanic Breakdowns/Controls.md",
+    "planning/Art/Player/original player design.png",
+    "planning/Art/Player/Player Concept Art.md",
+    "planning/Art/Interiors/zughy32.png",
+    "planning/Art/Interiors/rosy-42-palette-example-by-s-203792.png",
+    "planning/Art/Cards/H4.png",
+    "planning/Art/Cards/H3.png",
+    "planning/Art/Cards/H2.png",
+    "planning/Art/Cards/Card Concept Art.md",
+    "planning/Art/Art.md",
+    "planning/Mechanics.md",
+    "planning/art concepts/zughy32.png",
+    "planning/art concepts/rosy-42-palette-example-by-s-203792.png",
+    "planning/Root.md",
+    "assets/textures/cards/H1.png",
+    "assets/textures/cards/H0.png"
+  ]
 }
