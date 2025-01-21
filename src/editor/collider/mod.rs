@@ -3,6 +3,7 @@ pub mod ui;
 use bevy::prelude::*;
 use tools::SignificantComponent;
 use std::path::PathBuf;
+use crate::ui::create_placeholder;
 use crate::{ utilities::*, EditorObject, TILE_SIZE };
 use crate::consts::*;
 use super::*;
@@ -14,7 +15,6 @@ pub fn collidermode_plugin(app: &mut App) {
         .register_type::<Coordinate>()
         .register_type::<TCoordinate>()
         .register_type::<ColliderModeUI>()
-        .insert_resource(PlaceholderObject(EditorObject::default()))
 
         //startup systems (may need to be moved from here to maintain order)
 
@@ -42,6 +42,7 @@ pub fn collidermode_plugin(app: &mut App) {
 fn init_collidermode(mut message_queue: ResMut<EditorBottomBarQueuedMessages>
 ) {
     send_message!(Some('i'), message_queue, "Entering Collider Editing Mode".to_string());
+    Collider::create_placeholder(commands);
 }
 
 fn collidermode_keybinds(
@@ -50,7 +51,7 @@ fn collidermode_keybinds(
 
     crosshairs: Query<(&Transform, &Crosshair)>,
     colliders: Query<(Entity, &Collider)>,
-    current_editor_object: Res<PlaceholderObject>
+    current_editor_object: Res<PlaceholderObject<Collider>>,
 ) {
     //"P" handles placement of a collider and adding it to the scene
     if input.just_pressed(KeyCode::KeyP) {
@@ -123,14 +124,14 @@ struct ColliderModeUI;
 #[reflect(Component)]
 pub struct Collider {
     pub internal_type: u64,
-    pub coordinate: Coordinate,
+    pub coordinate: TCoordinate,
     pub rect: Rect,
 }
 impl Collider {
     fn new() -> Self {
         Self {
             internal_type: 0,
-            coordinate: Coordinate(0, 0),
+            coordinate: TCoordinate{type_char: 'C', coord: Coordinate{0: 0, 1: 0}},
             rect: Rect::new(0.0, 0.0, 1.0, 1.0),
         }
     }
@@ -141,8 +142,8 @@ impl Default for Collider {
     }
 }
 impl SignificantComponent for Collider {
-    fn get_coordinate(&self) -> Coordinate {
-        self.coordinate
+    fn get_coordinate(&self) -> &TCoordinate {
+        &self.coordinate
     }
     
     fn place(commands: &mut Commands, item: EditorObject, coord: Coordinate){

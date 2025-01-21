@@ -58,7 +58,6 @@ pub fn spawn_general_editor_ui(mut commands: Commands, asset_server: Res<AssetSe
     
 }
 
-
 pub fn send_messages(mut queued_messages: ResMut<EditorBottomBarQueuedMessages>, mut display_message: Query<(&DisplayMessage, &mut Text)>) {
     //push any messages into the in-game console and leave the last one in our BottomBarMessage for display
     let item = queued_messages.messages.pop(); {
@@ -90,6 +89,59 @@ macro_rules! send_message {
         $messages.messages.push((None, " ".to_string()));
     };
 }
+
+///Tagging component for the placeholder object we want to replace the current placeholder object with
+#[derive(Component)]
+pub struct NextPlaceholder;
+
+pub fn update_placeholder<T: SignificantComponent, Component>(
+    mut placeholder: ResMut<PlaceholderObject::<T>>,
+    replacement: Query<(Entity, &NextPlaceholder)>,
+) {
+    //update the placeholder object
+    let (entity, component) = replacement.single().unwrap();
+    let mut placeholder = placeholder.0;
+    placeholder.0 = component.clone();
+}
+
+// pub fn despawn_placeholder<T: SignificantComponent>(
+//     mut commands: Commands,
+//     placeholder: Res<PlaceholderObject<T>>,
+//     query: Query<Entity, With<T>>,
+// ) {
+//     //despawn the placeholder object
+// }
+
+
+
+pub fn create_placeholder(
+    mut commands: Commands,
+    spritesheet: Res<TilesheetHandle>,
+    crosshairs: Query<(&Transform, &Crosshair)>,
+
+    cur_state: State<EditorState>,
+) {
+    match cur_state.get() {
+        EditorState::Editing(x) => {
+            match x{
+
+            }
+        }
+        _ => {}
+    }
+}
+
+
+// pub fn create_tilemode_ui(mut commands: Commands, asset_server: Res<AssetServer>, crosshairs: Query<(&Transform, &Crosshair)>, tilesheet_handle: Res<TilesheetHandle>) {
+
+
+#[derive(Component)]
+pub struct PlaceholderObject<T: SignificantComponent>(pub T);
+
+
+
+
+
 
 // #[derive(Component)]
 // pub struct NormalModeObject{

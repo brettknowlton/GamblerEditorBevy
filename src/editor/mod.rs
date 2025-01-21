@@ -1,6 +1,8 @@
 #[macro_use]
 pub mod ui;
+use bevy::text::cosmic_text::Selection;
 pub use tile::*;
+use tools::SignificantComponent;
 pub use crate::consts::*;
 pub use crate::utilities::*;
 use resources::*;
@@ -67,7 +69,8 @@ pub fn editor_plugin(app: &mut App) {
         .init_resource::<EditorBottomBarDisplayed>()
         .init_resource::<EditorBottomBarMessage>()
         .init_resource::<EditorBottomBarQueuedMessages>()
-        .init_resource::<ActiveSelection>()
+        // .init_resource::<ActiveSelection>()
+        .init_resource::<PlaceholderObject>()
 
         //begin update system to update the bottom bar text
         .add_systems(Update, ui::send_messages)
@@ -128,10 +131,9 @@ fn stateful_keybinds(
     time: Res<Time>,
     input: Res<ButtonInput<KeyCode>>,
     mut message_queue: ResMut<EditorBottomBarQueuedMessages>,
-    mut active_selection: ResMut<ActiveSelection>,
     // m_input: Res<ButtonInput<MouseButton>>,
     mut crosshairs: Query<(&mut Crosshair, &mut Transform, &mut Sprite), Without<Camera2d>>,
-
+    mut active_selection: ResMut<PlaceholderObject>,
     mut uiitems: Query<(&mut UIItem, &mut Transform), (Without<Camera2d>, Without<Crosshair>)>,
     mut cameras: Query<(&mut UIItem, &mut Transform, &mut Camera2d)>
 ) {
