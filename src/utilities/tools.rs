@@ -4,7 +4,6 @@ use super::*;
 use bevy::math::Rect;
 
 pub trait SignificantComponent {
-
     fn place_rectangle(rect: Rect, commands: Commands);
     fn place<T: SignificantComponent + Component + Default>(commands: &mut Commands, item: EditorObject, coord: Coordinate, from: &Query<(Entity, &EditorObject), With<T>>) {
 
@@ -35,5 +34,4 @@ pub trait SignificantComponent {
             commands.entity(item.0).despawn();
         }
     }
-
 }

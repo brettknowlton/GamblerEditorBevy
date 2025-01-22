@@ -56,4 +56,3 @@ impl Default for EditorBottomBarMessage {
         Self{text: "".to_string()}
     }
 }
-

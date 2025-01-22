@@ -4,15 +4,16 @@ pub use ui::*;
 use bevy::prelude::*;
 use tools::SignificantComponent;
 use std::path::PathBuf;
+use crate::ui::create_placeholder;
 use crate::{ utilities::*, EditorObject, TILE_SIZE };
 use crate::consts::*;
 use super::*;
 
 
-
 fn init_collidermode(mut message_queue: ResMut<EditorBottomBarQueuedMessages>
 ) {
     send_message!(Some('i'), message_queue, "Entering Collider Editing Mode".to_string());
+    Collider::create_placeholder(commands);
 }
 
 fn collidermode_keybinds(
@@ -81,14 +82,14 @@ struct ColliderModeUI;
 #[reflect(Component)]
 pub struct Collider {
     pub internal_type: u64,
-    pub coordinate: Coordinate,
+    pub coordinate: TCoordinate,
     pub rect: Rect,
 }
 impl Collider {
     fn new() -> Self {
         Self {
             internal_type: 0,
-            coordinate: Coordinate(0, 0),
+            coordinate: TCoordinate{type_char: 'C', coord: Coordinate{0: 0, 1: 0}},
             rect: Rect::new(0.0, 0.0, 1.0, 1.0),
         }
     }

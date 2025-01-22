@@ -5,6 +5,7 @@ use selection::SelectionRect;
 pub use ui::*;
 
 pub use tile::*;
+use tools::SignificantComponent;
 pub use crate::consts::*;
 pub use crate::utilities::*;
 pub use crate::resources::*;
@@ -114,10 +115,9 @@ fn stateful_keybinds(
     time: Res<Time>,
     input: Res<ButtonInput<KeyCode>>,
     mut message_queue: ResMut<EditorBottomBarQueuedMessages>,
-    mut active_selection: ResMut<ActiveSelection>,
     // m_input: Res<ButtonInput<MouseButton>>,
     mut crosshairs: Query<(&mut Crosshair, &mut Transform, &mut Sprite), Without<Camera2d>>,
-
+    mut active_selection: ResMut<PlaceholderObject>,
     mut uiitems: Query<(&mut UIItem, &mut Transform), (Without<Camera2d>, Without<Crosshair>)>,
     mut cameras: Query<(&mut UIItem, &mut Transform, &mut Camera2d)>
 ) {
