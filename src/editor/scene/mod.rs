@@ -21,13 +21,13 @@ fn load_scene(mut commands: Commands, asset_server: Res<AssetServer>) {
     commands.spawn(DynamicSceneRoot(asset_server.load(format!("{DEFAULT_SCENE_PATH}.ron"))));
 }
 
-fn spawn_sprites(mut tiles: Query<(Entity, &mut EditorObject), Without<Sprite>>, mut commands: Commands, spritesheet: Res<TilesheetHandle>){
+fn spawn_sprites(mut tiles: Query<(Entity, &mut EditorObject), Without<Sprite>>, mut commands: Commands, spritesheets: Res<TextureHandles>, asset_server: Res<AssetServer>){
     //spawn the sprites for each tile, use the editorObject's tcoords to determine the sprite's position
     //if the EditorObject has a tcoord beginning with 'T'
     for (entity, eo) in tiles.iter_mut() {
         if eo.get_major_type() == 'T' {
             let sprite: Sprite = Sprite {
-            image: spritesheet.0.clone(),
+            image: spritesheets.0.get(&'t').unwrap().clone(),
             //the UVs are the same for every tile, just change the offset by using the tiletype as a multiplier
             rect: Some(Rect {
                 min: Vec2::new(
@@ -60,6 +60,7 @@ fn spawn_sprites(mut tiles: Query<(Entity, &mut EditorObject), Without<Sprite>>,
             );
 
         }
+    
     }
 
 }

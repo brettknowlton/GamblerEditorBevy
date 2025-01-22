@@ -1,0 +1,1 @@
+Copies the current placeholder object into the scene at the coordinate's location, if

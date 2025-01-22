@@ -4,31 +4,34 @@ use super::*;
 use bevy::math::Rect;
 
 pub trait SignificantComponent {
-    fn get_coordinate(&self) -> &TCoordinate;
+    fn place_rectangle(rect: Rect, commands: Commands);
+    fn place<T: SignificantComponent + Component + Default>(commands: &mut Commands, item: EditorObject, coord: Coordinate, from: &Query<(Entity, &EditorObject), With<T>>) {
 
-    fn use_rectangle_tool(rect: Rect, commands: Commands);
-    fn place(commands: &mut Commands, item: EditorObject, coord: Coordinate);
-    fn remove<T: SignificantComponent + Component>(
-        commands: &mut Commands,
-        coord: Coordinate,
-        from: Query<(Entity, &T)>
-    ) {
         //check if a tile already exists at this location and remove it if it does
-        if let Some(item) = from.iter().find(|(_, t)| t.get_coordinate() == coord) {
+        if let Some(item) = from.iter().find(|(_, t)| t.coordinate == TCoordinate::new('t', coord)) {
             //remove the old tile
             commands.entity(item.0).despawn();
         }
-    }
 
-    fn create_placeholder<T: Component + SignificantComponent>(new: &T, commands: Commands){
-        match new.get_coordinate().type_char {
-            'C' => {
-                commands.insert_resource();
-            }
-            'T' => {
-                commands.insert_resource(PlaceholderObject(EditorObject::default()));
-            }
-            _ => {}
+        commands.spawn((
+            T::default(),
+            Transform {
+                translation: Vec3::new(coord.0 as f32, coord.1 as f32, -5.0),
+                scale: Vec3::new(TILE_SCALE as f32, TILE_SCALE as f32, 1.0),
+                ..default()
+            },
+            EditorObject {
+                coordinate: TCoordinate::new('T', coord),
+                internal_type: item.internal_type,
+            },
+        ));
+    }
+    
+    fn remove<T: SignificantComponent + Component>(commands: &mut Commands, coord: Coordinate, from: &Query<(Entity, &EditorObject), With<T>>){
+        //check if a tile already exists at this location and remove it if it does
+        if let Some(item) = from.iter().find(|(_, t)| t.get_coordinate() == TCoordinate::new(t.get_major_type(), coord)) {
+            //remove the old tile
+            commands.entity(item.0).despawn();
         }
     }
 }

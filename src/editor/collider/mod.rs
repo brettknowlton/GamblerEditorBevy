@@ -1,4 +1,5 @@
-pub mod ui;
+mod ui;
+pub use ui::*;
 
 use bevy::prelude::*;
 use tools::SignificantComponent;
@@ -8,36 +9,6 @@ use crate::{ utilities::*, EditorObject, TILE_SIZE };
 use crate::consts::*;
 use super::*;
 
-
-pub fn collidermode_plugin(app: &mut App) {
-    app
-        .register_type::<Collider>()
-        .register_type::<Coordinate>()
-        .register_type::<TCoordinate>()
-        .register_type::<ColliderModeUI>()
-
-        //startup systems (may need to be moved from here to maintain order)
-
-        //OnEnter systems
-        .add_systems(OnEnter(EditorState::Editing(EditingComponent::Collider)), (init_collidermode, ui::show_collider_placeholder, ui::create_collidermode_ui).chain())
-
-        //Update systems, that run only while TileEditor is active
-        .add_systems(
-            Update,
-            (collidermode_keybinds, ui::update_placeholder)
-                .chain()
-                .run_if(in_state(EditorState::Editing(EditingComponent::Collider)))
-        )
-
-        //OnExit systems
-        .add_systems(
-            OnExit(EditorState::Editing(EditingComponent::Collider)), 
-            (
-                despawn_all::<ColliderModeUI>,
-                exit_collidermode
-            ).chain()
-        );
-}
 
 fn init_collidermode(mut message_queue: ResMut<EditorBottomBarQueuedMessages>
 ) {
@@ -50,34 +21,31 @@ fn collidermode_keybinds(
     input: Res<ButtonInput<KeyCode>>,
 
     crosshairs: Query<(&Transform, &Crosshair)>,
-    colliders: Query<(Entity, &Collider)>,
-    current_editor_object: Res<PlaceholderObject<Collider>>,
+    colliders: Query<(Entity, &EditorObject), With<Collider>>,
+    gridsnap: Res<State<GridSnap>>,
+
+    mut message_queue: ResMut<EditorBottomBarQueuedMessages>
 ) {
     //"P" handles placement of a collider and adding it to the scene
     if input.just_pressed(KeyCode::KeyP) {
         //clean up the bevy query overhead
         let (t, _) = crosshairs.single();
-        let focused_item = &current_editor_object.0;
+
+        //get the coordinate of the crosshair AND snap it to the grid if gridsnap is enabled
         let mut coord = Coordinate::from(t.translation);
-        let pushover = 1000 * ((TILE_SIZE * TILE_SCALE) as i64); //this effectively offsets all my tiles 1000 to the right and down, so that negative coordinates arent a problem and rounds to the nearest integer
-        coord = Coordinate(
-            ((coord.0 + pushover) / ((TILE_SIZE * TILE_SCALE) as i64)) *
-                ((TILE_SIZE * TILE_SCALE) as i64) -
-                pushover,
-            ((coord.1 + pushover) / ((TILE_SIZE * TILE_SCALE) as i64)) *
-                ((TILE_SIZE * TILE_SCALE) as i64) -
-                pushover
-        );
-
-        // println!("coords: {}{}", coord.0, coord.1);
-
-        //check if a tile already exists at this location and remove it if it does
-        if let Some(item) = colliders.iter().find(|(_, c)| c.coordinate == coord) {
-            //remove the old tile
-            commands.entity(item.0).despawn();
+        if gridsnap.get() == &GridSnap::Enabled {
+            coord = snap_coordinate_to_grid(coord);
         }
 
-        Collider::place(&mut commands, focused_item.clone(), coord);
+        //define the editor object to place
+        let to_place = EditorObject {
+            coordinate: TCoordinate::new('C', coord),
+            internal_type: 0,
+        };
+
+        //place the tile using our SignificantComponent trait
+        Collider::place(&mut commands, to_place, coord, &colliders);
+        send_message!(Some('i'), message_queue, format!("Placed collider at: ({}, {})", coord.0, coord.1));
     }
 
 
@@ -85,30 +53,20 @@ fn collidermode_keybinds(
     if input.just_pressed(KeyCode::KeyL) {
         let (t, _) = crosshairs.single();
         let mut coord = Coordinate::from(t.translation);
-        //"floor" the coordinate to the nearest tile grid space in a way that (kind of) respects the negative coordinate space, just dont place anything more than 1000 tiles away from the origin until I can figure that out
-        let pushover = 1000 * ((TILE_SIZE * TILE_SCALE) as i64);
-        coord = Coordinate(
-            ((coord.0 + pushover) / ((TILE_SIZE * TILE_SCALE) as i64)) *
-                ((TILE_SIZE * TILE_SCALE) as i64) -
-                pushover,
-            ((coord.1 + pushover) / ((TILE_SIZE * TILE_SCALE) as i64)) *
-                ((TILE_SIZE * TILE_SCALE) as i64) -
-                pushover
-        );
+        coord = snap_coordinate_to_grid(coord);
 
-        // println!("coords: {}{}", coord.0, coord.1);
-
-        Collider::remove(&mut commands, coord, colliders);
+        Tile::remove(&mut commands, coord, &colliders);
+        send_message!(Some('i'), message_queue, format!("Removing colliders at: ({}, {})", coord.0, coord.1));
     }
 
 }
 
-fn exit_collidermode(mut commands: Commands, mut tile_state: ResMut<NextState<EditorState>>, mut message_queue: ResMut<EditorBottomBarQueuedMessages>) {
+fn exit_collidermode(mut message_queue: ResMut<EditorBottomBarQueuedMessages>) {
 
     send_message!(Some('i'), message_queue, "Exiting Collider Editing Mode".to_string());
 
-    //remove the CurrentEditorObject resource
-    commands.insert_resource(PlaceholderObject(EditorObject::default()));
+    // //remove the CurrentEditorObject resource
+    // commands.insert_resource(PlaceholderObject(EditorObject::default()));
 }
 
 /// A component that marks an entity as part 
@@ -142,31 +100,40 @@ impl Default for Collider {
     }
 }
 impl SignificantComponent for Collider {
-    fn get_coordinate(&self) -> &TCoordinate {
-        &self.coordinate
-    }
-    
-    fn place(commands: &mut Commands, item: EditorObject, coord: Coordinate){
-        commands.spawn((
-            Collider {
-                internal_type: item.internal_type,
-                coordinate: coord,
-                rect: Rect::new(0.0, 0.0, 1.0, 1.0),
-            },
-            Transform {
-                translation: Vec3::new(coord.0 as f32, coord.1 as f32, -5.0),
-                scale: Vec3::new(TILE_SCALE as f32, TILE_SCALE as f32, 1.0),
-                ..default()
-            },
-            EditorObject {
-                coordinate: TCoordinate::new('C', coord),
-                internal_type: item.internal_type,
-            },
-        ));
-    }
 
-    fn use_rectangle_tool(_rect: Rect, _commands: Commands) {
+    fn place_rectangle(_rect: Rect, _commands: Commands) {
         //make a tile like normal in this rect, but use sliced tiles over the sprite sheet selection
         todo!();
     }
+}
+
+
+pub fn collidermode_plugin(app: &mut App) {
+    app
+        .register_type::<Collider>()
+        .register_type::<Coordinate>()
+        .register_type::<TCoordinate>()
+        .register_type::<ColliderModeUI>()
+
+        //startup systems (may need to be moved from here to maintain order)
+
+        //OnEnter systems
+        .add_systems(OnEnter(EditorState::Editing(EditingComponent::Collider)), (init_collidermode, show_collider_placeholder, create_collidermode_ui).chain())
+
+        //Update systems, that run only while TileEditor is active
+        .add_systems(
+            Update,
+            (collidermode_keybinds, super::ui::update_placeholder::<Collider>)
+                .chain()
+                .run_if(in_state(EditorState::Editing(EditingComponent::Collider)))
+        )
+
+        //OnExit systems
+        .add_systems(
+            OnExit(EditorState::Editing(EditingComponent::Collider)), 
+            (
+                despawn_all::<ColliderModeUI>,
+                exit_collidermode
+            ).chain()
+        );
 }

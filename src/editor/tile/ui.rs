@@ -2,37 +2,37 @@ use bevy::asset;
 
 use super::*;
 
-pub fn update_placeholder(
-    mut ui: Query<(&mut Sprite, &mut PlaceholderObjectTag)>,
-    placeholder: ResMut<PlaceholderObject>
-) {
-    for (mut sprite, _) in ui.iter_mut() {
-        //update the placeholder tile to match the current tile type of our placeholderTile resource
-        //do this by updating the UVs of the sprite
-        sprite.rect = Some(Rect {
-            min: Vec2::new(
-                (((placeholder.0.internal_type as usize) % SPRITESHEET_WIDTH) as f32) *
-                    (TILE_SIZE as f32),
-                (((placeholder.0.internal_type as usize) / SPRITESHEET_WIDTH) as f32) *
-                    (TILE_SIZE as f32)
-            ),
-            max: Vec2::new(
-                (((placeholder.0.internal_type as usize) % SPRITESHEET_WIDTH) as f32) *
-                    (TILE_SIZE as f32) +
-                    (TILE_SIZE as f32),
-                (((placeholder.0.internal_type as usize) / SPRITESHEET_WIDTH) as f32) *
-                    (TILE_SIZE as f32) +
-                    (TILE_SIZE as f32)
-            ),
-        });
+// pub fn change_placeholder(
+//     mut ui: Query<(&mut Sprite, &mut PlaceholderObjectTag)>,
+//     placeholder: ResMut<PlaceholderObject>
+// ) {
+//     for (mut sprite, _) in ui.iter_mut() {
+//         //update the placeholder tile to match the current tile type of our placeholderTile resource
+//         //do this by updating the UVs of the sprite
+//         sprite.rect = Some(Rect {
+//             min: Vec2::new(
+//                 (((placeholder.0.internal_type as usize) % SPRITESHEET_WIDTH) as f32) *
+//                     (TILE_SIZE as f32),
+//                 (((placeholder.0.internal_type as usize) / SPRITESHEET_WIDTH) as f32) *
+//                     (TILE_SIZE as f32)
+//             ),
+//             max: Vec2::new(
+//                 (((placeholder.0.internal_type as usize) % SPRITESHEET_WIDTH) as f32) *
+//                     (TILE_SIZE as f32) +
+//                     (TILE_SIZE as f32),
+//                 (((placeholder.0.internal_type as usize) / SPRITESHEET_WIDTH) as f32) *
+//                     (TILE_SIZE as f32) +
+//                     (TILE_SIZE as f32)
+//             ),
+//         });
 
-        //also move the placeholder tile to the current crosshair location
-    }
-}
+//         //also move the placeholder tile to the current crosshair location
+//     }
+// }
 
-pub fn show_tile_placeholder(
+pub fn spawn_tile_placeholder(
     mut commands: Commands,
-    spritesheet: Res<TilesheetHandle>,
+    spritesheet: Res<PlaceholderHandle>,
     crosshairs: Query<(&Transform, &Crosshair)>
 ) {
     let c = crosshairs.single();
@@ -40,18 +40,16 @@ pub fn show_tile_placeholder(
     let y_off = c.0.translation.y;
 
     let texpath = spritesheet.0.clone();
-    //display the placeholder tile
+    //spawn the placeholder tile
     commands.spawn((
-        Tile {
-            tile_type: 0,
-            coordinate: Coordinate(0, 0),
-        },
+        Tile {},
         Sprite {
             image: texpath,
             rect: Some(Rect {
                 min: Vec2::new(0.0, 0.0),
                 max: Vec2::new(TILE_SIZE as f32, TILE_SIZE as f32),
             }),
+            color: Color::srgba(1.0, 1.0, 1.0, 0.5),
             ..default()
         },
         Transform {
@@ -61,16 +59,37 @@ pub fn show_tile_placeholder(
         UIItem {
             ..default()
         },
-        TileModeUI,
+        TileModeUI, // give it tilemodeUI so it will just be destroyed when we exit tilemode
         PlaceholderObjectTag,
     ));
 }
 
-pub fn create_tilemode_ui(mut commands: Commands, asset_server: Res<AssetServer>, crosshairs: Query<(&Transform, &Crosshair)>, tilesheet_handle: Res<TilesheetHandle>) {
+// fn update_placeholder<Tile>(){
+//     //update the placeholder tile to match the current tile type of our placeholderTile resource
+//     //do this by updating the UVs of the sprite
+//     sprite.rect = Some(Rect {
+//         min: Vec2::new(
+//             (((placeholder.0.internal_type as usize) % SPRITESHEET_WIDTH) as f32) *
+//                 (TILE_SIZE as f32),
+//             (((placeholder.0.internal_type as usize) / SPRITESHEET_WIDTH) as f32) *
+//                 (TILE_SIZE as f32)
+//         ),
+//         max: Vec2::new(
+//             (((placeholder.0.internal_type as usize) % SPRITESHEET_WIDTH) as f32) *
+//                 (TILE_SIZE as f32) +
+//                 (TILE_SIZE as f32),
+//             (((placeholder.0.internal_type as usize) / SPRITESHEET_WIDTH) as f32) *
+//                 (TILE_SIZE as f32) +
+//                 (TILE_SIZE as f32)
+//         ),
+//     });
+
+//     //also move the placeholder tile to the current crosshair location
+// }
+
+pub fn create_tilemode_ui(mut commands: Commands, asset_server: Res<AssetServer>, crosshairs: Query<(&Transform, &Crosshair)>, tilesheet_handle: Res<PlaceholderHandle>, textures: Res<TextureHandles>) {
     
-    //display the "tilemode" menu
-    let texpath = PathBuf::from("textures/menus/menu1.png");
-    let tex1 = asset_server.load(texpath);
+    
 
     //offsets to make UI appear in the top left corner of the screen while still being anchored to the crosshair location
     let c = crosshairs.single();
@@ -81,8 +100,11 @@ pub fn create_tilemode_ui(mut commands: Commands, asset_server: Res<AssetServer>
     let ui_x = DEFAULT_WINDOW_WIDTH / 6.0;
     let ui_y = DEFAULT_WINDOW_HEIGHT;
     let ui_border = 4.0;
-
-    //spawn tilemodeUI
+    
+    
+    //display the "tilemode" menu
+    let texpath = PathBuf::from("textures/menus/menu1.png");
+    let tex1 = asset_server.load(texpath);
     commands.spawn((
         TileModeUI,
         Sprite {
@@ -111,8 +133,7 @@ pub fn create_tilemode_ui(mut commands: Commands, asset_server: Res<AssetServer>
     ));
 
     //spawn the display tilesheet, align with the top right of the UI, inset by the border of the UI
-    let tex_path = PathBuf::from("textures/tiles/tilesheet.png");
-    let tex = asset_server.load(tex_path);
+    let tex = textures.0.get(&'t').unwrap().clone();
     commands.spawn(
         (
             TileModeUI,
@@ -122,17 +143,6 @@ pub fn create_tilemode_ui(mut commands: Commands, asset_server: Res<AssetServer>
             Sprite {
                 image: tex,
                 anchor: Anchor::BottomLeft,
-                image_mode: bevy::sprite::SpriteImageMode::Sliced(TextureSlicer {
-                    border: BorderRect {
-                        bottom: 4.0,
-                        left: 4.0,
-                        right: 4.0,
-                        top: 4.0,
-                    },
-                    center_scale_mode: bevy::sprite::SliceScaleMode::Stretch,
-                    sides_scale_mode: bevy::sprite::SliceScaleMode::Stretch,
-                    ..default()
-                }),
                 ..default()
             },
             Transform {
@@ -159,4 +169,34 @@ pub fn create_tilemode_ui(mut commands: Commands, asset_server: Res<AssetServer>
         },
         UIItem::default(),
     ));
+
+    let tex = textures.0.get(&'r').unwrap().clone();
+    //create a tile selection component that will be used to select tiles from the tilesheet
+    commands.spawn((
+        TileModeUI,
+        TileSelector {
+            0: Rect {
+                min: Vec2::new(0.0, 0.0),
+                max: Vec2::new(TILE_SIZE as f32, TILE_SIZE as f32),
+            },
+        },
+        Sprite {
+            image: tex,
+            rect: Some(Rect {
+                min: Vec2::new(0.0, 0.0),
+                max: Vec2::new(TILE_SIZE as f32, TILE_SIZE as f32),
+            }),
+            ..default()
+        },
+    ));
+
+}
+
+#[derive(Component)]
+pub struct TileSelector(pub Rect);
+impl Default for TileSelector {
+    fn default() -> Self {
+        Self(Rect::new(0., 0., 1., 1.))
+    }
+
 }
