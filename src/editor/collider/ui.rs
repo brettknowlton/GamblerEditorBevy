@@ -1,32 +1,32 @@
 use super::*;
 
-pub fn update_placeholder(
-    mut ui: Query<(&mut Sprite, &mut PlaceholderObjectTag)>,
-    placeholder: ResMut<PlaceholderObject>
-) {
-    for (mut sprite, _) in ui.iter_mut() {
-        //update the placeholder tile to match the current tile type of our placeholderTile resource
-        //do this by updating the UVs of the sprite
-        sprite.rect = Some(Rect {
-            min: Vec2::new(
-                (((placeholder.0.internal_type as usize) % SPRITESHEET_WIDTH) as f32) *
-                    (TILE_SIZE as f32),
-                (((placeholder.0.internal_type as usize) / SPRITESHEET_WIDTH) as f32) *
-                    (TILE_SIZE as f32)
-            ),
-            max: Vec2::new(
-                (((placeholder.0.internal_type as usize) % SPRITESHEET_WIDTH) as f32) *
-                    (TILE_SIZE as f32) +
-                    (TILE_SIZE as f32),
-                (((placeholder.0.internal_type as usize) / SPRITESHEET_WIDTH) as f32) *
-                    (TILE_SIZE as f32) +
-                    (TILE_SIZE as f32)
-            ),
-        });
+// pub fn update_placeholder(
+//     mut ui: Query<(&mut Sprite, &mut PlaceholderObjectTag)>,
+//     placeholder: ResMut<PlaceholderHandle>
+// ) {
+//     for (mut sprite, _) in ui.iter_mut() {
+//         //update the placeholder tile to match the current tile type of our placeholderTile resource
+//         //do this by updating the UVs of the sprite
+//         sprite.rect = Some(Rect {
+//             min: Vec2::new(
+//                 (((placeholder.0.internal_type as usize) % SPRITESHEET_WIDTH) as f32) *
+//                     (TILE_SIZE as f32),
+//                 (((placeholder.0.internal_type as usize) / SPRITESHEET_WIDTH) as f32) *
+//                     (TILE_SIZE as f32)
+//             ),
+//             max: Vec2::new(
+//                 (((placeholder.0.internal_type as usize) % SPRITESHEET_WIDTH) as f32) *
+//                     (TILE_SIZE as f32) +
+//                     (TILE_SIZE as f32),
+//                 (((placeholder.0.internal_type as usize) / SPRITESHEET_WIDTH) as f32) *
+//                     (TILE_SIZE as f32) +
+//                     (TILE_SIZE as f32)
+//             ),
+//         });
 
-        //also move the placeholder tile to the current crosshair location
-    }
-}
+//         //also move the placeholder tile to the current crosshair location
+//     }
+// }
 
 pub fn show_collider_placeholder(
     mut commands: Commands,
@@ -71,7 +71,7 @@ pub fn show_collider_placeholder(
     ));
 }
 
-pub fn create_collidermode_ui(mut commands: Commands, asset_server: Res<AssetServer>, crosshairs: Query<(&Transform, &Crosshair)>, _tilesheet_handle: Res<TilesheetHandle>) {
+pub fn create_collidermode_ui(mut commands: Commands, asset_server: Res<AssetServer>, crosshairs: Query<(&Transform, &Crosshair)>, _tilesheet_handle: Res<TextureHandles>) {
     
     //display the "tilemode" menu
     let texpath = PathBuf::from("textures/menus/menu1.png");

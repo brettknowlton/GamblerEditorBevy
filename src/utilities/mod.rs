@@ -5,6 +5,7 @@ use crate::{ TILE_SCALE, TILE_SIZE };
 
 pub mod resources;
 pub mod tools;
+pub mod selection;
 
 //Helper Functions
 pub fn despawn_all<T: Component>(mut commands: Commands, to_despawn: Query<Entity, With<T>>) {
@@ -41,8 +42,17 @@ pub fn snap_coordinate_to_grid(coord: Coordinate) -> Coordinate {
 #[reflect(Component)]
 pub struct Coordinate(pub i64, pub i64);
 impl Coordinate {
+    
+    pub fn new(x: i64, y: i64) -> Self {
+        Self(x, y)
+    }
+
     pub fn from(v: Vec3) -> Self {
         Self(v.x as i64, v.y as i64)
+    }
+
+    pub fn add_tile_scale(&self) -> Self {
+        Self(self.0 + TILE_SIZE as i64, self.1 + TILE_SIZE as i64)
     }
 }
 impl Into<bevy::prelude::Vec2> for Coordinate {
