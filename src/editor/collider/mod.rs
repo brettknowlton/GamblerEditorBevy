@@ -4,16 +4,14 @@ pub use ui::*;
 use bevy::prelude::*;
 use tools::SignificantComponent;
 use std::path::PathBuf;
-use crate::ui::create_placeholder;
 use crate::{ utilities::*, EditorObject, TILE_SIZE };
 use crate::consts::*;
 use super::*;
 
+fn init(mut spritesheets: ResMut<TextureHandles>, asset_server: Res<AssetServer>){
+    let texpath= PathBuf::from("textures/tiles/collider_debug.png");
+    spritesheets.0.insert('c', asset_server.load(texpath));
 
-fn init_collidermode(mut message_queue: ResMut<EditorBottomBarQueuedMessages>
-) {
-    send_message!(Some('i'), message_queue, "Entering Collider Editing Mode".to_string());
-    Collider::create_placeholder(commands);
 }
 
 fn collidermode_keybinds(
@@ -116,9 +114,10 @@ pub fn collidermode_plugin(app: &mut App) {
         .register_type::<ColliderModeUI>()
 
         //startup systems (may need to be moved from here to maintain order)
+        .add_systems(Startup, init)
 
         //OnEnter systems
-        .add_systems(OnEnter(EditorState::Editing(EditingComponent::Collider)), (init_collidermode, show_collider_placeholder, create_collidermode_ui).chain())
+        .add_systems(OnEnter(EditorState::Editing(EditingComponent::Collider)), (update_placeholder::<Collider>, create_collidermode_ui).chain())
 
         //Update systems, that run only while TileEditor is active
         .add_systems(
@@ -137,3 +136,4 @@ pub fn collidermode_plugin(app: &mut App) {
             ).chain()
         );
 }
+//NOTHING BELOW THE PLUGINS

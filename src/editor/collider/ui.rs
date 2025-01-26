@@ -28,7 +28,7 @@ use super::*;
 //     }
 // }
 
-pub fn show_collider_placeholder(
+pub fn spawn_collider_placeholder(
     mut commands: Commands,
     crosshairs: Query<(&Transform, &Crosshair)>,
     asset_server: Res<AssetServer>,

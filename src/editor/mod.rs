@@ -117,7 +117,7 @@ fn stateful_keybinds(
     mut message_queue: ResMut<EditorBottomBarQueuedMessages>,
     // m_input: Res<ButtonInput<MouseButton>>,
     mut crosshairs: Query<(&mut Crosshair, &mut Transform, &mut Sprite), Without<Camera2d>>,
-    mut active_selection: ResMut<PlaceholderObject>,
+    mut active_selection: ResMut<PlaceholderHandle>,
     mut uiitems: Query<(&mut UIItem, &mut Transform), (Without<Camera2d>, Without<Crosshair>)>,
     mut cameras: Query<(&mut UIItem, &mut Transform, &mut Camera2d)>
 ) {
@@ -159,24 +159,24 @@ fn stateful_keybinds(
         let (_, t, _) = crosshairs.single();
         let coord = Coordinate { 0: t.translation.x as i64, 1: t.translation.y as i64 };
 
-        active_selection.selection_rect = Some(selection::SelectionRect::start(coord));
+        // active_selection.selection_rect = Some(selection::SelectionRect::start(coord));
 
-        send_message!(Some('i'), messages, "Rectangling.....");
+        send_message!(Some('i'), messages, "This feature is not yet implemented");
     } else if input.just_released(KeyCode::KeyO) {
         //use crosshair's coordinate as end
         let (_, t, _) = crosshairs.single();
         let coord = Coordinate { 0: t.translation.x as i64, 1: t.translation.y as i64 };
 
-        active_selection.selection_rect = active_selection.selection_rect.clone().map(|mut r| {
-            r.end(coord);
-            r
-        });
+        // active_selection.selection_rect = active_selection.selection_rect.clone().map(|mut r| {
+        //     r.end(coord);
+        //     r
+        // });
 
-        send_message!(
-            Some('i'),
-            messages,
-            format!("Selection Rect: {:?}", active_selection.selection_rect)
-        );
+        // send_message!(
+        //     Some('i'),
+        //     messages,
+        //     format!("Selection Rect: {:?}", active_selection.selection_rect)
+        // );
     }
 
     // 1 will switch to tile mode
@@ -383,7 +383,7 @@ pub fn editor_plugin(app: &mut App) {
 
         //plugins
         .add_plugins(tile::tilemode_plugin)
-        // .add_plugins(collider::collidermode_plugin)
+        .add_plugins(collider::collidermode_plugin)
         .add_plugins(scene::scene_plugin)
 
         //on entrance to this state, we give our placeholder object a handle to the default SignificantComponent of this mode- in normal mode this is a SelectionRect

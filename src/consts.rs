@@ -20,12 +20,11 @@ pub const TILE_SIZE: usize = 32;//number of pixels wide the tile source image is
 pub const SCALED_TILE_WIDTH: usize = TILE_SIZE * TILE_SCALE;
 pub const SCALED_TILE_HEIGHT: usize = TILE_SIZE * TILE_SCALE;
 
-pub const SPRITESHEET_WIDTH: usize = 8;
-pub const MAX_SPRITESHEET_ITEMS: usize = 32;
 
+pub const UI_SCALE: f32 = 10.;//a scale value we can use to scale UI elements
+pub const UI_Z_LAYER: f32 = 10.;//z layer for UI elements, we can use this to make to relatively place UI elements correctly
 
-pub const UI_SCALE: usize = 10;
-pub const UI_Z_LAYER: f32 = 10.;
+pub const DEFAULT_TEXT_HEIGHT: f32 = 20.;//default height of text in pixels
 
 
 pub const DEFAULT_WINDOW_WIDTH: f32 = 1200.;
@@ -36,7 +35,12 @@ pub const ASSETS_PATH: &str = "assets/";
 pub const TEXTURES_PATH: &str = "assets/textures/";
 pub const DEFAULT_SCENE_PATH: &str = "scenes/scene";
 
+pub const SPRITESHEET_WIDTH: usize = 8;//how many tiles wide our spritesheet is allowed to be
+pub const MAX_SPRITESHEET_ITEMS: usize = 32;
 
+
+pub const UI_BORDER_PX: f32 = 2.;//border around the UI elements
+pub const UI_BORDER_REAL: f32 = UI_BORDER_PX * UI_SCALE;//border around the UI elements as a fraction of the window height
 /*
 
 alright what the hell does this mean? im sure hyrum just said that in his head lol

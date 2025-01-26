@@ -4,7 +4,7 @@
 	- [x] Load a spritesheet into SpriteSheets HashMap. there will be a known limited number of these sprites so maybe a static size HashMap *not needed*
 	- [x] there is also now a PlaceholderHandle that keeps the currently used handle. This way we can draw whatever from whatever and it will work out fine.
 	- [x] onEnter - make sure visually the sprite changes, we want to use the first TileScaled cut of our spritesheet for the placeholder by default, we can update what cut out with specific systems later.
-- [ ] Fix Tilemode UI with the spritesheet previews location, anchor top right with max width TILE_SCALE * SPRITESHEETWIDTH
+- [x] Fix Tilemode UI with the spritesheet previews location, anchor Top Left with max width TILE_SCALE * SPRITESHEETWIDTH
 - [ ] show a grid
 - [ ] make sure snap to grid works how it should after that implementation and center placements on the crosshair
 

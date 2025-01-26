@@ -3,7 +3,7 @@
   entities: {
     4294967310: (
       components: {
-        "bevy_hierarchy::components::parent::Parent": (4294967308),
+        "bevy_hierarchy::components::parent::Parent": (4294967311),
         "bevy_render::primitives::Aabb": (
           center: (16.0, 16.0, 0.0),
           half_extents: (16.0, 16.0, 0.0),
