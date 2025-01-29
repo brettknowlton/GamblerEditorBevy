@@ -5,8 +5,15 @@
 	- [x] there is also now a PlaceholderHandle that keeps the currently used handle. This way we can draw whatever from whatever and it will work out fine.
 	- [x] onEnter - make sure visually the sprite changes, we want to use the first TileScaled cut of our spritesheet for the placeholder by default, we can update what cut out with specific systems later.
 - [x] Fix Tilemode UI with the spritesheet previews location, anchor Top Left with max width TILE_SCALE * SPRITESHEETWIDTH
-- [ ] show a grid
-- [ ] make sure snap to grid works how it should after that implementation and center placements on the crosshair
+- [x] show a grid
+- [ ] make sure grid works how it should after that implementation and center placements on the crosshair
+- [ ] make snap to grid toggleable  (maybe ctrl+g?)
+
+- [ ] more bottom bar UI
+	- [ ] think about showing controls?
+
+- [ ] look into mappable controls.
+	- [ ] hashmap of Action String -> fnmut?? that would be cool but a lot of work, FnMut() is a bitch tho with | | syntax and shit
 
 - [ ] Next we can implement rectangle tool for SelectionRect, SelectionRect will be our test case for this kind of functionality. - actual selection functionality we will not worry about yet
 - [ ] 

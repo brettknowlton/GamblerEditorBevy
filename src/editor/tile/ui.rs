@@ -36,28 +36,6 @@ pub fn spawn_tile_placeholder(
     ));
 }
 
-// fn update_placeholder<Tile>(){
-//     //update the placeholder tile to match the current tile type of our placeholderTile resource
-//     //do this by updating the UVs of the sprite
-//     sprite.rect = Some(Rect {
-//         min: Vec2::new(
-//             (((placeholder.0.internal_type as usize) % SPRITESHEET_WIDTH) as f32) *
-//                 (TILE_SIZE as f32),
-//             (((placeholder.0.internal_type as usize) / SPRITESHEET_WIDTH) as f32) *
-//                 (TILE_SIZE as f32)
-//         ),
-//         max: Vec2::new(
-//             (((placeholder.0.internal_type as usize) % SPRITESHEET_WIDTH) as f32) *
-//                 (TILE_SIZE as f32) +
-//                 (TILE_SIZE as f32),
-//             (((placeholder.0.internal_type as usize) / SPRITESHEET_WIDTH) as f32) *
-//                 (TILE_SIZE as f32) +
-//                 (TILE_SIZE as f32)
-//         ),
-//     });
-
-//     //also move the placeholder tile to the current crosshair location
-// }
 
 pub fn create_tilemode_ui(
     mut commands: Commands,

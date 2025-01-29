@@ -15,8 +15,21 @@ pub fn despawn_all<T: Component>(mut commands: Commands, to_despawn: Query<Entit
 }
 
 pub fn snap_value_to_grid(coord: Coordinate, grid_size: i64) -> Coordinate {
-    let x = (coord.0 / grid_size) * grid_size;
-    let y = (coord.1 / grid_size) * grid_size;
+    //floor x and y values to the last multiple of grid_size
+    //if coordinate is negative, this will round down to the nearest multiple of grid_size further negative
+    let x: i64;
+    let y: i64;
+    if coord.0 < 0 {
+        x = coord.0 - (grid_size + (coord.0 % grid_size));
+    } else {
+        x = coord.0 - (coord.0 % grid_size);
+    }
+    if coord.1 < 0 {
+        y = coord.1 - (grid_size + (coord.1 % grid_size));
+    } else {
+        y = coord.1 - (coord.1 % grid_size);
+    }
+
     Coordinate(x, y)
 }
 
@@ -42,7 +55,6 @@ pub fn snap_coordinate_to_grid(coord: Coordinate) -> Coordinate {
 #[reflect(Component)]
 pub struct Coordinate(pub i64, pub i64);
 impl Coordinate {
-    
     pub fn new(x: i64, y: i64) -> Self {
         Self(x, y)
     }
@@ -52,7 +64,7 @@ impl Coordinate {
     }
 
     pub fn add_tile_scale(&self) -> Self {
-        Self(self.0 + TILE_SIZE as i64, self.1 + TILE_SIZE as i64)
+        Self(self.0 + (TILE_SIZE as i64), self.1 + (TILE_SIZE as i64))
     }
 }
 impl Into<bevy::prelude::Vec2> for Coordinate {

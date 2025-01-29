@@ -1,5 +1,6 @@
 #[macro_use]
 pub mod ui;
+use bevy::gizmos::grid;
 use selection::ActiveSelection;
 use selection::SelectionRect;
 pub use ui::*;
@@ -54,12 +55,11 @@ pub enum GridSnap {
     Disabled,
 }
 
-#[derive(Clone, Copy, Eq, PartialEq, Debug, Hash)]
-pub enum EditingModes {
-    GridSnap(bool), //whether or not we are snapping to the grid defined by TILE_SCALE
-    CompositeTiles(bool), //whether or not we are placing colliders along with tiles
-    CursorEnabled(bool), //whether or not the cursor is enabled
-    CrosshairEnabled(bool), //whether or not the crosshair is enabled
+#[derive(Clone, Default, Eq, PartialEq, Debug, Hash, States)]
+pub enum ShowGrid {
+    #[default]
+    Yes,
+    No,
 }
 
 fn initialize(
@@ -112,6 +112,10 @@ struct BottomBarUpdate;
 fn stateful_keybinds(
     mut next_state: ResMut<NextState<EditorState>>,
     state: ResMut<State<EditorState>>,
+    
+    mut next_showgrid_state: ResMut<NextState<ShowGrid>>,
+    showgrid_state: ResMut<State<ShowGrid>>,
+
     time: Res<Time>,
     input: Res<ButtonInput<KeyCode>>,
     mut message_queue: ResMut<EditorBottomBarQueuedMessages>,
@@ -151,6 +155,14 @@ fn stateful_keybinds(
     {
         next_state.set(EditorState::QuitAsk);
         send_message!(Some('i'), messages, "Would you like to exit the editor? Yenter/Noscape");
+    }
+
+    //G will toggle the grid visibility
+    if input.just_pressed(KeyCode::KeyG) {
+        next_showgrid_state.set(match showgrid_state.get() {
+            ShowGrid::Yes => ShowGrid::No,
+            ShowGrid::No => ShowGrid::Yes,
+        });
     }
 
     //O is the main button to directly use the Rectangle Tool
@@ -353,8 +365,17 @@ fn draw_rect_placeholder(
     crosshairs: Query<(&Transform, &Crosshair)>
 ) {
     let (t, _) = crosshairs.single();
+}
 
-    
+fn draw_grid(mut gizmos: Gizmos) {
+    gizmos
+        .grid_2d(
+            Isometry2d::new(Vec2::new(0.0, 0.0), Rot2::degrees(0.)),
+            UVec2::new(100, 100),
+            Vec2::new((TILE_SIZE * TILE_SCALE) as f32, (TILE_SIZE * TILE_SCALE) as f32),
+            Color::srgba(0.0, 1.0, 0.0, 0.5)
+        )
+        .outer_edges();
 }
 
 pub fn editor_plugin(app: &mut App) {
@@ -362,6 +383,7 @@ pub fn editor_plugin(app: &mut App) {
         //states
         .init_state::<EditorState>()
         .init_state::<GridSnap>()
+        .init_state::<ShowGrid>()
 
         //registrations
         .register_type::<EditorObject>()
@@ -396,7 +418,9 @@ pub fn editor_plugin(app: &mut App) {
         .add_systems(Startup, (initialize, create_crosshair, ui::spawn_general_editor_ui).chain())
 
         //universal update systems for all editing modes
-        .add_systems(Update, stateful_keybinds.run_if(not(in_state(EditorState::Inactive))));
+        .add_systems(Update, stateful_keybinds.run_if(not(in_state(EditorState::Inactive))))
+        .add_systems(Update, draw_grid.run_if(in_state(ShowGrid::Yes)));
+
     //placeholder resource for whatever tile we are trying to place
 }
 //NOTHING BELOW THE PLUGINS >:(
