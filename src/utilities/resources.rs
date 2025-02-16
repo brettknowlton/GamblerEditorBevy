@@ -56,3 +56,23 @@ impl Default for EditorBottomBarMessage {
         Self{text: "".to_string()}
     }
 }
+
+
+
+
+#[derive(Resource)]
+pub struct SelectedTileID{pub id: u64}
+impl Default for SelectedTileID {
+    fn default() -> Self {
+        Self{id: 0}
+    }
+}
+
+
+#[derive(Resource)]
+pub struct TileUpdateNeeded(pub bool);
+impl Default for TileUpdateNeeded {
+    fn default() -> Self {
+        Self(false)
+    }
+}

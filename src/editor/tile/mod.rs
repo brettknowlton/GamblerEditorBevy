@@ -31,7 +31,9 @@ fn tilemode_keybinds(
     crosshairs: Query<(&Transform, &Crosshair)>,
     tiles: Query<(Entity, &EditorObject), With<Tile>>,
     gridsnap: Res<State<GridSnap>>,
-    tile_selection: Query<&TileSelector>,
+    mut selected_tile_id: ResMut<SelectedTileID>,
+    mut needs_update: ResMut<TileUpdateNeeded>
+
 )
 {
     //"P" handles placement of a tile and adding it to the scene
@@ -46,8 +48,7 @@ fn tilemode_keybinds(
             coord = snap_coordinate_to_grid(coord);
         }
 
-        let selection = tile_selection.single();
-        let first_tile = selection.0.min.x + selection.0.min.y * SPRITESHEET_WIDTH as f32;
+        let first_tile = selected_tile_id.id;
 
         let to_place = EditorObject {
             coordinate: TCoordinate::new('T', coord),
@@ -69,32 +70,28 @@ fn tilemode_keybinds(
         send_message!(Some('i'), message_queue, format!("Removing tiles at: ({}, {})", coord.0, coord.1));
     }
 
-    // if input.just_pressed(KeyCode::ArrowRight) {
-    //     //move all values in the tile_selection 1 unit right, if it goes off the edge, loop back to the left side of the spritesheet
-    //     let mut selection = tile_selection.0;
-    //     selection.min.x = (selection.min.x + 1.0) % SPRITESHEET_WIDTH as f32;
-    //     selection.max.x = (selection.max.x + 1.0) % SPRITESHEET_WIDTH as f32;
+    if input.just_pressed(KeyCode::ArrowRight) {
+        //pressing right increments selected_rect_id by 1, looping back to 0 if it goes over the max_spritesheet_items
+        selected_tile_id.id = (selected_tile_id.id + 1) % MAX_SPRITESHEET_ITEMS;
+        needs_update.0 = true;
+    }
+    if input.just_pressed(KeyCode::ArrowLeft) {
+        //cycles through the spritesheet to the left
+        selected_tile_id.id = (selected_tile_id.id + MAX_SPRITESHEET_ITEMS - 1) % MAX_SPRITESHEET_ITEMS;
+        needs_update.0 = true;
+    }
+    if input.just_pressed(KeyCode::ArrowUp) {
+        //cycles through the spritesheet up using the spritesheet width
+        selected_tile_id.id = (selected_tile_id.id + MAX_SPRITESHEET_ITEMS - SPRITESHEET_WIDTH as u64) % MAX_SPRITESHEET_ITEMS;
+        needs_update.0 = true;
+    }
+    if input.just_pressed(KeyCode::ArrowDown) {
+        //cycles through the spritesheet down
+        selected_tile_id.id = (selected_tile_id.id + SPRITESHEET_WIDTH as u64) % MAX_SPRITESHEET_ITEMS;
+        needs_update.0 = true;
+    }
 
 
-    // }
-    // if input.just_pressed(KeyCode::ArrowLeft) {
-    //     //cycles through the spritesheet to the left
-    //     current_editor_object.0.internal_type =
-    //         (current_editor_object.0.get_internal_type() + (MAX_SPRITESHEET_ITEMS as u64) - 1) %
-    //         (MAX_SPRITESHEET_ITEMS as u64);
-    // }
-    // if input.just_pressed(KeyCode::ArrowUp) {
-    //     //cycles through the spritesheet up
-    //     current_editor_object.0.internal_type =
-    //         ((MAX_SPRITESHEET_ITEMS - SPRITESHEET_WIDTH) as u64) +
-    //         (current_editor_object.0.get_internal_type() % (SPRITESHEET_WIDTH as u64));
-    // }
-    // if input.just_pressed(KeyCode::ArrowDown) {
-    //     //cycles through the spritesheet down
-    //     current_editor_object.0.internal_type =
-    //         (current_editor_object.0.get_internal_type() + (SPRITESHEET_WIDTH as u64)) %
-    //         (MAX_SPRITESHEET_ITEMS as u64);
-    // }
 }
 
 fn exit_tilemode(mut message_queue: ResMut<EditorBottomBarQueuedMessages>) {
@@ -139,6 +136,17 @@ impl SignificantComponent for Tile {
 }
 
 
+fn run_if_tile_update_needed(needs_update: Res<TileUpdateNeeded>) -> bool {
+    if needs_update.0 {
+        true
+    } else {
+        false
+    }
+}
+
+fn reset_update_needed(mut needs_update: ResMut<TileUpdateNeeded>) {
+    needs_update.0 = false;
+}
 
 
 pub fn tilemode_plugin(app: &mut App) {
@@ -147,6 +155,8 @@ pub fn tilemode_plugin(app: &mut App) {
         .register_type::<TCoordinate>()
         .register_type::<TileModeUI>()
 
+        .init_resource::<SelectedTileID>()
+        .init_resource::<TileUpdateNeeded>()
         // .init_resource::<SpritesheetCrop>()
         // .insert_resource(PlaceholderObject(EditorObject::default()))
         //startup systems (may need to be moved from here to maintain order)
@@ -161,7 +171,7 @@ pub fn tilemode_plugin(app: &mut App) {
         //Update systems, that run only while TileEditor is active
         .add_systems(
             Update,
-            (tilemode_keybinds)
+            (tilemode_keybinds, (update_placeholder::<Tile>, reset_update_needed).run_if(run_if_tile_update_needed))
                 .chain()
                 .run_if(in_state(EditorState::Editing(EditingComponent::Tile)))
         )

@@ -31,16 +31,16 @@ fn spawn_sprites(mut tiles: Query<(Entity, &mut EditorObject), Without<Sprite>>,
             //the UVs are the same for every tile, just change the offset by using the tiletype as a multiplier
             rect: Some(Rect {
                 min: Vec2::new(
-                    (((eo.get_internal_type() as usize) % SPRITESHEET_WIDTH) as f32) *
+                    (((eo.get_internal_type() as u64) % SPRITESHEET_WIDTH) as f32) *
                         (TILE_SIZE as f32),
-                    (((eo.get_internal_type() as usize) / SPRITESHEET_WIDTH) as f32) *
+                    (((eo.get_internal_type() as u64) / SPRITESHEET_WIDTH) as f32) *
                         (TILE_SIZE as f32)
                 ),
                 max: Vec2::new(
-                    (((eo.get_internal_type() as usize) % SPRITESHEET_WIDTH) as f32) *
+                    (((eo.get_internal_type() as u64) % SPRITESHEET_WIDTH) as f32) *
                         (TILE_SIZE as f32) +
                         (TILE_SIZE as f32),
-                    (((eo.get_internal_type() as usize) / SPRITESHEET_WIDTH) as f32) *
+                    (((eo.get_internal_type() as u64) / SPRITESHEET_WIDTH) as f32) *
                         (TILE_SIZE as f32) +
                         (TILE_SIZE as f32)
                 ),

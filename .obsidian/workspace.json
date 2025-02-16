@@ -11,10 +11,17 @@
             "id": "5164161d9a27d8a0",
             "type": "leaf",
             "state": {
-              "type": "empty",
-              "state": {},
-              "icon": "lucide-file",
-              "title": "New tab"
+              "type": "canvas",
+              "state": {
+                "file": "PCL Process.canvas",
+                "viewState": {
+                  "x": -110.68010253922216,
+                  "y": 147.8153867019571,
+                  "zoom": -2.1999999999999997
+                }
+              },
+              "icon": "lucide-layout-dashboard",
+              "title": "PCL Process"
             }
           }
         ]
@@ -156,6 +163,7 @@
   },
   "active": "5164161d9a27d8a0",
   "lastOpenFiles": [
+    "PCL Process.canvas",
     "planning/Mechanic Breakdowns/Mechanics.md",
     "planning/Gambler Editor.md",
     "GamblerEditorBevy/planning/Mechanic Breakdowns/Mechanics.md",

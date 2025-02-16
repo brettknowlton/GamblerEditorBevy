@@ -96,7 +96,7 @@ pub fn create_tilemode_ui(
             custom_size: Some(
                 Vec2::new(
                     ui_panel_width- UI_BORDER_REAL,
-                    (MAX_SPRITESHEET_ITEMS / SPRITESHEET_WIDTH * TILE_SCALE * UI_SCALE  as usize) as f32,
+                    (MAX_SPRITESHEET_ITEMS / SPRITESHEET_WIDTH * (TILE_SCALE as u64)) as f32 * UI_SCALE,
                     
                 )
             ),

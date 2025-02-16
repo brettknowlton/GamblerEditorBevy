@@ -110,11 +110,14 @@ pub struct PlaceholderObjectTag;
 
 pub fn update_placeholder<T: SignificantComponent + Component + Default>(
     mut commands: Commands,
+
     state: ResMut<State<EditorState>>,
-    crosshairs: Query<(&Crosshair, &Transform)>,
     mut placeholder: ResMut<PlaceholderHandle>,
     textures: Res<TextureHandles>,
+
+    crosshairs: Query<(&Crosshair, &Transform)>,
     placeholders: Query<(Entity, &PlaceholderObjectTag)>
+
 ) {
     //delete any existing placeholder objects
     for (e, _) in placeholders.iter() {

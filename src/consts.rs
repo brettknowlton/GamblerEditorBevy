@@ -35,8 +35,8 @@ pub const ASSETS_PATH: &str = "assets/";
 pub const TEXTURES_PATH: &str = "assets/textures/";
 pub const DEFAULT_SCENE_PATH: &str = "scenes/scene";
 
-pub const SPRITESHEET_WIDTH: usize = 8;//how many tiles wide our spritesheet is allowed to be
-pub const MAX_SPRITESHEET_ITEMS: usize = 32;
+pub const SPRITESHEET_WIDTH: u64 = 8;//how many tiles wide our spritesheet is allowed to be
+pub const MAX_SPRITESHEET_ITEMS: u64 = 32;
 
 
 pub const UI_BORDER_PX: f32 = 2.;//border around the UI elements
