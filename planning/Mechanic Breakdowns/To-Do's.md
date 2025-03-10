@@ -6,7 +6,7 @@
 	- [x] onEnter - make sure visually the sprite changes, we want to use the first TileScaled cut of our spritesheet for the placeholder by default, we can update what cut out with specific systems later.
 - [x] Fix Tilemode UI with the spritesheet previews location, anchor Top Left with max width TILE_SCALE * SPRITESHEETWIDTH
 - [x] show a grid
-- [ ] make sure grid works how it should after that implementation and center placements on the crosshair
+- [x] make sure grid works how it should after that implementation and center placements on the crosshair
 - [ ] make snap to grid toggleable  (maybe ctrl+g?)
 
 - [ ] more bottom bar UI

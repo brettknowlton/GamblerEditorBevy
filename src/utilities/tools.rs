@@ -5,11 +5,11 @@ use bevy::math::Rect;
 
 pub trait SignificantComponent {
     fn place_rectangle(rect: Rect, commands: Commands);
-    fn place<T: SignificantComponent + Component + Default>(commands: &mut Commands, item: EditorObject, coord: Coordinate, from: &Query<(Entity, &EditorObject), With<T>>) {
+    fn place<T: SignificantComponent + Component + Default>(commands: &mut Commands, item: EditorObject, item_type: char, coord: Coordinate, from: &Query<(Entity, &EditorObject), With<T>>) {
 
-        //check if a tile already exists at this location and remove it if it does
-        if let Some(item) = from.iter().find(|(_, t)| t.coordinate == TCoordinate::new('t', coord)) {
-            //remove the old tile
+        //check if an item already exists at this location and remove it if it does
+        if let Some(item) = from.iter().find(|(_, t)| t.coordinate == TCoordinate::new(item_type, coord)) {
+            //remove the old item
             commands.entity(item.0).despawn();
         }
 
@@ -21,7 +21,7 @@ pub trait SignificantComponent {
                 ..default()
             },
             EditorObject {
-                coordinate: TCoordinate::new('T', coord),
+                coordinate: TCoordinate::new(item_type, coord),
                 internal_type: item.internal_type,
             },
         ));

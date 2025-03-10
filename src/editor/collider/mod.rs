@@ -37,12 +37,12 @@ fn collidermode_keybinds(
 
         //define the editor object to place
         let to_place = EditorObject {
-            coordinate: TCoordinate::new('C', coord),
+            coordinate: TCoordinate::new('c', coord),
             internal_type: 0,
         };
 
         //place the tile using our SignificantComponent trait
-        Collider::place(&mut commands, to_place, coord, &colliders);
+        Collider::place(&mut commands, to_place, 'c',  coord, &colliders);
         send_message!(Some('i'), message_queue, format!("Placed collider at: ({}, {})", coord.0, coord.1));
     }
 
@@ -87,7 +87,7 @@ impl Collider {
     fn new() -> Self {
         Self {
             internal_type: 0,
-            coordinate: TCoordinate{type_char: 'C', coord: Coordinate{0: 0, 1: 0}},
+            coordinate: TCoordinate{type_char: 'c', coord: Coordinate{0: 0, 1: 0}},
             rect: Rect::new(0.0, 0.0, 1.0, 1.0),
         }
     }
@@ -117,7 +117,7 @@ pub fn collidermode_plugin(app: &mut App) {
         .add_systems(Startup, init)
 
         //OnEnter systems
-        .add_systems(OnEnter(EditorState::Editing(EditingComponent::Collider)), (update_placeholder::<Collider>, create_collidermode_ui).chain())
+        .add_systems(OnEnter(EditorState::Editing(EditingComponent::Collider)), (crate::ui::update_placeholder::<Collider>, ui::create_collidermode_ui).chain())
 
         //Update systems, that run only while TileEditor is active
         .add_systems(

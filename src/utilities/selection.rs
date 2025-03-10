@@ -30,7 +30,7 @@ impl SelectionRect {
 
 impl SignificantComponent for SelectionRect {
 
-    fn place<T: SignificantComponent + Component>(commands: &mut Commands, item: crate::EditorObject, coord: Coordinate, from: &Query<(Entity, &EditorObject), With<T>>) {
+    fn place<T: SignificantComponent + Component>(commands: &mut Commands, item: crate::EditorObject, item_type: char, coord: Coordinate, from: &Query<(Entity, &EditorObject), With<T>>) {
         commands.spawn((
             SelectionRect {
                 start: coord,

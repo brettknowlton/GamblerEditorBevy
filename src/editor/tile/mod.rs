@@ -51,12 +51,12 @@ fn tilemode_keybinds(
         let first_tile = selected_tile_id.id;
 
         let to_place = EditorObject {
-            coordinate: TCoordinate::new('T', coord),
+            coordinate: TCoordinate::new('t', coord),
             internal_type: first_tile as u64,
         };
 
         //place the tile using our SignificantComponent trait
-        Tile::place(&mut commands, to_place, coord, &tiles);
+        Tile::place(&mut commands, to_place, 't', coord, &tiles);
         send_message!(Some('i'), message_queue, format!("Placed tile at: ({}, {})", coord.0, coord.1));
     }
 
