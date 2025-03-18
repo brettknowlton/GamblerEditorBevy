@@ -1,4 +1,3 @@
-use bevy::text::cosmic_text::Selection;
 use tools::SignificantComponent;
 
 use crate::EditorObject;
@@ -44,7 +43,9 @@ impl SignificantComponent for SelectionRect {
             EditorObject {
                 internal_type: item.get_internal_type(),
                 coordinate: TCoordinate::new('T', coord),
+                zone_id: item.zone_id,
             },
+            
         ));
     }
     

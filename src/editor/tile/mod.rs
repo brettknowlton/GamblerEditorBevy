@@ -11,8 +11,6 @@ use super::*;
 use ui::*;
 
 
-
-
 fn load_spritesheet(asset_server: Res<AssetServer>, mut message_queue: ResMut<EditorBottomBarQueuedMessages>, mut textures: ResMut<TextureHandles>) {
     //load the tilesheet for this mode
     let tex_path = PathBuf::from("textures/tiles/tilesheet.png");
@@ -55,6 +53,7 @@ fn tilemode_keybinds(
         let to_place = EditorObject {
             coordinate: TCoordinate::new('t', coord),
             internal_type: first_tile as u64,
+            zone_id: TCoordinate::new('f', Coordinate{0: coord.0 / ZONE_SIZE as i64, 1: coord.1 / ZONE_SIZE as i64}),
         };
 
         //place the tile using our SignificantComponent trait
@@ -89,17 +88,35 @@ fn tilemode_keybinds(
     if input.just_pressed(KeyCode::ArrowLeft) {
         //cycles through the spritesheet to the left
         selected_tile_id.id = (selected_tile_id.id + MAX_SPRITESHEET_ITEMS - 1) % MAX_SPRITESHEET_ITEMS;
-        needs_update.0 = true;
+        placeholder_update_ev.send(UpdatePlaceholderEvent {
+            tcoord: TCoordinate::new('t', Coordinate(0, 0)),
+            rect: Rect {
+                min: Vec2::new((selected_tile_id.id % SPRITESHEET_WIDTH) as f32 * TILE_SIZE as f32, (selected_tile_id.id / SPRITESHEET_WIDTH as u64) as f32 * TILE_SIZE as f32),
+                max: Vec2::new((selected_tile_id.id % SPRITESHEET_WIDTH + 1) as f32 * TILE_SIZE as f32, (selected_tile_id.id / SPRITESHEET_WIDTH as u64 + 1) as f32 * TILE_SIZE as f32),
+            },
+        });
     }
     if input.just_pressed(KeyCode::ArrowUp) {
         //cycles through the spritesheet up using the spritesheet width
         selected_tile_id.id = (selected_tile_id.id + MAX_SPRITESHEET_ITEMS - SPRITESHEET_WIDTH as u64) % MAX_SPRITESHEET_ITEMS;
-        needs_update.0 = true;
+        placeholder_update_ev.send(UpdatePlaceholderEvent {
+            tcoord: TCoordinate::new('t', Coordinate(0, 0)),
+            rect: Rect {
+                min: Vec2::new((selected_tile_id.id % SPRITESHEET_WIDTH) as f32 * TILE_SIZE as f32, (selected_tile_id.id / SPRITESHEET_WIDTH as u64) as f32 * TILE_SIZE as f32),
+                max: Vec2::new((selected_tile_id.id % SPRITESHEET_WIDTH + 1) as f32 * TILE_SIZE as f32, (selected_tile_id.id / SPRITESHEET_WIDTH as u64 + 1) as f32 * TILE_SIZE as f32),
+            },
+        });
     }
     if input.just_pressed(KeyCode::ArrowDown) {
         //cycles through the spritesheet down
         selected_tile_id.id = (selected_tile_id.id + SPRITESHEET_WIDTH as u64) % MAX_SPRITESHEET_ITEMS;
-        needs_update.0 = true;
+        placeholder_update_ev.send(UpdatePlaceholderEvent {
+            tcoord: TCoordinate::new('t', Coordinate(0, 0)),
+            rect: Rect {
+                min: Vec2::new((selected_tile_id.id % SPRITESHEET_WIDTH) as f32 * TILE_SIZE as f32, (selected_tile_id.id / SPRITESHEET_WIDTH as u64) as f32 * TILE_SIZE as f32),
+                max: Vec2::new((selected_tile_id.id % SPRITESHEET_WIDTH + 1) as f32 * TILE_SIZE as f32, (selected_tile_id.id / SPRITESHEET_WIDTH as u64 + 1) as f32 * TILE_SIZE as f32),
+            },
+        });
     }
 
 
@@ -110,8 +127,6 @@ fn exit_tilemode(mut message_queue: ResMut<EditorBottomBarQueuedMessages>) {
     // commands.insert_resource(PlaceholderObject(EditorObject::default()));
     send_message!(Some('i'), message_queue, "Exiting Tile Editing Mode".to_string());
 }
-
-
 
 
 /// A component that marks an entity as part of the tile editing UI.

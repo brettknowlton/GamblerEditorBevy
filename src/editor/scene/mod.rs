@@ -53,9 +53,9 @@ fn spawn_sprites(mut tiles: Query<(Entity, &mut EditorObject), Without<Sprite>>,
 
             commands
                 .entity(entity)
-                .insert(sprite)
+                .insert((sprite, Visibility::default()))
                 .entry::<Transform>().and_modify(move |mut t| {
-                    t.translation = Vec3::new( coord.0 as f32, coord.1 as f32, -5.);
+                    t.translation = Vec3::new( coord.0 as f32, coord.1 as f32, 0.);
                 }
             );
 
@@ -77,7 +77,7 @@ fn spawn_sprites(mut tiles: Query<(Entity, &mut EditorObject), Without<Sprite>>,
                 .entity(entity)
                 .insert(sprite)
                 .entry::<Transform>().and_modify(move |mut t| {
-                    t.translation = Vec3::new( coord.0 as f32, coord.1 as f32, -5.);
+                    t.translation = Vec3::new( coord.0 as f32, coord.1 as f32, 0.5);
                 }
             );
 

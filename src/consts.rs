@@ -13,12 +13,20 @@ pub const WINDOW_TITLE2:&str= "GamblerEditor";
 //Default color that the background will be replaced by if nothing is being rendered
 pub const WINDOW_DEFAULT_BACKGROUND_COLOR: Srgba = Srgba::new(0.31, 0.643, 0.722, 1.);
 
+pub const ZONE_SIZE: u32 = 64;//width/height of a zone in tiles
 
-pub const TILE_SCALE: usize = 4;//scale factor of tiles
-pub const TILE_SIZE: usize = 32;//number of pixels wide the tile source image is
+pub const PLAYER_SIZE_X: u32= 72;
+pub const PLAYER_SIZE_Y: u32= 90;
+pub const PLAYER_SCALE: u32= 2;
 
-pub const SCALED_TILE_WIDTH: usize = TILE_SIZE * TILE_SCALE;
-pub const SCALED_TILE_HEIGHT: usize = TILE_SIZE * TILE_SCALE;
+pub const SCALED_PLAYER_WIDTH: u32= PLAYER_SIZE_X * PLAYER_SCALE;
+pub const SCALED_PLAYER_HEIGHT: u32= PLAYER_SIZE_Y * PLAYER_SCALE;
+
+pub const TILE_SCALE: u32 = PLAYER_SCALE;//scale factor of tiles
+pub const TILE_SIZE: u32 = 32;//number of pixels wide the tile source image is
+
+pub const SCALED_TILE_WIDTH: u32 = TILE_SIZE * TILE_SCALE;
+pub const SCALED_TILE_HEIGHT: u32 = TILE_SIZE * TILE_SCALE;
 
 
 pub const UI_SCALE: f32 = 10.;//a scale value we can use to scale UI elements
@@ -41,6 +49,14 @@ pub const MAX_SPRITESHEET_ITEMS: u64 = 32;
 
 pub const UI_BORDER_PX: f32 = 2.;//border around the UI elements
 pub const UI_BORDER_REAL: f32 = UI_BORDER_PX * UI_SCALE;//border around the UI elements as a fraction of the window height
+
+
+
+//PHYSICS CONSTS
+pub const GRAVITY: f32 = 9.8;
+pub const FRICTION: f32 = 0.1;
+pub const MAX_SPEED: f32 = 10.0;
+pub const JUMP_FORCE: f32 = 10.0;
 /*
 
 alright what the hell does this mean? im sure hyrum just said that in his head lol

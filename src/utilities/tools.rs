@@ -15,6 +15,7 @@ pub trait SignificantComponent {
 
         commands.spawn((
             T::default(),
+            Visibility::default(),
             Transform {
                 translation: Vec3::new(coord.0 as f32, coord.1 as f32, -5.0),
                 scale: Vec3::new(TILE_SCALE as f32, TILE_SCALE as f32, 1.0),
@@ -23,6 +24,7 @@ pub trait SignificantComponent {
             EditorObject {
                 coordinate: TCoordinate::new(item_type, coord),
                 internal_type: item.internal_type,
+                zone_id: item.zone_id,
             },
         ));
     }

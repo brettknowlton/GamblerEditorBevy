@@ -3,10 +3,12 @@ use bevy::prelude::*;
 pub mod consts;
 pub mod utilities;
 pub mod editor;
+pub mod game;
 
 pub use consts::*;
 pub use utilities::*;
 pub use editor::*;
+pub use game::*;
 
 fn main() {
     App::new()
@@ -30,6 +32,8 @@ fn main() {
         .insert_resource(ClearColor(Color::from(WINDOW_DEFAULT_BACKGROUND_COLOR)))
         .insert_resource(Time::<Fixed>::from_hz(64.0))
         .add_plugins(editor::editor_plugin)
+        .add_plugins(game::game_plugin)
+
         .run();
 }
 

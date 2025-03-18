@@ -39,6 +39,7 @@ fn collidermode_keybinds(
         let to_place = EditorObject {
             coordinate: TCoordinate::new('c', coord),
             internal_type: 0,
+            zone_id: TCoordinate::new('f', Coordinate{0: coord.0 / ZONE_SIZE as i64, 1: coord.1 / ZONE_SIZE as i64}),
         };
 
         //place the tile using our SignificantComponent trait

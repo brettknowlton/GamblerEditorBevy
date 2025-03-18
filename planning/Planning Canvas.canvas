@@ -1,0 +1,36 @@
+{
+	"nodes":[
+		{"id":"08351c19ee5927f6","x":-180,"y":-280,"width":360,"height":140,"color":"5","type":"text","text":"**Main**\n\nSets up default plugins, clear color, a fixed time clock and our editor plugin\n"},
+		{"id":"9b2c412bd0288943","x":324,"y":-40,"width":380,"height":110,"color":"6","type":"text","text":"**Utilities**\nDirectory of files that are shared among plugins"},
+		{"id":"eb546e85a5e5f727","x":820,"y":-40,"width":278,"height":60,"type":"text","text":"Tcoordinate"},
+		{"id":"4632b819a3dab59d","x":820,"y":40,"width":278,"height":60,"type":"text","text":"snap_coordinate_to_grid"},
+		{"id":"a1bfdc16524dbe1a","x":820,"y":200,"width":278,"height":60,"type":"text","text":"despawn_all"},
+		{"id":"c45be7f34aead691","x":820,"y":120,"width":278,"height":60,"type":"text","text":"snap_value_to_grid"},
+		{"id":"e24bb401f299207b","x":1140,"y":-40,"width":250,"height":60,"type":"text","text":"Coordinate"},
+		{"id":"7001a5d7566bb262","x":514,"y":150,"width":190,"height":370,"color":"6","type":"text","text":"**Resources**\nResource defenitions go here, structs that will be globally used by bevy"},
+		{"id":"f198ff67f73c9a44","x":-160,"y":-40,"width":326,"height":720,"color":"2","type":"text","text":"**Editor Plugin**\nMain plugin that runs the editor as a whole, this state machine keeps track of what kinds of things we are placing into the world"},
+		{"id":"763335e6ca80b248","x":341,"y":-210,"width":347,"height":96,"color":"6","type":"text","text":"**Consts**\nFile of global constants that can be used anywhere"},
+		{"id":"bc558e2775aca68a","x":166,"y":720,"width":705,"height":149,"type":"text","text":"Tile Plugin\nallows for the creation/deletion of tiles."},
+		{"id":"c4dcdee7a0d9161a","x":-160,"y":416,"width":326,"height":264,"type":"text","text":"editor/ui.rs\n\n"},
+		{"id":"2823e28ab64621e5","x":-297,"y":-1140,"width":477,"height":100,"type":"text","text":"Brainstorm session for fleshing out the ideas of an area"},
+		{"id":"a1d759dfaf1c91ef","x":386,"y":-1147,"width":256,"height":114,"type":"text","text":"Design / Build on top of existing ideas for that area"},
+		{"id":"3bdc21c70df1d250","x":816,"y":-1151,"width":282,"height":118,"type":"text","text":"Add EVERYTHING we make to a concept folder for this area."},
+		{"id":"6885b68c8e7522ca","x":1247,"y":-1147,"width":286,"height":110,"type":"text","text":"Add area and all dependencies of area to the editor"},
+		{"id":"63c33916b08742e2","x":-260,"y":-960,"width":426,"height":380,"type":"text","text":"Areas are going to include:\n\n64 x 64 tile areas \"zones\"\n\nImage set\n     BG\n     \"Defined collider area\"\n     fg\n     enemies\n     gameobjects(generalized)"}
+	],
+	"edges":[
+		{"id":"27320a5b86e5dff6","fromNode":"08351c19ee5927f6","fromSide":"bottom","toNode":"f198ff67f73c9a44","toSide":"top"},
+		{"id":"ad5070d484c98a5b","fromNode":"08351c19ee5927f6","fromSide":"right","toNode":"763335e6ca80b248","toSide":"left","toEnd":"none","color":"6"},
+		{"id":"87f77610231ebdeb","fromNode":"f198ff67f73c9a44","fromSide":"right","toNode":"9b2c412bd0288943","toSide":"left","toEnd":"none"},
+		{"id":"19d300b8c66e4723","fromNode":"9b2c412bd0288943","fromSide":"right","toNode":"eb546e85a5e5f727","toSide":"left"},
+		{"id":"8d020f17be284f2d","fromNode":"eb546e85a5e5f727","fromSide":"right","toNode":"e24bb401f299207b","toSide":"left"},
+		{"id":"64ebd9b6190fe784","fromNode":"9b2c412bd0288943","fromSide":"right","toNode":"a1bfdc16524dbe1a","toSide":"left"},
+		{"id":"af3f8df0e73134e5","fromNode":"9b2c412bd0288943","fromSide":"right","toNode":"4632b819a3dab59d","toSide":"left"},
+		{"id":"48bfc9f39a551972","fromNode":"9b2c412bd0288943","fromSide":"right","toNode":"c45be7f34aead691","toSide":"left"},
+		{"id":"e0f3af3f58e45b34","fromNode":"4632b819a3dab59d","fromSide":"right","toNode":"e24bb401f299207b","toSide":"bottom","toEnd":"none","color":"3"},
+		{"id":"5b36cd09c78a40ae","fromNode":"9b2c412bd0288943","fromSide":"bottom","toNode":"7001a5d7566bb262","toSide":"top"},
+		{"id":"606628e2421de130","fromNode":"2823e28ab64621e5","fromSide":"right","toNode":"a1d759dfaf1c91ef","toSide":"left"},
+		{"id":"79dcd9d78f72370b","fromNode":"a1d759dfaf1c91ef","fromSide":"right","toNode":"3bdc21c70df1d250","toSide":"left"},
+		{"id":"c2a0671bdc86dbf5","fromNode":"3bdc21c70df1d250","fromSide":"right","toNode":"6885b68c8e7522ca","toSide":"left"}
+	]
+}

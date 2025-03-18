@@ -1,7 +1,4 @@
 use bevy::{prelude::*, utils::HashMap};
-use tools::SignificantComponent;
-use super::*;
-use crate::EditorObject;
 
 
 #[derive(Resource, Default)]

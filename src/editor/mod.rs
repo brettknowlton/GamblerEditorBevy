@@ -1,6 +1,5 @@
 #[macro_use]
 pub mod ui;
-use bevy::gizmos::grid;
 use selection::ActiveSelection;
 use selection::SelectionRect;
 pub use ui::*;
@@ -8,11 +7,9 @@ pub use ui::*;
 pub use tile::*;
 use tools::SignificantComponent;
 pub use crate::consts::*;
+use crate::game;
 pub use crate::utilities::*;
 pub use crate::resources::*;
-pub use crate::tools::*;
-
-use resources::*;
 
 mod tile;
 mod collider;
@@ -34,6 +31,13 @@ pub enum EditorState {
     Saving,
     QuitAsk,
     Editing(EditingComponent),
+}
+
+#[derive(Clone, Copy, Default, Eq, PartialEq, Debug, Hash, States)]
+pub enum TestingState {
+    #[default]
+    Inactive,
+    Testing,
 }
 
 ///The EditingComponent enum is used to determine what type of object the user is currently trying to place in the scene, this is kind of like an "Internal Type" for the editor state.
@@ -119,6 +123,10 @@ struct BottomBarUpdate;
 fn stateful_keybinds(
     mut next_state: ResMut<NextState<EditorState>>,
     state: ResMut<State<EditorState>>,
+    mut next_test_state: ResMut<NextState<TestingState>>,
+    test_state: ResMut<State<TestingState>>,
+    mut next_game_state: ResMut<NextState<game::GameState>>,
+
     
     mut next_showgrid_state: ResMut<NextState<ShowGrid>>,
     showgrid_state: ResMut<State<ShowGrid>>,
@@ -162,6 +170,21 @@ fn stateful_keybinds(
     {
         next_state.set(EditorState::QuitAsk);
         send_message!(Some('i'), messages, "Would you like to exit the editor? Yenter/Noscape");
+    } else if 
+        //CTRL + T will toggle TEST mode, disabling the editor and enabling the game functionality.
+        input.all_pressed(vec![KeyCode::KeyT, KeyCode::ControlLeft]) &&
+        state.get() != &EditorState::Inactive
+    {
+        if test_state.get() == &TestingState::Testing {
+            next_state.set(EditorState::Normal);
+            next_test_state.set(TestingState::Inactive);
+            send_message!(Some('i'), messages, "Exiting Test Mode");
+        } else {
+            next_state.set(EditorState::Inactive);
+            next_test_state.set(TestingState::Testing);
+            next_game_state.set(game::GameState::Running);
+            send_message!(Some('i'), messages, "Entering Test Mode");
+        }
     }
 
     //G will toggle the grid visibility
@@ -335,6 +358,8 @@ pub struct EditorObject {
     pub internal_type: u64,
     //the coordinate of the object as well as the major type of the object combined into a neat little package
     pub coordinate: TCoordinate,
+    //this zone ID will track which zone the object is in, this is used to determine which zone to load the object into and to help with performance by only loading objects in the current/neighrboring zones
+    pub zone_id: TCoordinate,
 }
 
 impl EditorObject {
@@ -383,6 +408,15 @@ fn draw_grid(mut gizmos: Gizmos) {
             Color::srgba(0.0, 1.0, 0.0, 0.5)
         )
         .outer_edges();
+
+    gizmos
+        .grid_2d(
+            Isometry2d::IDENTITY,
+            UVec2::new(10, 10),
+            Vec2::new((TILE_SIZE * TILE_SCALE * ZONE_SIZE) as f32, (TILE_SIZE * TILE_SCALE * ZONE_SIZE) as f32),
+            Color::srgba(1.0, 0.0, 0.0, 0.5)
+        )
+        .outer_edges();
 }
 
 pub fn editor_plugin(app: &mut App) {
@@ -391,6 +425,7 @@ pub fn editor_plugin(app: &mut App) {
         .init_state::<EditorState>()
         .init_state::<GridSnap>()
         .init_state::<ShowGrid>()
+        .init_state::<TestingState>()
 
         //registrations
         .register_type::<EditorObject>()

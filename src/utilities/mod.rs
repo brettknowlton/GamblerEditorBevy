@@ -37,6 +37,8 @@ pub fn snap_coordinate_to_grid(coord: Coordinate) -> Coordinate {
     snap_value_to_grid(coord, (TILE_SIZE * TILE_SCALE) as i64)
 }
 
+
+
 ///A Coordinate is a simple struct that holds two i64 values, x and y identifying a point in our editor
 /// most items are anchored to Bottom Left, so the x and y values (generally) define the bottom left corner of the object
 #[derive(
@@ -75,7 +77,23 @@ impl Into<bevy::prelude::Vec2> for Coordinate {
 
 ///A TCoordinate, or a "typed coordinate" is a coordinate that also includes an identifying character,
 ///this way the coordinate is unique, as no two objects of the same type can occupy the same space,
-/// and makes for an efficient Unique Identifier for the object
+/// and makes for an efficient Unique Identifier both objects AND zones
+/// 
+/// Objects Example:
+///     TCoordinate { type_char: 'T', coord: Coordinate(0, 0) }
+/// Object Types: 
+/// T: Tile
+/// C: Collider
+/// R: Editor Rect
+/// P: Placeholder
+/// 
+/// 
+/// Zones Example:
+///    TCoordinate { type_char: 'F', coord: Coordinate(0, 0) }
+/// Zone Types:
+/// F: Foreground
+/// B: Background
+/// 
 #[derive(Component, Reflect, Deserialize, Serialize, Debug, Clone, PartialEq, Eq, Hash)]
 #[reflect(Component)]
 pub struct TCoordinate {
