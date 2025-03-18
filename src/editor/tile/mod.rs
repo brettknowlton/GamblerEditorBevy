@@ -32,7 +32,9 @@ fn tilemode_keybinds(
     tiles: Query<(Entity, &EditorObject), With<Tile>>,
     gridsnap: Res<State<GridSnap>>,
     mut selected_tile_id: ResMut<SelectedTileID>,
-    mut needs_update: ResMut<TileUpdateNeeded>
+    mut needs_update: ResMut<TileUpdateNeeded>,
+
+    mut placeholder_update_ev: EventWriter<UpdatePlaceholderEvent>
 
 )
 {
@@ -73,7 +75,16 @@ fn tilemode_keybinds(
     if input.just_pressed(KeyCode::ArrowRight) {
         //pressing right increments selected_rect_id by 1, looping back to 0 if it goes over the max_spritesheet_items
         selected_tile_id.id = (selected_tile_id.id + 1) % MAX_SPRITESHEET_ITEMS;
-        needs_update.0 = true;
+        // needs_update.0 = true;
+        println!("Creating event with Selected Tile ID: {}", selected_tile_id.id);
+        placeholder_update_ev.send(UpdatePlaceholderEvent {
+            tcoord: TCoordinate::new('t', Coordinate(0, 0)),
+            rect: Rect {
+                min: Vec2::new((selected_tile_id.id % SPRITESHEET_WIDTH) as f32 * TILE_SIZE as f32, (selected_tile_id.id / SPRITESHEET_WIDTH as u64) as f32 * TILE_SIZE as f32),
+                max: Vec2::new((selected_tile_id.id % SPRITESHEET_WIDTH + 1) as f32 * TILE_SIZE as f32, (selected_tile_id.id / SPRITESHEET_WIDTH as u64 + 1) as f32 * TILE_SIZE as f32),
+            },
+        });
+
     }
     if input.just_pressed(KeyCode::ArrowLeft) {
         //cycles through the spritesheet to the left

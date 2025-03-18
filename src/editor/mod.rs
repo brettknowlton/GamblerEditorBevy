@@ -62,6 +62,13 @@ pub enum ShowGrid {
     No,
 }
 
+#[derive(Event)]
+pub struct UpdatePlaceholderEvent{
+    pub tcoord: TCoordinate,
+    pub rect: Rect
+}
+
+
 fn initialize(
     mut commands: Commands,
 
@@ -388,6 +395,7 @@ pub fn editor_plugin(app: &mut App) {
         //registrations
         .register_type::<EditorObject>()
         .add_event::<BottomBarUpdate>()
+        .add_event::<UpdatePlaceholderEvent>()
 
         //resources
         .init_resource::<EditorBottomBarDisplayed>()
@@ -414,13 +422,14 @@ pub fn editor_plugin(app: &mut App) {
             (ui::update_placeholder::<SelectionRect>, draw_rect_placeholder).chain()
         )
 
+
         //The only true startup systems here:
         .add_systems(Startup, (initialize, create_crosshair, ui::spawn_general_editor_ui).chain())
 
         //universal update systems for all editing modes
         .add_systems(Update, stateful_keybinds.run_if(not(in_state(EditorState::Inactive))))
-        .add_systems(Update, draw_grid.run_if(in_state(ShowGrid::Yes)));
-
+        .add_systems(Update, draw_grid.run_if(in_state(ShowGrid::Yes)))
+        .add_systems(Update, ui::trigger_placeholder_update);
     //placeholder resource for whatever tile we are trying to place
 }
 //NOTHING BELOW THE PLUGINS >:(
