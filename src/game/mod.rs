@@ -1,5 +1,7 @@
-use std::path::PathBuf;
 use super::editor::*;
+use super::utilities::*;
+use super::editor::collider::*;
+use std::path::PathBuf;
 
 use bevy::prelude::*;
 
@@ -21,9 +23,16 @@ pub enum GameState {
 pub fn game_plugin(app: &mut App) {
     app.init_state::<GameState>()
         //OnEnter systems
-        .add_systems(OnEnter(GameState::Inactive), (load_save_data, player::spawn_player).chain())
-
-        .add_systems(Update, player::player_physics.run_if(in_state(GameState::Running)));
+        .add_systems(
+            OnEnter(GameState::Inactive),
+            (load_save_data, player::spawn_player).chain(),
+        )
+        .add_systems(
+            Update,
+            (player::do_player_collision, player::player_physics)
+                .chain()
+                .run_if(in_state(GameState::Running)),
+        );
     // .add_systems(
     //     OnEnter(GameState::Loading),
     //     ().chain()
@@ -51,13 +60,12 @@ pub enum Direction {
 #[derive(Component, Debug)]
 pub struct AnimationDef {
     frame_size: Vec2,
-    layout: Vec2,//(rows, columns), ie # of frames in each direction of the spritesheet a 3x4 spritesheet would be (3, 4)
-    pub frame_count: u32,//total number of frames in the animation
+    layout: Vec2, //(rows, columns), ie # of frames in each direction of the spritesheet a 3x4 spritesheet would be (3, 4)
+    pub frame_count: u32, //total number of frames in the animation
     pub frame_duration: f32,
     pub current_frame: u32,
     pub frame_timer: f32,
 }
-
 
 fn load_save_data(mut commands: Commands, asset_server: Res<AssetServer>) {
     // let save_data = asset_server.load("save_data.json");
