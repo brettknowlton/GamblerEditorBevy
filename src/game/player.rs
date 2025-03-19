@@ -68,7 +68,7 @@ impl Default for Player {
 
 pub fn spawn_player(mut commands: Commands, asset_server: Res<AssetServer>) {
     println!("spawning player...");
-    let path = PathBuf::from("textures\\player\\PlayerHD.png");
+    let path = PathBuf::from("textures/player/PlayerHD.png");
     let player_sprite = asset_server.load(path);
     commands.spawn((
         Player {
@@ -84,4 +84,44 @@ pub fn spawn_player(mut commands: Commands, asset_server: Res<AssetServer>) {
             ..Default::default()
         },
     ));
+}
+
+pub fn do_player_collision(mut commands: Commands, players: Query<(Entity, &Player, &Transform)>, colliders: Query<(Entity, &Collider, &Transform)>) {
+    for (player_entity, player, player_transform) in players.iter() {
+        let collisions = Vec::new();
+        for (collider_entity, collider, collider_transform) in colliders.iter() {
+            if player_transform.translation.x < collider_transform.translation.x + TILE_SIZE as f32
+                && player_transform.translation.x + SCALED_PLAYER_WIDTH as f32 > collider_transform.translation.x
+                && player_transform.translation.y < collider_transform.translation.y + TILE_SIZE as f32
+                && player_transform.translation.y + SCALED_PLAYER_HEIGHT as f32 > collider_transform.translation.y {
+                //collision detected
+                collisions.push((collider_entity, collider, collider_transform));
+            }
+        }
+
+        collisions.into_par_iter().for_each(|(collider_entity, collider, collider_transform)| {
+            //handle collision
+            if player.velocity.x > 0.0 {
+                //player is moving right and has hit this collider
+                player.velocity.x = 0.0;
+                player_transform.translation.x = collider_transform.translation.x - SCALED_PLAYER_WIDTH as f32;
+            } else if player.velocity.x < 0.0 {
+                //player is moving left
+                player.velocity.x = 0.0;
+                player_transform.translation.x = collider_transform.translation.x + collider.size.x;
+            }
+            if player.velocity.y > 0.0 {
+                //player is moving up
+                player.velocity.y = 0.0;
+                player_transform.translation.y = collider_transform.translation.y - SCALED_PLAYER_HEIGHT as f32;
+            } else if player.velocity.y < 0.0 {
+                //player is falling
+                player.velocity.y = 0.0;
+                player_transform.translation.y = collider_transform.translation.y + collider.size.y;
+            }
+
+        }
+
+        );
+    }
 }

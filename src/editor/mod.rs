@@ -11,8 +11,8 @@ use crate::game;
 pub use crate::utilities::*;
 pub use crate::resources::*;
 
-mod tile;
-mod collider;
+pub mod tile;
+pub mod collider;
 mod scene;
 pub use std::{ fmt::Debug, path::PathBuf };
 

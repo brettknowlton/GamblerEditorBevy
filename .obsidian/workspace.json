@@ -11,14 +11,12 @@
             "id": "5164161d9a27d8a0",
             "type": "leaf",
             "state": {
-              "type": "markdown",
+              "type": "image",
               "state": {
-                "file": "planning/To-Do's.md",
-                "mode": "source",
-                "source": false
+                "file": "assets/textures/player/PlayerHD.png"
               },
-              "icon": "lucide-file",
-              "title": "To-Do's"
+              "icon": "lucide-image",
+              "title": "PlayerHD"
             }
           }
         ]
@@ -162,24 +160,27 @@
   },
   "active": "5164161d9a27d8a0",
   "lastOpenFiles": [
-    "target/debug/deps/gambler_bevy-1cc2ff3bf7e3691d",
-    "target/debug/incremental/gambler_bevy-0p5dbw2uxfkgn/s-h5kvy485xf-1o8ich4-54fu836aipgtqzbnzumwb8hry/work-products.bin",
-    "target/debug/incremental/gambler_bevy-0p5dbw2uxfkgn/s-h5kvy485xf-1o8ich4-54fu836aipgtqzbnzumwb8hry/query-cache.bin",
-    "target/debug/incremental/gambler_bevy-0p5dbw2uxfkgn/s-h5kvy485xf-1o8ich4-54fu836aipgtqzbnzumwb8hry/eycxsdbr7e862zr5f58xk9xui.o",
-    "target/debug/incremental/gambler_bevy-0p5dbw2uxfkgn/s-h5kvy485xf-1o8ich4-54fu836aipgtqzbnzumwb8hry/evpppmr55v7qfeumbjhsth3h0.o",
-    "target/debug/incremental/gambler_bevy-0p5dbw2uxfkgn/s-h5kvy485xf-1o8ich4-54fu836aipgtqzbnzumwb8hry/eu825bhzpjr4xr9ugnq87oxr3.o",
-    "target/debug/incremental/gambler_bevy-0p5dbw2uxfkgn/s-h5kvy485xf-1o8ich4-54fu836aipgtqzbnzumwb8hry/eq0xfyt3dy43o88acsoajfje0.o",
-    "target/debug/incremental/gambler_bevy-0p5dbw2uxfkgn/s-h5kvy485xf-1o8ich4-54fu836aipgtqzbnzumwb8hry/eolsqypzuxtxaj0q8u2sx22j6.o",
-    "target/debug/incremental/gambler_bevy-0p5dbw2uxfkgn/s-h5kvy485xf-1o8ich4-54fu836aipgtqzbnzumwb8hry/enqkglyl652zkkb7eqg3im085.o",
-    "target/debug/incremental/gambler_bevy-0p5dbw2uxfkgn/s-h5kvy485xf-1o8ich4-54fu836aipgtqzbnzumwb8hry/eg027bf5nt1j0brcn4czikvxr.o",
-    "target/debug/incremental/gambler_bevy-0p5dbw2uxfkgn/s-h5kvy485xf-1o8ich4-54fu836aipgtqzbnzumwb8hry/e9kju3otkpq5xo0f4czm9ggrv.o",
+    "target/debug/incremental/gambler_bevy-3pnazb3jzqdea/s-h5mp6luabg-0iglw8h-working/dep-graph.part.bin",
+    "target/debug/incremental/gambler_bevy-3pnazb3jzqdea/s-h5mp6luabg-0iglw8h-working",
+    "target/debug/incremental/gambler_bevy-3pnazb3jzqdea/s-h5mp6luabg-0iglw8h.lock",
+    "assets/textures/player/PlayerLD.png",
+    "assets/textures/player/PlayerHD.png",
+    "planning/To-Do's.md",
+    "target/debug/deps/rmeta3eSogN/lib.rmeta",
+    "target/debug/deps/rmeta3eSogN",
+    "target/debug/deps/rmetatcVDHE",
+    "target/debug/deps/rmetaIeTdRV",
+    "target/debug/deps/rmetaFVnM0S/lib.rmeta",
+    "target/debug/deps/rmetaFVnM0S",
+    "target/debug/deps/rmeta4hoj3f/lib.rmeta",
+    "target/debug/deps/rmeta4hoj3f",
+    "planning/Planning Canvas.canvas",
     "planning/Art/Art.md",
     "planning/Art/Player/Player Concept Art.md",
     "planning/Art/Cards/Card Concept Art.md",
     "planning/Gambler Editor.md",
     "planning/Mechanic Breakdowns/Controls.md",
     "planning/Mechanic Breakdowns/Mechanics.md",
-    "planning/To-Do's.md",
     "planning/Mechanic Breakdowns 1/Mechanics.md",
     "PCL Process.canvas",
     "planning/Mechanic Breakdowns/Rectangle Tool.md",
@@ -195,8 +196,6 @@
     "planning/Mechanics.md",
     "planning/art concepts/zughy32.png",
     "planning/art concepts/rosy-42-palette-example-by-s-203792.png",
-    "planning/Root.md",
-    "assets/textures/cards/H1.png",
-    "assets/textures/cards/H0.png"
+    "planning/Root.md"
   ]
 }

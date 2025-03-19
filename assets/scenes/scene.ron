@@ -3,7 +3,7 @@
   entities: {
     4294967311: (
       components: {
-        "bevy_hierarchy::components::parent::Parent": (4294967374),
+        "bevy_hierarchy::components::parent::Parent": (4294967408),
         "bevy_render::primitives::Aabb": (
           center: (16.0, 16.0, 0.0),
           half_extents: (16.0, 16.0, 0.0),
@@ -32,16 +32,16 @@
         "gambler_bevy::editor::tile::Tile": (),
       },
     ),
-    4294967313: (
+    4294967312: (
       components: {
-        "bevy_hierarchy::components::parent::Parent": (4294967374),
+        "bevy_hierarchy::components::parent::Parent": (4294967408),
         "bevy_render::primitives::Aabb": (
           center: (16.0, 16.0, 0.0),
           half_extents: (16.0, 16.0, 0.0),
         ),
         "bevy_render::sync_world::SyncToRenderWorld": (),
         "bevy_render::view::visibility::InheritedVisibility": (true),
-        "bevy_render::view::visibility::ViewVisibility": (true),
+        "bevy_render::view::visibility::ViewVisibility": (false),
         "bevy_render::view::visibility::Visibility": Inherited,
         "bevy_transform::components::global_transform::GlobalTransform": ((4.0, 0.0, 0.0, 0.0, 4.0, 0.0, 0.0, 0.0, 1.0, 512.0, -128.0, -5.0)),
         "bevy_transform::components::transform::Transform": (
@@ -63,16 +63,16 @@
         "gambler_bevy::editor::tile::Tile": (),
       },
     ),
-    4294967314: (
+    4294967313: (
       components: {
-        "bevy_hierarchy::components::parent::Parent": (4294967374),
+        "bevy_hierarchy::components::parent::Parent": (4294967408),
         "bevy_render::primitives::Aabb": (
           center: (16.0, 16.0, 0.0),
           half_extents: (16.0, 16.0, 0.0),
         ),
         "bevy_render::sync_world::SyncToRenderWorld": (),
         "bevy_render::view::visibility::InheritedVisibility": (true),
-        "bevy_render::view::visibility::ViewVisibility": (true),
+        "bevy_render::view::visibility::ViewVisibility": (false),
         "bevy_render::view::visibility::Visibility": Inherited,
         "bevy_transform::components::global_transform::GlobalTransform": ((4.0, 0.0, 0.0, 0.0, 4.0, 0.0, 0.0, 0.0, 1.0, 512.0, 0.0, -5.0)),
         "bevy_transform::components::transform::Transform": (
@@ -94,9 +94,9 @@
         "gambler_bevy::editor::tile::Tile": (),
       },
     ),
-    4294967315: (
+    4294967314: (
       components: {
-        "bevy_hierarchy::components::parent::Parent": (4294967374),
+        "bevy_hierarchy::components::parent::Parent": (4294967408),
         "bevy_render::primitives::Aabb": (
           center: (16.0, 16.0, 0.0),
           half_extents: (16.0, 16.0, 0.0),
@@ -125,9 +125,9 @@
         "gambler_bevy::editor::tile::Tile": (),
       },
     ),
-    4294967317: (
+    4294967315: (
       components: {
-        "bevy_hierarchy::components::parent::Parent": (38654705742),
+        "bevy_hierarchy::components::parent::Parent": (25769803888),
         "bevy_render::primitives::Aabb": (
           center: (16.0, 16.0, 0.0),
           half_extents: (16.0, 16.0, 0.0),
@@ -156,9 +156,9 @@
         "gambler_bevy::editor::tile::Tile": (),
       },
     ),
-    4294967318: (
+    4294967316: (
       components: {
-        "bevy_hierarchy::components::parent::Parent": (38654705742),
+        "bevy_hierarchy::components::parent::Parent": (25769803888),
         "bevy_render::primitives::Aabb": (
           center: (16.0, 16.0, 0.0),
           half_extents: (16.0, 16.0, 0.0),
@@ -187,9 +187,9 @@
         "gambler_bevy::editor::tile::Tile": (),
       },
     ),
-    4294967319: (
+    4294967317: (
       components: {
-        "bevy_hierarchy::components::parent::Parent": (38654705742),
+        "bevy_hierarchy::components::parent::Parent": (25769803888),
         "bevy_render::primitives::Aabb": (
           center: (16.0, 16.0, 0.0),
           half_extents: (16.0, 16.0, 0.0),
@@ -218,9 +218,9 @@
         "gambler_bevy::editor::tile::Tile": (),
       },
     ),
-    4294967320: (
+    4294967318: (
       components: {
-        "bevy_hierarchy::components::parent::Parent": (38654705742),
+        "bevy_hierarchy::components::parent::Parent": (25769803888),
         "bevy_render::primitives::Aabb": (
           center: (16.0, 16.0, 0.0),
           half_extents: (16.0, 16.0, 0.0),
@@ -249,9 +249,9 @@
         "gambler_bevy::editor::tile::Tile": (),
       },
     ),
-    4294967321: (
+    4294967319: (
       components: {
-        "bevy_hierarchy::components::parent::Parent": (38654705742),
+        "bevy_hierarchy::components::parent::Parent": (25769803888),
         "bevy_render::primitives::Aabb": (
           center: (16.0, 16.0, 0.0),
           half_extents: (16.0, 16.0, 0.0),
@@ -280,9 +280,9 @@
         "gambler_bevy::editor::tile::Tile": (),
       },
     ),
-    4294967322: (
+    4294967320: (
       components: {
-        "bevy_hierarchy::components::parent::Parent": (38654705742),
+        "bevy_hierarchy::components::parent::Parent": (25769803888),
         "bevy_render::primitives::Aabb": (
           center: (16.0, 16.0, 0.0),
           half_extents: (16.0, 16.0, 0.0),
@@ -313,69 +313,7 @@
     ),
     4294967323: (
       components: {
-        "bevy_hierarchy::components::parent::Parent": (38654705742),
-        "bevy_render::primitives::Aabb": (
-          center: (16.0, 16.0, 0.0),
-          half_extents: (16.0, 16.0, 0.0),
-        ),
-        "bevy_render::sync_world::SyncToRenderWorld": (),
-        "bevy_render::view::visibility::InheritedVisibility": (true),
-        "bevy_render::view::visibility::ViewVisibility": (true),
-        "bevy_render::view::visibility::Visibility": Inherited,
-        "bevy_transform::components::global_transform::GlobalTransform": ((4.0, 0.0, 0.0, 0.0, 4.0, 0.0, 0.0, 0.0, 1.0, -128.0, 256.0, -5.0)),
-        "bevy_transform::components::transform::Transform": (
-          translation: (-128.0, 256.0, 0.0),
-          rotation: (0.0, 0.0, 0.0, 1.0),
-          scale: (4.0, 4.0, 1.0),
-        ),
-        "gambler_bevy::editor::EditorObject": (
-          internal_type: 0,
-          coordinate: (
-            type_char: 't',
-            coord: (-128, 256),
-          ),
-          zone_id: (
-            type_char: 'f',
-            coord: (-2, 4),
-          ),
-        ),
-        "gambler_bevy::editor::tile::Tile": (),
-      },
-    ),
-    4294967324: (
-      components: {
-        "bevy_hierarchy::components::parent::Parent": (38654705742),
-        "bevy_render::primitives::Aabb": (
-          center: (16.0, 16.0, 0.0),
-          half_extents: (16.0, 16.0, 0.0),
-        ),
-        "bevy_render::sync_world::SyncToRenderWorld": (),
-        "bevy_render::view::visibility::InheritedVisibility": (true),
-        "bevy_render::view::visibility::ViewVisibility": (true),
-        "bevy_render::view::visibility::Visibility": Inherited,
-        "bevy_transform::components::global_transform::GlobalTransform": ((4.0, 0.0, 0.0, 0.0, 4.0, 0.0, 0.0, 0.0, 1.0, 0.0, 256.0, -5.0)),
-        "bevy_transform::components::transform::Transform": (
-          translation: (0.0, 256.0, 0.0),
-          rotation: (0.0, 0.0, 0.0, 1.0),
-          scale: (4.0, 4.0, 1.0),
-        ),
-        "gambler_bevy::editor::EditorObject": (
-          internal_type: 1,
-          coordinate: (
-            type_char: 't',
-            coord: (0, 256),
-          ),
-          zone_id: (
-            type_char: 'f',
-            coord: (0, 4),
-          ),
-        ),
-        "gambler_bevy::editor::tile::Tile": (),
-      },
-    ),
-    4294967325: (
-      components: {
-        "bevy_hierarchy::components::parent::Parent": (38654705742),
+        "bevy_hierarchy::components::parent::Parent": (25769803888),
         "bevy_render::primitives::Aabb": (
           center: (16.0, 16.0, 0.0),
           half_extents: (16.0, 16.0, 0.0),
@@ -404,194 +342,9 @@
         "gambler_bevy::editor::tile::Tile": (),
       },
     ),
-    4294967334: (
+    4294967330: (
       components: {
-        "bevy_hierarchy::components::parent::Parent": (81604378702),
-        "bevy_render::primitives::Aabb": (
-          center: (16.0, 16.0, 0.0),
-          half_extents: (16.0, 16.0, 0.0),
-        ),
-        "bevy_render::sync_world::SyncToRenderWorld": (),
-        "bevy_render::view::visibility::InheritedVisibility": (true),
-        "bevy_render::view::visibility::ViewVisibility": (true),
-        "bevy_render::view::visibility::Visibility": Inherited,
-        "bevy_transform::components::global_transform::GlobalTransform": ((4.0, 0.0, 0.0, 0.0, 4.0, 0.0, 0.0, 0.0, 1.0, 256.0, -512.0, 0.0)),
-        "bevy_transform::components::transform::Transform": (
-          translation: (256.0, -512.0, 0.0),
-          rotation: (0.0, 0.0, 0.0, 1.0),
-          scale: (4.0, 4.0, 1.0),
-        ),
-        "gambler_bevy::editor::EditorObject": (
-          internal_type: 0,
-          coordinate: (
-            type_char: 't',
-            coord: (256, -512),
-          ),
-          zone_id: (
-            type_char: 'f',
-            coord: (4, -8),
-          ),
-        ),
-        "gambler_bevy::editor::tile::Tile": (),
-      },
-    ),
-    4294967335: (
-      components: {
-        "bevy_hierarchy::components::parent::Parent": (81604378702),
-        "bevy_render::primitives::Aabb": (
-          center: (16.0, 16.0, 0.0),
-          half_extents: (16.0, 16.0, 0.0),
-        ),
-        "bevy_render::sync_world::SyncToRenderWorld": (),
-        "bevy_render::view::visibility::InheritedVisibility": (true),
-        "bevy_render::view::visibility::ViewVisibility": (true),
-        "bevy_render::view::visibility::Visibility": Inherited,
-        "bevy_transform::components::global_transform::GlobalTransform": ((4.0, 0.0, 0.0, 0.0, 4.0, 0.0, 0.0, 0.0, 1.0, 128.0, -512.0, 0.0)),
-        "bevy_transform::components::transform::Transform": (
-          translation: (128.0, -512.0, 0.0),
-          rotation: (0.0, 0.0, 0.0, 1.0),
-          scale: (4.0, 4.0, 1.0),
-        ),
-        "gambler_bevy::editor::EditorObject": (
-          internal_type: 0,
-          coordinate: (
-            type_char: 't',
-            coord: (128, -512),
-          ),
-          zone_id: (
-            type_char: 'f',
-            coord: (2, -8),
-          ),
-        ),
-        "gambler_bevy::editor::tile::Tile": (),
-      },
-    ),
-    4294967336: (
-      components: {
-        "bevy_hierarchy::components::parent::Parent": (81604378702),
-        "bevy_render::primitives::Aabb": (
-          center: (16.0, 16.0, 0.0),
-          half_extents: (16.0, 16.0, 0.0),
-        ),
-        "bevy_render::sync_world::SyncToRenderWorld": (),
-        "bevy_render::view::visibility::InheritedVisibility": (true),
-        "bevy_render::view::visibility::ViewVisibility": (true),
-        "bevy_render::view::visibility::Visibility": Inherited,
-        "bevy_transform::components::global_transform::GlobalTransform": ((4.0, 0.0, 0.0, 0.0, 4.0, 0.0, 0.0, 0.0, 1.0, 0.0, -512.0, 0.0)),
-        "bevy_transform::components::transform::Transform": (
-          translation: (0.0, -512.0, 0.0),
-          rotation: (0.0, 0.0, 0.0, 1.0),
-          scale: (4.0, 4.0, 1.0),
-        ),
-        "gambler_bevy::editor::EditorObject": (
-          internal_type: 0,
-          coordinate: (
-            type_char: 't',
-            coord: (0, -512),
-          ),
-          zone_id: (
-            type_char: 'f',
-            coord: (0, -8),
-          ),
-        ),
-        "gambler_bevy::editor::tile::Tile": (),
-      },
-    ),
-    4294967337: (
-      components: {
-        "bevy_hierarchy::components::parent::Parent": (81604378702),
-        "bevy_render::primitives::Aabb": (
-          center: (16.0, 16.0, 0.0),
-          half_extents: (16.0, 16.0, 0.0),
-        ),
-        "bevy_render::sync_world::SyncToRenderWorld": (),
-        "bevy_render::view::visibility::InheritedVisibility": (true),
-        "bevy_render::view::visibility::ViewVisibility": (true),
-        "bevy_render::view::visibility::Visibility": Inherited,
-        "bevy_transform::components::global_transform::GlobalTransform": ((4.0, 0.0, 0.0, 0.0, 4.0, 0.0, 0.0, 0.0, 1.0, -128.0, -512.0, 0.0)),
-        "bevy_transform::components::transform::Transform": (
-          translation: (-128.0, -512.0, 0.0),
-          rotation: (0.0, 0.0, 0.0, 1.0),
-          scale: (4.0, 4.0, 1.0),
-        ),
-        "gambler_bevy::editor::EditorObject": (
-          internal_type: 0,
-          coordinate: (
-            type_char: 't',
-            coord: (-128, -512),
-          ),
-          zone_id: (
-            type_char: 'f',
-            coord: (-2, -8),
-          ),
-        ),
-        "gambler_bevy::editor::tile::Tile": (),
-      },
-    ),
-    4294967338: (
-      components: {
-        "bevy_hierarchy::components::parent::Parent": (81604378702),
-        "bevy_render::primitives::Aabb": (
-          center: (16.0, 16.0, 0.0),
-          half_extents: (16.0, 16.0, 0.0),
-        ),
-        "bevy_render::sync_world::SyncToRenderWorld": (),
-        "bevy_render::view::visibility::InheritedVisibility": (true),
-        "bevy_render::view::visibility::ViewVisibility": (true),
-        "bevy_render::view::visibility::Visibility": Inherited,
-        "bevy_transform::components::global_transform::GlobalTransform": ((4.0, 0.0, 0.0, 0.0, 4.0, 0.0, 0.0, 0.0, 1.0, -256.0, -512.0, 0.0)),
-        "bevy_transform::components::transform::Transform": (
-          translation: (-256.0, -512.0, 0.0),
-          rotation: (0.0, 0.0, 0.0, 1.0),
-          scale: (4.0, 4.0, 1.0),
-        ),
-        "gambler_bevy::editor::EditorObject": (
-          internal_type: 0,
-          coordinate: (
-            type_char: 't',
-            coord: (-256, -512),
-          ),
-          zone_id: (
-            type_char: 'f',
-            coord: (-4, -8),
-          ),
-        ),
-        "gambler_bevy::editor::tile::Tile": (),
-      },
-    ),
-    4294967339: (
-      components: {
-        "bevy_hierarchy::components::parent::Parent": (81604378702),
-        "bevy_render::primitives::Aabb": (
-          center: (16.0, 16.0, 0.0),
-          half_extents: (16.0, 16.0, 0.0),
-        ),
-        "bevy_render::sync_world::SyncToRenderWorld": (),
-        "bevy_render::view::visibility::InheritedVisibility": (true),
-        "bevy_render::view::visibility::ViewVisibility": (true),
-        "bevy_render::view::visibility::Visibility": Inherited,
-        "bevy_transform::components::global_transform::GlobalTransform": ((4.0, 0.0, 0.0, 0.0, 4.0, 0.0, 0.0, 0.0, 1.0, -384.0, -512.0, 0.0)),
-        "bevy_transform::components::transform::Transform": (
-          translation: (-384.0, -512.0, 0.0),
-          rotation: (0.0, 0.0, 0.0, 1.0),
-          scale: (4.0, 4.0, 1.0),
-        ),
-        "gambler_bevy::editor::EditorObject": (
-          internal_type: 0,
-          coordinate: (
-            type_char: 't',
-            coord: (-384, -512),
-          ),
-          zone_id: (
-            type_char: 'f',
-            coord: (-6, -8),
-          ),
-        ),
-        "gambler_bevy::editor::tile::Tile": (),
-      },
-    ),
-    4294967379: (
-      components: {
+        "bevy_hierarchy::components::parent::Parent": (4294967309),
         "bevy_render::primitives::Aabb": (
           center: (16.0, 16.0, 0.0),
           half_extents: (16.0, 16.0, 0.0),
@@ -620,8 +373,9 @@
         "gambler_bevy::editor::tile::Tile": (),
       },
     ),
-    4294967380: (
+    4294967331: (
       components: {
+        "bevy_hierarchy::components::parent::Parent": (4294967309),
         "bevy_render::primitives::Aabb": (
           center: (16.0, 16.0, 0.0),
           half_extents: (16.0, 16.0, 0.0),
@@ -650,8 +404,9 @@
         "gambler_bevy::editor::tile::Tile": (),
       },
     ),
-    4294967381: (
+    4294967332: (
       components: {
+        "bevy_hierarchy::components::parent::Parent": (4294967309),
         "bevy_render::primitives::Aabb": (
           center: (16.0, 16.0, 0.0),
           half_extents: (16.0, 16.0, 0.0),
@@ -680,8 +435,9 @@
         "gambler_bevy::editor::tile::Tile": (),
       },
     ),
-    4294967382: (
+    4294967333: (
       components: {
+        "bevy_hierarchy::components::parent::Parent": (4294967309),
         "bevy_render::primitives::Aabb": (
           center: (16.0, 16.0, 0.0),
           half_extents: (16.0, 16.0, 0.0),
@@ -710,8 +466,9 @@
         "gambler_bevy::editor::tile::Tile": (),
       },
     ),
-    4294967383: (
+    4294967334: (
       components: {
+        "bevy_hierarchy::components::parent::Parent": (4294967309),
         "bevy_render::primitives::Aabb": (
           center: (16.0, 16.0, 0.0),
           half_extents: (16.0, 16.0, 0.0),
@@ -740,8 +497,9 @@
         "gambler_bevy::editor::tile::Tile": (),
       },
     ),
-    4294967384: (
+    4294967335: (
       components: {
+        "bevy_hierarchy::components::parent::Parent": (4294967309),
         "bevy_render::primitives::Aabb": (
           center: (16.0, 16.0, 0.0),
           half_extents: (16.0, 16.0, 0.0),
@@ -770,8 +528,9 @@
         "gambler_bevy::editor::tile::Tile": (),
       },
     ),
-    4294967394: (
+    4294967336: (
       components: {
+        "bevy_hierarchy::components::parent::Parent": (4294967309),
         "bevy_render::primitives::Aabb": (
           center: (16.0, 16.0, 0.0),
           half_extents: (16.0, 16.0, 0.0),
@@ -800,8 +559,9 @@
         "gambler_bevy::editor::tile::Tile": (),
       },
     ),
-    4294967395: (
+    4294967337: (
       components: {
+        "bevy_hierarchy::components::parent::Parent": (4294967309),
         "bevy_render::primitives::Aabb": (
           center: (16.0, 16.0, 0.0),
           half_extents: (16.0, 16.0, 0.0),
@@ -830,8 +590,9 @@
         "gambler_bevy::editor::tile::Tile": (),
       },
     ),
-    4294967396: (
+    4294967338: (
       components: {
+        "bevy_hierarchy::components::parent::Parent": (4294967309),
         "bevy_render::primitives::Aabb": (
           center: (16.0, 16.0, 0.0),
           half_extents: (16.0, 16.0, 0.0),
@@ -860,8 +621,9 @@
         "gambler_bevy::editor::tile::Tile": (),
       },
     ),
-    4294967397: (
+    4294967339: (
       components: {
+        "bevy_hierarchy::components::parent::Parent": (4294967309),
         "bevy_render::primitives::Aabb": (
           center: (16.0, 16.0, 0.0),
           half_extents: (16.0, 16.0, 0.0),
@@ -890,8 +652,9 @@
         "gambler_bevy::editor::tile::Tile": (),
       },
     ),
-    4294967398: (
+    4294967340: (
       components: {
+        "bevy_hierarchy::components::parent::Parent": (4294967309),
         "bevy_render::primitives::Aabb": (
           center: (16.0, 16.0, 0.0),
           half_extents: (16.0, 16.0, 0.0),
@@ -920,8 +683,9 @@
         "gambler_bevy::editor::tile::Tile": (),
       },
     ),
-    4294967399: (
+    4294967341: (
       components: {
+        "bevy_hierarchy::components::parent::Parent": (4294967309),
         "bevy_render::primitives::Aabb": (
           center: (16.0, 16.0, 0.0),
           half_extents: (16.0, 16.0, 0.0),
@@ -950,8 +714,9 @@
         "gambler_bevy::editor::tile::Tile": (),
       },
     ),
-    4294967400: (
+    4294967342: (
       components: {
+        "bevy_hierarchy::components::parent::Parent": (4294967309),
         "bevy_render::primitives::Aabb": (
           center: (16.0, 16.0, 0.0),
           half_extents: (16.0, 16.0, 0.0),
@@ -980,8 +745,9 @@
         "gambler_bevy::editor::tile::Tile": (),
       },
     ),
-    4294967401: (
+    4294967343: (
       components: {
+        "bevy_hierarchy::components::parent::Parent": (4294967309),
         "bevy_render::primitives::Aabb": (
           center: (16.0, 16.0, 0.0),
           half_extents: (16.0, 16.0, 0.0),
@@ -1010,8 +776,9 @@
         "gambler_bevy::editor::tile::Tile": (),
       },
     ),
-    4294967402: (
+    4294967344: (
       components: {
+        "bevy_hierarchy::components::parent::Parent": (4294967309),
         "bevy_render::primitives::Aabb": (
           center: (16.0, 16.0, 0.0),
           half_extents: (16.0, 16.0, 0.0),
@@ -1040,8 +807,9 @@
         "gambler_bevy::editor::tile::Tile": (),
       },
     ),
-    4294967403: (
+    4294967345: (
       components: {
+        "bevy_hierarchy::components::parent::Parent": (4294967309),
         "bevy_render::primitives::Aabb": (
           center: (16.0, 16.0, 0.0),
           half_extents: (16.0, 16.0, 0.0),
@@ -1070,8 +838,9 @@
         "gambler_bevy::editor::tile::Tile": (),
       },
     ),
-    4294967404: (
+    4294967346: (
       components: {
+        "bevy_hierarchy::components::parent::Parent": (4294967309),
         "bevy_render::primitives::Aabb": (
           center: (16.0, 16.0, 0.0),
           half_extents: (16.0, 16.0, 0.0),
@@ -1100,8 +869,9 @@
         "gambler_bevy::editor::tile::Tile": (),
       },
     ),
-    4294967405: (
+    4294967347: (
       components: {
+        "bevy_hierarchy::components::parent::Parent": (4294967309),
         "bevy_render::primitives::Aabb": (
           center: (16.0, 16.0, 0.0),
           half_extents: (16.0, 16.0, 0.0),
@@ -1130,8 +900,9 @@
         "gambler_bevy::editor::tile::Tile": (),
       },
     ),
-    4294967406: (
+    4294967348: (
       components: {
+        "bevy_hierarchy::components::parent::Parent": (4294967309),
         "bevy_render::primitives::Aabb": (
           center: (16.0, 16.0, 0.0),
           half_extents: (16.0, 16.0, 0.0),
@@ -1160,8 +931,9 @@
         "gambler_bevy::editor::tile::Tile": (),
       },
     ),
-    4294967407: (
+    4294967349: (
       components: {
+        "bevy_hierarchy::components::parent::Parent": (4294967309),
         "bevy_render::primitives::Aabb": (
           center: (16.0, 16.0, 0.0),
           half_extents: (16.0, 16.0, 0.0),
@@ -1190,8 +962,9 @@
         "gambler_bevy::editor::tile::Tile": (),
       },
     ),
-    4294967408: (
+    4294967350: (
       components: {
+        "bevy_hierarchy::components::parent::Parent": (4294967309),
         "bevy_render::primitives::Aabb": (
           center: (16.0, 16.0, 0.0),
           half_extents: (16.0, 16.0, 0.0),
@@ -1220,8 +993,9 @@
         "gambler_bevy::editor::tile::Tile": (),
       },
     ),
-    4294967409: (
+    4294967351: (
       components: {
+        "bevy_hierarchy::components::parent::Parent": (4294967309),
         "bevy_render::primitives::Aabb": (
           center: (16.0, 16.0, 0.0),
           half_extents: (16.0, 16.0, 0.0),
@@ -1250,8 +1024,9 @@
         "gambler_bevy::editor::tile::Tile": (),
       },
     ),
-    4294967410: (
+    4294967352: (
       components: {
+        "bevy_hierarchy::components::parent::Parent": (4294967309),
         "bevy_render::primitives::Aabb": (
           center: (16.0, 16.0, 0.0),
           half_extents: (16.0, 16.0, 0.0),
@@ -1280,15 +1055,16 @@
         "gambler_bevy::editor::tile::Tile": (),
       },
     ),
-    4294967411: (
+    4294967353: (
       components: {
+        "bevy_hierarchy::components::parent::Parent": (4294967309),
         "bevy_render::primitives::Aabb": (
           center: (16.0, 16.0, 0.0),
           half_extents: (16.0, 16.0, 0.0),
         ),
         "bevy_render::sync_world::SyncToRenderWorld": (),
         "bevy_render::view::visibility::InheritedVisibility": (true),
-        "bevy_render::view::visibility::ViewVisibility": (true),
+        "bevy_render::view::visibility::ViewVisibility": (false),
         "bevy_render::view::visibility::Visibility": Inherited,
         "bevy_transform::components::global_transform::GlobalTransform": ((2.0, 0.0, 0.0, 0.0, 2.0, 0.0, 0.0, 0.0, 1.0, 384.0, -384.0, 0.0)),
         "bevy_transform::components::transform::Transform": (
@@ -1310,45 +1086,16 @@
         "gambler_bevy::editor::tile::Tile": (),
       },
     ),
-    8589934606: (
+    4294967355: (
       components: {
+        "bevy_hierarchy::components::parent::Parent": (4294967309),
         "bevy_render::primitives::Aabb": (
           center: (16.0, 16.0, 0.0),
           half_extents: (16.0, 16.0, 0.0),
         ),
         "bevy_render::sync_world::SyncToRenderWorld": (),
         "bevy_render::view::visibility::InheritedVisibility": (true),
-        "bevy_render::view::visibility::ViewVisibility": (true),
-        "bevy_render::view::visibility::Visibility": Inherited,
-        "bevy_transform::components::global_transform::GlobalTransform": ((2.0, 0.0, 0.0, 0.0, 2.0, 0.0, 0.0, 0.0, 1.0, -384.0, -64.0, 0.0)),
-        "bevy_transform::components::transform::Transform": (
-          translation: (-384.0, -64.0, 0.0),
-          rotation: (0.0, 0.0, 0.0, 1.0),
-          scale: (2.0, 2.0, 1.0),
-        ),
-        "gambler_bevy::editor::EditorObject": (
-          internal_type: 1,
-          coordinate: (
-            type_char: 't',
-            coord: (-384, -64),
-          ),
-          zone_id: (
-            type_char: 'f',
-            coord: (-6, -1),
-          ),
-        ),
-        "gambler_bevy::editor::tile::Tile": (),
-      },
-    ),
-    8589934608: (
-      components: {
-        "bevy_render::primitives::Aabb": (
-          center: (16.0, 16.0, 0.0),
-          half_extents: (16.0, 16.0, 0.0),
-        ),
-        "bevy_render::sync_world::SyncToRenderWorld": (),
-        "bevy_render::view::visibility::InheritedVisibility": (true),
-        "bevy_render::view::visibility::ViewVisibility": (true),
+        "bevy_render::view::visibility::ViewVisibility": (false),
         "bevy_render::view::visibility::Visibility": Inherited,
         "bevy_transform::components::global_transform::GlobalTransform": ((2.0, 0.0, 0.0, 0.0, 2.0, 0.0, 0.0, 0.0, 1.0, 384.0, -192.0, 0.0)),
         "bevy_transform::components::transform::Transform": (
@@ -1370,15 +1117,16 @@
         "gambler_bevy::editor::tile::Tile": (),
       },
     ),
-    8589934612: (
+    4294967356: (
       components: {
+        "bevy_hierarchy::components::parent::Parent": (4294967309),
         "bevy_render::primitives::Aabb": (
           center: (16.0, 16.0, 0.0),
           half_extents: (16.0, 16.0, 0.0),
         ),
         "bevy_render::sync_world::SyncToRenderWorld": (),
         "bevy_render::view::visibility::InheritedVisibility": (true),
-        "bevy_render::view::visibility::ViewVisibility": (true),
+        "bevy_render::view::visibility::ViewVisibility": (false),
         "bevy_render::view::visibility::Visibility": Inherited,
         "bevy_transform::components::global_transform::GlobalTransform": ((2.0, 0.0, 0.0, 0.0, 2.0, 0.0, 0.0, 0.0, 1.0, 448.0, -192.0, 0.0)),
         "bevy_transform::components::transform::Transform": (
@@ -1400,8 +1148,9 @@
         "gambler_bevy::editor::tile::Tile": (),
       },
     ),
-    8589934622: (
+    4294967357: (
       components: {
+        "bevy_hierarchy::components::parent::Parent": (4294967309),
         "bevy_render::primitives::Aabb": (
           center: (16.0, 16.0, 0.0),
           half_extents: (16.0, 16.0, 0.0),
@@ -1430,8 +1179,9 @@
         "gambler_bevy::editor::tile::Tile": (),
       },
     ),
-    8589934623: (
+    4294967358: (
       components: {
+        "bevy_hierarchy::components::parent::Parent": (4294967309),
         "bevy_render::primitives::Aabb": (
           center: (16.0, 16.0, 0.0),
           half_extents: (16.0, 16.0, 0.0),
@@ -1460,8 +1210,9 @@
         "gambler_bevy::editor::tile::Tile": (),
       },
     ),
-    8589934624: (
+    4294967359: (
       components: {
+        "bevy_hierarchy::components::parent::Parent": (4294967309),
         "bevy_render::primitives::Aabb": (
           center: (16.0, 16.0, 0.0),
           half_extents: (16.0, 16.0, 0.0),
@@ -1490,8 +1241,9 @@
         "gambler_bevy::editor::tile::Tile": (),
       },
     ),
-    8589934625: (
+    4294967360: (
       components: {
+        "bevy_hierarchy::components::parent::Parent": (4294967309),
         "bevy_render::primitives::Aabb": (
           center: (16.0, 16.0, 0.0),
           half_extents: (16.0, 16.0, 0.0),
@@ -1520,8 +1272,9 @@
         "gambler_bevy::editor::tile::Tile": (),
       },
     ),
-    8589934626: (
+    4294967361: (
       components: {
+        "bevy_hierarchy::components::parent::Parent": (4294967309),
         "bevy_render::primitives::Aabb": (
           center: (16.0, 16.0, 0.0),
           half_extents: (16.0, 16.0, 0.0),
@@ -1550,8 +1303,9 @@
         "gambler_bevy::editor::tile::Tile": (),
       },
     ),
-    8589934627: (
+    4294967362: (
       components: {
+        "bevy_hierarchy::components::parent::Parent": (4294967309),
         "bevy_render::primitives::Aabb": (
           center: (16.0, 16.0, 0.0),
           half_extents: (16.0, 16.0, 0.0),
@@ -1580,8 +1334,9 @@
         "gambler_bevy::editor::tile::Tile": (),
       },
     ),
-    8589934628: (
+    4294967363: (
       components: {
+        "bevy_hierarchy::components::parent::Parent": (4294967309),
         "bevy_render::primitives::Aabb": (
           center: (16.0, 16.0, 0.0),
           half_extents: (16.0, 16.0, 0.0),
@@ -1610,15 +1365,16 @@
         "gambler_bevy::editor::tile::Tile": (),
       },
     ),
-    8589934629: (
+    4294967364: (
       components: {
+        "bevy_hierarchy::components::parent::Parent": (4294967309),
         "bevy_render::primitives::Aabb": (
           center: (16.0, 16.0, 0.0),
           half_extents: (16.0, 16.0, 0.0),
         ),
         "bevy_render::sync_world::SyncToRenderWorld": (),
         "bevy_render::view::visibility::InheritedVisibility": (true),
-        "bevy_render::view::visibility::ViewVisibility": (true),
+        "bevy_render::view::visibility::ViewVisibility": (false),
         "bevy_render::view::visibility::Visibility": Inherited,
         "bevy_transform::components::global_transform::GlobalTransform": ((2.0, 0.0, 0.0, 0.0, 2.0, 0.0, 0.0, 0.0, 1.0, 448.0, -384.0, 0.0)),
         "bevy_transform::components::transform::Transform": (
@@ -1640,8 +1396,9 @@
         "gambler_bevy::editor::tile::Tile": (),
       },
     ),
-    8589934636: (
+    4294967365: (
       components: {
+        "bevy_hierarchy::components::parent::Parent": (4294967309),
         "bevy_render::primitives::Aabb": (
           center: (16.0, 16.0, 0.0),
           half_extents: (16.0, 16.0, 0.0),
@@ -1670,15 +1427,16 @@
         "gambler_bevy::editor::tile::Tile": (),
       },
     ),
-    8589934638: (
+    4294967366: (
       components: {
+        "bevy_hierarchy::components::parent::Parent": (4294967309),
         "bevy_render::primitives::Aabb": (
           center: (16.0, 16.0, 0.0),
           half_extents: (16.0, 16.0, 0.0),
         ),
         "bevy_render::sync_world::SyncToRenderWorld": (),
         "bevy_render::view::visibility::InheritedVisibility": (true),
-        "bevy_render::view::visibility::ViewVisibility": (true),
+        "bevy_render::view::visibility::ViewVisibility": (false),
         "bevy_render::view::visibility::Visibility": Inherited,
         "bevy_transform::components::global_transform::GlobalTransform": ((2.0, 0.0, 0.0, 0.0, 2.0, 0.0, 0.0, 0.0, 1.0, 448.0, -256.0, 0.0)),
         "bevy_transform::components::transform::Transform": (
@@ -1700,8 +1458,9 @@
         "gambler_bevy::editor::tile::Tile": (),
       },
     ),
-    8589934639: (
+    4294967367: (
       components: {
+        "bevy_hierarchy::components::parent::Parent": (4294967309),
         "bevy_render::primitives::Aabb": (
           center: (16.0, 16.0, 0.0),
           half_extents: (16.0, 16.0, 0.0),
@@ -1730,8 +1489,9 @@
         "gambler_bevy::editor::tile::Tile": (),
       },
     ),
-    8589934641: (
+    4294967368: (
       components: {
+        "bevy_hierarchy::components::parent::Parent": (4294967309),
         "bevy_render::primitives::Aabb": (
           center: (16.0, 16.0, 0.0),
           half_extents: (16.0, 16.0, 0.0),
@@ -1760,8 +1520,9 @@
         "gambler_bevy::editor::tile::Tile": (),
       },
     ),
-    8589934642: (
+    4294967369: (
       components: {
+        "bevy_hierarchy::components::parent::Parent": (4294967309),
         "bevy_render::primitives::Aabb": (
           center: (16.0, 16.0, 0.0),
           half_extents: (16.0, 16.0, 0.0),
@@ -1790,8 +1551,9 @@
         "gambler_bevy::editor::tile::Tile": (),
       },
     ),
-    8589934646: (
+    4294967370: (
       components: {
+        "bevy_hierarchy::components::parent::Parent": (4294967309),
         "bevy_render::primitives::Aabb": (
           center: (16.0, 16.0, 0.0),
           half_extents: (16.0, 16.0, 0.0),
@@ -1820,8 +1582,9 @@
         "gambler_bevy::editor::tile::Tile": (),
       },
     ),
-    8589934648: (
+    4294967371: (
       components: {
+        "bevy_hierarchy::components::parent::Parent": (4294967309),
         "bevy_render::primitives::Aabb": (
           center: (16.0, 16.0, 0.0),
           half_extents: (16.0, 16.0, 0.0),
@@ -1850,8 +1613,9 @@
         "gambler_bevy::editor::tile::Tile": (),
       },
     ),
-    8589934653: (
+    4294967372: (
       components: {
+        "bevy_hierarchy::components::parent::Parent": (4294967309),
         "bevy_render::primitives::Aabb": (
           center: (16.0, 16.0, 0.0),
           half_extents: (16.0, 16.0, 0.0),
@@ -1880,8 +1644,9 @@
         "gambler_bevy::editor::tile::Tile": (),
       },
     ),
-    8589934655: (
+    4294967373: (
       components: {
+        "bevy_hierarchy::components::parent::Parent": (4294967309),
         "bevy_render::primitives::Aabb": (
           center: (16.0, 16.0, 0.0),
           half_extents: (16.0, 16.0, 0.0),
@@ -1910,45 +1675,16 @@
         "gambler_bevy::editor::tile::Tile": (),
       },
     ),
-    8589934673: (
+    4294967375: (
       components: {
+        "bevy_hierarchy::components::parent::Parent": (4294967309),
         "bevy_render::primitives::Aabb": (
           center: (16.0, 16.0, 0.0),
           half_extents: (16.0, 16.0, 0.0),
         ),
         "bevy_render::sync_world::SyncToRenderWorld": (),
         "bevy_render::view::visibility::InheritedVisibility": (true),
-        "bevy_render::view::visibility::ViewVisibility": (true),
-        "bevy_render::view::visibility::Visibility": Inherited,
-        "bevy_transform::components::global_transform::GlobalTransform": ((2.0, 0.0, 0.0, 0.0, 2.0, 0.0, 0.0, 0.0, 1.0, 448.0, -128.0, 0.0)),
-        "bevy_transform::components::transform::Transform": (
-          translation: (448.0, -128.0, 0.0),
-          rotation: (0.0, 0.0, 0.0, 1.0),
-          scale: (2.0, 2.0, 1.0),
-        ),
-        "gambler_bevy::editor::EditorObject": (
-          internal_type: 1,
-          coordinate: (
-            type_char: 't',
-            coord: (448, -128),
-          ),
-          zone_id: (
-            type_char: 'f',
-            coord: (7, -2),
-          ),
-        ),
-        "gambler_bevy::editor::tile::Tile": (),
-      },
-    ),
-    8589934682: (
-      components: {
-        "bevy_render::primitives::Aabb": (
-          center: (16.0, 16.0, 0.0),
-          half_extents: (16.0, 16.0, 0.0),
-        ),
-        "bevy_render::sync_world::SyncToRenderWorld": (),
-        "bevy_render::view::visibility::InheritedVisibility": (true),
-        "bevy_render::view::visibility::ViewVisibility": (true),
+        "bevy_render::view::visibility::ViewVisibility": (false),
         "bevy_render::view::visibility::Visibility": Inherited,
         "bevy_transform::components::global_transform::GlobalTransform": ((2.0, 0.0, 0.0, 0.0, 2.0, 0.0, 0.0, 0.0, 1.0, 448.0, -320.0, 0.0)),
         "bevy_transform::components::transform::Transform": (
@@ -1970,8 +1706,9 @@
         "gambler_bevy::editor::tile::Tile": (),
       },
     ),
-    8589934687: (
+    4294967376: (
       components: {
+        "bevy_hierarchy::components::parent::Parent": (4294967309),
         "bevy_render::primitives::Aabb": (
           center: (16.0, 16.0, 0.0),
           half_extents: (16.0, 16.0, 0.0),
@@ -2000,135 +1737,16 @@
         "gambler_bevy::editor::tile::Tile": (),
       },
     ),
-    8589934688: (
+    4294967381: (
       components: {
+        "bevy_hierarchy::components::parent::Parent": (4294967309),
         "bevy_render::primitives::Aabb": (
           center: (16.0, 16.0, 0.0),
           half_extents: (16.0, 16.0, 0.0),
         ),
         "bevy_render::sync_world::SyncToRenderWorld": (),
         "bevy_render::view::visibility::InheritedVisibility": (true),
-        "bevy_render::view::visibility::ViewVisibility": (true),
-        "bevy_render::view::visibility::Visibility": Inherited,
-        "bevy_transform::components::global_transform::GlobalTransform": ((2.0, 0.0, 0.0, 0.0, 2.0, 0.0, 0.0, 0.0, 1.0, -64.0, -128.0, 0.0)),
-        "bevy_transform::components::transform::Transform": (
-          translation: (-64.0, -128.0, 0.0),
-          rotation: (0.0, 0.0, 0.0, 1.0),
-          scale: (2.0, 2.0, 1.0),
-        ),
-        "gambler_bevy::editor::EditorObject": (
-          internal_type: 1,
-          coordinate: (
-            type_char: 't',
-            coord: (-64, -128),
-          ),
-          zone_id: (
-            type_char: 'f',
-            coord: (-1, -2),
-          ),
-        ),
-        "gambler_bevy::editor::tile::Tile": (),
-      },
-    ),
-    8589934689: (
-      components: {
-        "bevy_render::primitives::Aabb": (
-          center: (16.0, 16.0, 0.0),
-          half_extents: (16.0, 16.0, 0.0),
-        ),
-        "bevy_render::sync_world::SyncToRenderWorld": (),
-        "bevy_render::view::visibility::InheritedVisibility": (true),
-        "bevy_render::view::visibility::ViewVisibility": (true),
-        "bevy_render::view::visibility::Visibility": Inherited,
-        "bevy_transform::components::global_transform::GlobalTransform": ((2.0, 0.0, 0.0, 0.0, 2.0, 0.0, 0.0, 0.0, 1.0, -192.0, -128.0, 0.0)),
-        "bevy_transform::components::transform::Transform": (
-          translation: (-192.0, -128.0, 0.0),
-          rotation: (0.0, 0.0, 0.0, 1.0),
-          scale: (2.0, 2.0, 1.0),
-        ),
-        "gambler_bevy::editor::EditorObject": (
-          internal_type: 1,
-          coordinate: (
-            type_char: 't',
-            coord: (-192, -128),
-          ),
-          zone_id: (
-            type_char: 'f',
-            coord: (-3, -2),
-          ),
-        ),
-        "gambler_bevy::editor::tile::Tile": (),
-      },
-    ),
-    12884901901: (
-      components: {
-        "bevy_render::primitives::Aabb": (
-          center: (16.0, 16.0, 0.0),
-          half_extents: (16.0, 16.0, 0.0),
-        ),
-        "bevy_render::sync_world::SyncToRenderWorld": (),
-        "bevy_render::view::visibility::InheritedVisibility": (true),
-        "bevy_render::view::visibility::ViewVisibility": (true),
-        "bevy_render::view::visibility::Visibility": Inherited,
-        "bevy_transform::components::global_transform::GlobalTransform": ((2.0, 0.0, 0.0, 0.0, 2.0, 0.0, 0.0, 0.0, 1.0, 384.0, -128.0, 0.0)),
-        "bevy_transform::components::transform::Transform": (
-          translation: (384.0, -128.0, 0.0),
-          rotation: (0.0, 0.0, 0.0, 1.0),
-          scale: (2.0, 2.0, 1.0),
-        ),
-        "gambler_bevy::editor::EditorObject": (
-          internal_type: 1,
-          coordinate: (
-            type_char: 't',
-            coord: (384, -128),
-          ),
-          zone_id: (
-            type_char: 'f',
-            coord: (6, -2),
-          ),
-        ),
-        "gambler_bevy::editor::tile::Tile": (),
-      },
-    ),
-    12884901933: (
-      components: {
-        "bevy_render::primitives::Aabb": (
-          center: (16.0, 16.0, 0.0),
-          half_extents: (16.0, 16.0, 0.0),
-        ),
-        "bevy_render::sync_world::SyncToRenderWorld": (),
-        "bevy_render::view::visibility::InheritedVisibility": (true),
-        "bevy_render::view::visibility::ViewVisibility": (true),
-        "bevy_render::view::visibility::Visibility": Inherited,
-        "bevy_transform::components::global_transform::GlobalTransform": ((2.0, 0.0, 0.0, 0.0, 2.0, 0.0, 0.0, 0.0, 1.0, -128.0, -128.0, 0.0)),
-        "bevy_transform::components::transform::Transform": (
-          translation: (-128.0, -128.0, 0.0),
-          rotation: (0.0, 0.0, 0.0, 1.0),
-          scale: (2.0, 2.0, 1.0),
-        ),
-        "gambler_bevy::editor::EditorObject": (
-          internal_type: 1,
-          coordinate: (
-            type_char: 't',
-            coord: (-128, -128),
-          ),
-          zone_id: (
-            type_char: 'f',
-            coord: (-2, -2),
-          ),
-        ),
-        "gambler_bevy::editor::tile::Tile": (),
-      },
-    ),
-    12884901936: (
-      components: {
-        "bevy_render::primitives::Aabb": (
-          center: (16.0, 16.0, 0.0),
-          half_extents: (16.0, 16.0, 0.0),
-        ),
-        "bevy_render::sync_world::SyncToRenderWorld": (),
-        "bevy_render::view::visibility::InheritedVisibility": (true),
-        "bevy_render::view::visibility::ViewVisibility": (true),
+        "bevy_render::view::visibility::ViewVisibility": (false),
         "bevy_render::view::visibility::Visibility": Inherited,
         "bevy_transform::components::global_transform::GlobalTransform": ((2.0, 0.0, 0.0, 0.0, 2.0, 0.0, 0.0, 0.0, 1.0, 384.0, -320.0, 0.0)),
         "bevy_transform::components::transform::Transform": (
@@ -2150,15 +1768,16 @@
         "gambler_bevy::editor::tile::Tile": (),
       },
     ),
-    12884901939: (
+    4294967382: (
       components: {
+        "bevy_hierarchy::components::parent::Parent": (4294967309),
         "bevy_render::primitives::Aabb": (
           center: (16.0, 16.0, 0.0),
           half_extents: (16.0, 16.0, 0.0),
         ),
         "bevy_render::sync_world::SyncToRenderWorld": (),
         "bevy_render::view::visibility::InheritedVisibility": (true),
-        "bevy_render::view::visibility::ViewVisibility": (true),
+        "bevy_render::view::visibility::ViewVisibility": (false),
         "bevy_render::view::visibility::Visibility": Inherited,
         "bevy_transform::components::global_transform::GlobalTransform": ((2.0, 0.0, 0.0, 0.0, 2.0, 0.0, 0.0, 0.0, 1.0, 384.0, -256.0, 0.0)),
         "bevy_transform::components::transform::Transform": (
@@ -2180,188 +1799,9 @@
         "gambler_bevy::editor::tile::Tile": (),
       },
     ),
-    12884901977: (
+    4294967389: (
       components: {
-        "bevy_render::primitives::Aabb": (
-          center: (16.0, 16.0, 0.0),
-          half_extents: (16.0, 16.0, 0.0),
-        ),
-        "bevy_render::sync_world::SyncToRenderWorld": (),
-        "bevy_render::view::visibility::InheritedVisibility": (true),
-        "bevy_render::view::visibility::ViewVisibility": (true),
-        "bevy_render::view::visibility::Visibility": Inherited,
-        "bevy_transform::components::global_transform::GlobalTransform": ((2.0, 0.0, 0.0, 0.0, 2.0, 0.0, 0.0, 0.0, 1.0, 0.0, -128.0, 0.0)),
-        "bevy_transform::components::transform::Transform": (
-          translation: (0.0, -128.0, 0.0),
-          rotation: (0.0, 0.0, 0.0, 1.0),
-          scale: (2.0, 2.0, 1.0),
-        ),
-        "gambler_bevy::editor::EditorObject": (
-          internal_type: 1,
-          coordinate: (
-            type_char: 't',
-            coord: (0, -128),
-          ),
-          zone_id: (
-            type_char: 'f',
-            coord: (0, -2),
-          ),
-        ),
-        "gambler_bevy::editor::tile::Tile": (),
-      },
-    ),
-    12884901979: (
-      components: {
-        "bevy_render::primitives::Aabb": (
-          center: (16.0, 16.0, 0.0),
-          half_extents: (16.0, 16.0, 0.0),
-        ),
-        "bevy_render::sync_world::SyncToRenderWorld": (),
-        "bevy_render::view::visibility::InheritedVisibility": (true),
-        "bevy_render::view::visibility::ViewVisibility": (true),
-        "bevy_render::view::visibility::Visibility": Inherited,
-        "bevy_transform::components::global_transform::GlobalTransform": ((2.0, 0.0, 0.0, 0.0, 2.0, 0.0, 0.0, 0.0, 1.0, 64.0, -128.0, 0.0)),
-        "bevy_transform::components::transform::Transform": (
-          translation: (64.0, -128.0, 0.0),
-          rotation: (0.0, 0.0, 0.0, 1.0),
-          scale: (2.0, 2.0, 1.0),
-        ),
-        "gambler_bevy::editor::EditorObject": (
-          internal_type: 1,
-          coordinate: (
-            type_char: 't',
-            coord: (64, -128),
-          ),
-          zone_id: (
-            type_char: 'f',
-            coord: (1, -2),
-          ),
-        ),
-        "gambler_bevy::editor::tile::Tile": (),
-      },
-    ),
-    12884901980: (
-      components: {
-        "bevy_render::primitives::Aabb": (
-          center: (16.0, 16.0, 0.0),
-          half_extents: (16.0, 16.0, 0.0),
-        ),
-        "bevy_render::sync_world::SyncToRenderWorld": (),
-        "bevy_render::view::visibility::InheritedVisibility": (true),
-        "bevy_render::view::visibility::ViewVisibility": (true),
-        "bevy_render::view::visibility::Visibility": Inherited,
-        "bevy_transform::components::global_transform::GlobalTransform": ((2.0, 0.0, 0.0, 0.0, 2.0, 0.0, 0.0, 0.0, 1.0, 128.0, -128.0, 0.0)),
-        "bevy_transform::components::transform::Transform": (
-          translation: (128.0, -128.0, 0.0),
-          rotation: (0.0, 0.0, 0.0, 1.0),
-          scale: (2.0, 2.0, 1.0),
-        ),
-        "gambler_bevy::editor::EditorObject": (
-          internal_type: 1,
-          coordinate: (
-            type_char: 't',
-            coord: (128, -128),
-          ),
-          zone_id: (
-            type_char: 'f',
-            coord: (2, -2),
-          ),
-        ),
-        "gambler_bevy::editor::tile::Tile": (),
-      },
-    ),
-    12884901981: (
-      components: {
-        "bevy_render::primitives::Aabb": (
-          center: (16.0, 16.0, 0.0),
-          half_extents: (16.0, 16.0, 0.0),
-        ),
-        "bevy_render::sync_world::SyncToRenderWorld": (),
-        "bevy_render::view::visibility::InheritedVisibility": (true),
-        "bevy_render::view::visibility::ViewVisibility": (true),
-        "bevy_render::view::visibility::Visibility": Inherited,
-        "bevy_transform::components::global_transform::GlobalTransform": ((2.0, 0.0, 0.0, 0.0, 2.0, 0.0, 0.0, 0.0, 1.0, 256.0, -128.0, 0.0)),
-        "bevy_transform::components::transform::Transform": (
-          translation: (256.0, -128.0, 0.0),
-          rotation: (0.0, 0.0, 0.0, 1.0),
-          scale: (2.0, 2.0, 1.0),
-        ),
-        "gambler_bevy::editor::EditorObject": (
-          internal_type: 1,
-          coordinate: (
-            type_char: 't',
-            coord: (256, -128),
-          ),
-          zone_id: (
-            type_char: 'f',
-            coord: (4, -2),
-          ),
-        ),
-        "gambler_bevy::editor::tile::Tile": (),
-      },
-    ),
-    12884901982: (
-      components: {
-        "bevy_render::primitives::Aabb": (
-          center: (16.0, 16.0, 0.0),
-          half_extents: (16.0, 16.0, 0.0),
-        ),
-        "bevy_render::sync_world::SyncToRenderWorld": (),
-        "bevy_render::view::visibility::InheritedVisibility": (true),
-        "bevy_render::view::visibility::ViewVisibility": (true),
-        "bevy_render::view::visibility::Visibility": Inherited,
-        "bevy_transform::components::global_transform::GlobalTransform": ((2.0, 0.0, 0.0, 0.0, 2.0, 0.0, 0.0, 0.0, 1.0, 192.0, -128.0, 0.0)),
-        "bevy_transform::components::transform::Transform": (
-          translation: (192.0, -128.0, 0.0),
-          rotation: (0.0, 0.0, 0.0, 1.0),
-          scale: (2.0, 2.0, 1.0),
-        ),
-        "gambler_bevy::editor::EditorObject": (
-          internal_type: 1,
-          coordinate: (
-            type_char: 't',
-            coord: (192, -128),
-          ),
-          zone_id: (
-            type_char: 'f',
-            coord: (3, -2),
-          ),
-        ),
-        "gambler_bevy::editor::tile::Tile": (),
-      },
-    ),
-    115964117044: (
-      components: {
-        "bevy_render::primitives::Aabb": (
-          center: (16.0, 16.0, 0.0),
-          half_extents: (16.0, 16.0, 0.0),
-        ),
-        "bevy_render::sync_world::SyncToRenderWorld": (),
-        "bevy_render::view::visibility::InheritedVisibility": (true),
-        "bevy_render::view::visibility::ViewVisibility": (true),
-        "bevy_render::view::visibility::Visibility": Inherited,
-        "bevy_transform::components::global_transform::GlobalTransform": ((2.0, 0.0, 0.0, 0.0, 2.0, 0.0, 0.0, 0.0, 1.0, -320.0, -128.0, 0.0)),
-        "bevy_transform::components::transform::Transform": (
-          translation: (-320.0, -128.0, 0.0),
-          rotation: (0.0, 0.0, 0.0, 1.0),
-          scale: (2.0, 2.0, 1.0),
-        ),
-        "gambler_bevy::editor::EditorObject": (
-          internal_type: 1,
-          coordinate: (
-            type_char: 't',
-            coord: (-320, -128),
-          ),
-          zone_id: (
-            type_char: 'f',
-            coord: (-5, -2),
-          ),
-        ),
-        "gambler_bevy::editor::tile::Tile": (),
-      },
-    ),
-    115964117066: (
-      components: {
+        "bevy_hierarchy::components::parent::Parent": (4294967309),
         "bevy_render::primitives::Aabb": (
           center: (16.0, 16.0, 0.0),
           half_extents: (16.0, 16.0, 0.0),
@@ -2390,8 +1830,9 @@
         "gambler_bevy::editor::tile::Tile": (),
       },
     ),
-    133143986242: (
+    4294967390: (
       components: {
+        "bevy_hierarchy::components::parent::Parent": (4294967309),
         "bevy_render::primitives::Aabb": (
           center: (16.0, 16.0, 0.0),
           half_extents: (16.0, 16.0, 0.0),
@@ -2420,8 +1861,9 @@
         "gambler_bevy::editor::tile::Tile": (),
       },
     ),
-    141733920821: (
+    4294967391: (
       components: {
+        "bevy_hierarchy::components::parent::Parent": (4294967309),
         "bevy_render::primitives::Aabb": (
           center: (16.0, 16.0, 0.0),
           half_extents: (16.0, 16.0, 0.0),
@@ -2450,8 +1892,9 @@
         "gambler_bevy::editor::tile::Tile": (),
       },
     ),
-    180388626490: (
+    4294967392: (
       components: {
+        "bevy_hierarchy::components::parent::Parent": (4294967309),
         "bevy_render::primitives::Aabb": (
           center: (16.0, 16.0, 0.0),
           half_extents: (16.0, 16.0, 0.0),
@@ -2490,38 +1933,9 @@
         ),
       },
     ),
-    188978561079: (
+    4294967394: (
       components: {
-        "bevy_render::primitives::Aabb": (
-          center: (16.0, 16.0, 0.0),
-          half_extents: (16.0, 16.0, 0.0),
-        ),
-        "bevy_render::sync_world::SyncToRenderWorld": (),
-        "bevy_render::view::visibility::InheritedVisibility": (true),
-        "bevy_render::view::visibility::ViewVisibility": (true),
-        "bevy_render::view::visibility::Visibility": Inherited,
-        "bevy_transform::components::global_transform::GlobalTransform": ((2.0, 0.0, 0.0, 0.0, 2.0, 0.0, 0.0, 0.0, 1.0, -256.0, -128.0, 0.0)),
-        "bevy_transform::components::transform::Transform": (
-          translation: (-256.0, -128.0, 0.0),
-          rotation: (0.0, 0.0, 0.0, 1.0),
-          scale: (2.0, 2.0, 1.0),
-        ),
-        "gambler_bevy::editor::EditorObject": (
-          internal_type: 1,
-          coordinate: (
-            type_char: 't',
-            coord: (-256, -128),
-          ),
-          zone_id: (
-            type_char: 'f',
-            coord: (-4, -2),
-          ),
-        ),
-        "gambler_bevy::editor::tile::Tile": (),
-      },
-    ),
-    219043332163: (
-      components: {
+        "bevy_hierarchy::components::parent::Parent": (4294967309),
         "bevy_render::primitives::Aabb": (
           center: (16.0, 16.0, 0.0),
           half_extents: (16.0, 16.0, 0.0),
@@ -2560,38 +1974,9 @@
         ),
       },
     ),
-    231928234053: (
+    4294967396: (
       components: {
-        "bevy_render::primitives::Aabb": (
-          center: (16.0, 16.0, 0.0),
-          half_extents: (16.0, 16.0, 0.0),
-        ),
-        "bevy_render::sync_world::SyncToRenderWorld": (),
-        "bevy_render::view::visibility::InheritedVisibility": (true),
-        "bevy_render::view::visibility::ViewVisibility": (true),
-        "bevy_render::view::visibility::Visibility": Inherited,
-        "bevy_transform::components::global_transform::GlobalTransform": ((2.0, 0.0, 0.0, 0.0, 2.0, 0.0, 0.0, 0.0, 1.0, -384.0, -128.0, 0.0)),
-        "bevy_transform::components::transform::Transform": (
-          translation: (-384.0, -128.0, 0.0),
-          rotation: (0.0, 0.0, 0.0, 1.0),
-          scale: (2.0, 2.0, 1.0),
-        ),
-        "gambler_bevy::editor::EditorObject": (
-          internal_type: 1,
-          coordinate: (
-            type_char: 't',
-            coord: (-384, -128),
-          ),
-          zone_id: (
-            type_char: 'f',
-            coord: (-6, -2),
-          ),
-        ),
-        "gambler_bevy::editor::tile::Tile": (),
-      },
-    ),
-    261993005121: (
-      components: {
+        "bevy_hierarchy::components::parent::Parent": (4294967309),
         "bevy_render::primitives::Aabb": (
           center: (16.0, 16.0, 0.0),
           half_extents: (16.0, 16.0, 0.0),
@@ -2630,8 +2015,9 @@
         ),
       },
     ),
-    266287972425: (
+    4294967397: (
       components: {
+        "bevy_hierarchy::components::parent::Parent": (4294967309),
         "bevy_render::primitives::Aabb": (
           center: (16.0, 16.0, 0.0),
           half_extents: (16.0, 16.0, 0.0),
@@ -2660,8 +2046,9 @@
         "gambler_bevy::editor::tile::Tile": (),
       },
     ),
-    317827579981: (
+    4294967398: (
       components: {
+        "bevy_hierarchy::components::parent::Parent": (4294967309),
         "bevy_render::primitives::Aabb": (
           center: (16.0, 16.0, 0.0),
           half_extents: (16.0, 16.0, 0.0),
@@ -2690,8 +2077,9 @@
         "gambler_bevy::editor::tile::Tile": (),
       },
     ),
-    343597383748: (
+    4294967399: (
       components: {
+        "bevy_hierarchy::components::parent::Parent": (4294967309),
         "bevy_render::primitives::Aabb": (
           center: (16.0, 16.0, 0.0),
           half_extents: (16.0, 16.0, 0.0),
@@ -2720,38 +2108,9 @@
         "gambler_bevy::editor::tile::Tile": (),
       },
     ),
-    360777252942: (
+    4294967401: (
       components: {
-        "bevy_render::primitives::Aabb": (
-          center: (16.0, 16.0, 0.0),
-          half_extents: (16.0, 16.0, 0.0),
-        ),
-        "bevy_render::sync_world::SyncToRenderWorld": (),
-        "bevy_render::view::visibility::InheritedVisibility": (true),
-        "bevy_render::view::visibility::ViewVisibility": (true),
-        "bevy_render::view::visibility::Visibility": Inherited,
-        "bevy_transform::components::global_transform::GlobalTransform": ((2.0, 0.0, 0.0, 0.0, 2.0, 0.0, 0.0, 0.0, 1.0, 320.0, -128.0, 0.0)),
-        "bevy_transform::components::transform::Transform": (
-          translation: (320.0, -128.0, 0.0),
-          rotation: (0.0, 0.0, 0.0, 1.0),
-          scale: (2.0, 2.0, 1.0),
-        ),
-        "gambler_bevy::editor::EditorObject": (
-          internal_type: 1,
-          coordinate: (
-            type_char: 't',
-            coord: (320, -128),
-          ),
-          zone_id: (
-            type_char: 'f',
-            coord: (5, -2),
-          ),
-        ),
-        "gambler_bevy::editor::tile::Tile": (),
-      },
-    ),
-    579820585036: (
-      components: {
+        "bevy_hierarchy::components::parent::Parent": (4294967309),
         "bevy_render::primitives::Aabb": (
           center: (16.0, 16.0, 0.0),
           half_extents: (16.0, 16.0, 0.0),
@@ -2780,8 +2139,9 @@
         "gambler_bevy::editor::tile::Tile": (),
       },
     ),
-    627065225280: (
+    4294967402: (
       components: {
+        "bevy_hierarchy::components::parent::Parent": (4294967309),
         "bevy_render::primitives::Aabb": (
           center: (16.0, 16.0, 0.0),
           half_extents: (16.0, 16.0, 0.0),
@@ -2810,8 +2170,9 @@
         "gambler_bevy::editor::tile::Tile": (),
       },
     ),
-    695784702011: (
+    4294967403: (
       components: {
+        "bevy_hierarchy::components::parent::Parent": (4294967309),
         "bevy_render::primitives::Aabb": (
           center: (16.0, 16.0, 0.0),
           half_extents: (16.0, 16.0, 0.0),
@@ -2850,8 +2211,9 @@
         ),
       },
     ),
-    1017907249224: (
+    4294967404: (
       components: {
+        "bevy_hierarchy::components::parent::Parent": (4294967309),
         "bevy_render::primitives::Aabb": (
           center: (16.0, 16.0, 0.0),
           half_extents: (16.0, 16.0, 0.0),
@@ -2890,8 +2252,9 @@
         ),
       },
     ),
-    1056561954876: (
+    4294967405: (
       components: {
+        "bevy_hierarchy::components::parent::Parent": (4294967309),
         "bevy_render::primitives::Aabb": (
           center: (16.0, 16.0, 0.0),
           half_extents: (16.0, 16.0, 0.0),
@@ -2930,38 +2293,9 @@
         ),
       },
     ),
-    1232655614027: (
+    4294967407: (
       components: {
-        "bevy_render::primitives::Aabb": (
-          center: (16.0, 16.0, 0.0),
-          half_extents: (16.0, 16.0, 0.0),
-        ),
-        "bevy_render::sync_world::SyncToRenderWorld": (),
-        "bevy_render::view::visibility::InheritedVisibility": (true),
-        "bevy_render::view::visibility::ViewVisibility": (true),
-        "bevy_render::view::visibility::Visibility": Inherited,
-        "bevy_transform::components::global_transform::GlobalTransform": ((2.0, 0.0, 0.0, 0.0, 2.0, 0.0, 0.0, 0.0, 1.0, -320.0, -64.0, 0.0)),
-        "bevy_transform::components::transform::Transform": (
-          translation: (-320.0, -64.0, 0.0),
-          rotation: (0.0, 0.0, 0.0, 1.0),
-          scale: (2.0, 2.0, 1.0),
-        ),
-        "gambler_bevy::editor::EditorObject": (
-          internal_type: 1,
-          coordinate: (
-            type_char: 't',
-            coord: (-320, -64),
-          ),
-          zone_id: (
-            type_char: 'f',
-            coord: (-5, -1),
-          ),
-        ),
-        "gambler_bevy::editor::tile::Tile": (),
-      },
-    ),
-    2783138807887: (
-      components: {
+        "bevy_hierarchy::components::parent::Parent": (4294967309),
         "bevy_render::primitives::Aabb": (
           center: (16.0, 16.0, 0.0),
           half_extents: (16.0, 16.0, 0.0),
@@ -2985,6 +2319,1026 @@
           zone_id: (
             type_char: 'f',
             coord: (-5, -3),
+          ),
+        ),
+        "gambler_bevy::editor::tile::Tile": (),
+      },
+    ),
+    4294967414: (
+      components: {
+        "bevy_render::primitives::Aabb": (
+          center: (16.0, 16.0, 0.0),
+          half_extents: (16.0, 16.0, 0.0),
+        ),
+        "bevy_render::sync_world::SyncToRenderWorld": (),
+        "bevy_render::view::visibility::InheritedVisibility": (true),
+        "bevy_render::view::visibility::ViewVisibility": (true),
+        "bevy_render::view::visibility::Visibility": Inherited,
+        "bevy_transform::components::global_transform::GlobalTransform": ((2.0, 0.0, 0.0, 0.0, 2.0, 0.0, 0.0, 0.0, 1.0, -512.0, -192.0, 0.0)),
+        "bevy_transform::components::transform::Transform": (
+          translation: (-512.0, -192.0, 0.0),
+          rotation: (0.0, 0.0, 0.0, 1.0),
+          scale: (2.0, 2.0, 1.0),
+        ),
+        "gambler_bevy::editor::EditorObject": (
+          internal_type: 1,
+          coordinate: (
+            type_char: 't',
+            coord: (-512, -192),
+          ),
+          zone_id: (
+            type_char: 'f',
+            coord: (-8, -3),
+          ),
+        ),
+        "gambler_bevy::editor::tile::Tile": (),
+      },
+    ),
+    4294967415: (
+      components: {
+        "bevy_render::primitives::Aabb": (
+          center: (16.0, 16.0, 0.0),
+          half_extents: (16.0, 16.0, 0.0),
+        ),
+        "bevy_render::sync_world::SyncToRenderWorld": (),
+        "bevy_render::view::visibility::InheritedVisibility": (true),
+        "bevy_render::view::visibility::ViewVisibility": (true),
+        "bevy_render::view::visibility::Visibility": Inherited,
+        "bevy_transform::components::global_transform::GlobalTransform": ((2.0, 0.0, 0.0, 0.0, 2.0, 0.0, 0.0, 0.0, 1.0, -512.0, -128.0, 0.0)),
+        "bevy_transform::components::transform::Transform": (
+          translation: (-512.0, -128.0, 0.0),
+          rotation: (0.0, 0.0, 0.0, 1.0),
+          scale: (2.0, 2.0, 1.0),
+        ),
+        "gambler_bevy::editor::EditorObject": (
+          internal_type: 1,
+          coordinate: (
+            type_char: 't',
+            coord: (-512, -128),
+          ),
+          zone_id: (
+            type_char: 'f',
+            coord: (-8, -2),
+          ),
+        ),
+        "gambler_bevy::editor::tile::Tile": (),
+      },
+    ),
+    4294967418: (
+      components: {
+        "bevy_render::primitives::Aabb": (
+          center: (16.0, 16.0, 0.0),
+          half_extents: (16.0, 16.0, 0.0),
+        ),
+        "bevy_render::sync_world::SyncToRenderWorld": (),
+        "bevy_render::view::visibility::InheritedVisibility": (true),
+        "bevy_render::view::visibility::ViewVisibility": (true),
+        "bevy_render::view::visibility::Visibility": Inherited,
+        "bevy_transform::components::global_transform::GlobalTransform": ((2.0, 0.0, 0.0, 0.0, 2.0, 0.0, 0.0, 0.0, 1.0, -576.0, -128.0, 0.0)),
+        "bevy_transform::components::transform::Transform": (
+          translation: (-576.0, -128.0, 0.0),
+          rotation: (0.0, 0.0, 0.0, 1.0),
+          scale: (2.0, 2.0, 1.0),
+        ),
+        "gambler_bevy::editor::EditorObject": (
+          internal_type: 1,
+          coordinate: (
+            type_char: 't',
+            coord: (-576, -128),
+          ),
+          zone_id: (
+            type_char: 'f',
+            coord: (-9, -2),
+          ),
+        ),
+        "gambler_bevy::editor::tile::Tile": (),
+      },
+    ),
+    4294967419: (
+      components: {
+        "bevy_render::primitives::Aabb": (
+          center: (16.0, 16.0, 0.0),
+          half_extents: (16.0, 16.0, 0.0),
+        ),
+        "bevy_render::sync_world::SyncToRenderWorld": (),
+        "bevy_render::view::visibility::InheritedVisibility": (true),
+        "bevy_render::view::visibility::ViewVisibility": (true),
+        "bevy_render::view::visibility::Visibility": Inherited,
+        "bevy_transform::components::global_transform::GlobalTransform": ((2.0, 0.0, 0.0, 0.0, 2.0, 0.0, 0.0, 0.0, 1.0, -576.0, -192.0, 0.0)),
+        "bevy_transform::components::transform::Transform": (
+          translation: (-576.0, -192.0, 0.0),
+          rotation: (0.0, 0.0, 0.0, 1.0),
+          scale: (2.0, 2.0, 1.0),
+        ),
+        "gambler_bevy::editor::EditorObject": (
+          internal_type: 1,
+          coordinate: (
+            type_char: 't',
+            coord: (-576, -192),
+          ),
+          zone_id: (
+            type_char: 'f',
+            coord: (-9, -3),
+          ),
+        ),
+        "gambler_bevy::editor::tile::Tile": (),
+      },
+    ),
+    4294967420: (
+      components: {
+        "bevy_render::primitives::Aabb": (
+          center: (16.0, 16.0, 0.0),
+          half_extents: (16.0, 16.0, 0.0),
+        ),
+        "bevy_render::sync_world::SyncToRenderWorld": (),
+        "bevy_render::view::visibility::InheritedVisibility": (true),
+        "bevy_render::view::visibility::ViewVisibility": (true),
+        "bevy_render::view::visibility::Visibility": Inherited,
+        "bevy_transform::components::global_transform::GlobalTransform": ((2.0, 0.0, 0.0, 0.0, 2.0, 0.0, 0.0, 0.0, 1.0, -576.0, -256.0, 0.0)),
+        "bevy_transform::components::transform::Transform": (
+          translation: (-576.0, -256.0, 0.0),
+          rotation: (0.0, 0.0, 0.0, 1.0),
+          scale: (2.0, 2.0, 1.0),
+        ),
+        "gambler_bevy::editor::EditorObject": (
+          internal_type: 1,
+          coordinate: (
+            type_char: 't',
+            coord: (-576, -256),
+          ),
+          zone_id: (
+            type_char: 'f',
+            coord: (-9, -4),
+          ),
+        ),
+        "gambler_bevy::editor::tile::Tile": (),
+      },
+    ),
+    4294967421: (
+      components: {
+        "bevy_render::primitives::Aabb": (
+          center: (16.0, 16.0, 0.0),
+          half_extents: (16.0, 16.0, 0.0),
+        ),
+        "bevy_render::sync_world::SyncToRenderWorld": (),
+        "bevy_render::view::visibility::InheritedVisibility": (true),
+        "bevy_render::view::visibility::ViewVisibility": (true),
+        "bevy_render::view::visibility::Visibility": Inherited,
+        "bevy_transform::components::global_transform::GlobalTransform": ((2.0, 0.0, 0.0, 0.0, 2.0, 0.0, 0.0, 0.0, 1.0, -576.0, -320.0, 0.0)),
+        "bevy_transform::components::transform::Transform": (
+          translation: (-576.0, -320.0, 0.0),
+          rotation: (0.0, 0.0, 0.0, 1.0),
+          scale: (2.0, 2.0, 1.0),
+        ),
+        "gambler_bevy::editor::EditorObject": (
+          internal_type: 1,
+          coordinate: (
+            type_char: 't',
+            coord: (-576, -320),
+          ),
+          zone_id: (
+            type_char: 'f',
+            coord: (-9, -5),
+          ),
+        ),
+        "gambler_bevy::editor::tile::Tile": (),
+      },
+    ),
+    4294967422: (
+      components: {
+        "bevy_render::primitives::Aabb": (
+          center: (16.0, 16.0, 0.0),
+          half_extents: (16.0, 16.0, 0.0),
+        ),
+        "bevy_render::sync_world::SyncToRenderWorld": (),
+        "bevy_render::view::visibility::InheritedVisibility": (true),
+        "bevy_render::view::visibility::ViewVisibility": (true),
+        "bevy_render::view::visibility::Visibility": Inherited,
+        "bevy_transform::components::global_transform::GlobalTransform": ((2.0, 0.0, 0.0, 0.0, 2.0, 0.0, 0.0, 0.0, 1.0, -576.0, -384.0, 0.0)),
+        "bevy_transform::components::transform::Transform": (
+          translation: (-576.0, -384.0, 0.0),
+          rotation: (0.0, 0.0, 0.0, 1.0),
+          scale: (2.0, 2.0, 1.0),
+        ),
+        "gambler_bevy::editor::EditorObject": (
+          internal_type: 1,
+          coordinate: (
+            type_char: 't',
+            coord: (-576, -384),
+          ),
+          zone_id: (
+            type_char: 'f',
+            coord: (-9, -6),
+          ),
+        ),
+        "gambler_bevy::editor::tile::Tile": (),
+      },
+    ),
+    4294967423: (
+      components: {
+        "bevy_render::primitives::Aabb": (
+          center: (16.0, 16.0, 0.0),
+          half_extents: (16.0, 16.0, 0.0),
+        ),
+        "bevy_render::sync_world::SyncToRenderWorld": (),
+        "bevy_render::view::visibility::InheritedVisibility": (true),
+        "bevy_render::view::visibility::ViewVisibility": (true),
+        "bevy_render::view::visibility::Visibility": Inherited,
+        "bevy_transform::components::global_transform::GlobalTransform": ((2.0, 0.0, 0.0, 0.0, 2.0, 0.0, 0.0, 0.0, 1.0, -192.0, -128.0, 0.0)),
+        "bevy_transform::components::transform::Transform": (
+          translation: (-192.0, -128.0, 0.0),
+          rotation: (0.0, 0.0, 0.0, 1.0),
+          scale: (2.0, 2.0, 1.0),
+        ),
+        "gambler_bevy::editor::EditorObject": (
+          internal_type: 0,
+          coordinate: (
+            type_char: 't',
+            coord: (-192, -128),
+          ),
+          zone_id: (
+            type_char: 'f',
+            coord: (-3, -2),
+          ),
+        ),
+        "gambler_bevy::editor::tile::Tile": (),
+      },
+    ),
+    8589934620: (
+      components: {
+        "bevy_render::primitives::Aabb": (
+          center: (16.0, 16.0, 0.0),
+          half_extents: (16.0, 16.0, 0.0),
+        ),
+        "bevy_render::sync_world::SyncToRenderWorld": (),
+        "bevy_render::view::visibility::InheritedVisibility": (true),
+        "bevy_render::view::visibility::ViewVisibility": (true),
+        "bevy_render::view::visibility::Visibility": Inherited,
+        "bevy_transform::components::global_transform::GlobalTransform": ((2.0, 0.0, 0.0, 0.0, 2.0, 0.0, 0.0, 0.0, 1.0, -448.0, -320.0, 0.0)),
+        "bevy_transform::components::transform::Transform": (
+          translation: (-448.0, -320.0, 0.0),
+          rotation: (0.0, 0.0, 0.0, 1.0),
+          scale: (2.0, 2.0, 1.0),
+        ),
+        "gambler_bevy::editor::EditorObject": (
+          internal_type: 1,
+          coordinate: (
+            type_char: 't',
+            coord: (-448, -320),
+          ),
+          zone_id: (
+            type_char: 'f',
+            coord: (-7, -5),
+          ),
+        ),
+        "gambler_bevy::editor::tile::Tile": (),
+      },
+    ),
+    8589934621: (
+      components: {
+        "bevy_render::primitives::Aabb": (
+          center: (16.0, 16.0, 0.0),
+          half_extents: (16.0, 16.0, 0.0),
+        ),
+        "bevy_render::sync_world::SyncToRenderWorld": (),
+        "bevy_render::view::visibility::InheritedVisibility": (true),
+        "bevy_render::view::visibility::ViewVisibility": (true),
+        "bevy_render::view::visibility::Visibility": Inherited,
+        "bevy_transform::components::global_transform::GlobalTransform": ((2.0, 0.0, 0.0, 0.0, 2.0, 0.0, 0.0, 0.0, 1.0, -512.0, -256.0, 0.0)),
+        "bevy_transform::components::transform::Transform": (
+          translation: (-512.0, -256.0, 0.0),
+          rotation: (0.0, 0.0, 0.0, 1.0),
+          scale: (2.0, 2.0, 1.0),
+        ),
+        "gambler_bevy::editor::EditorObject": (
+          internal_type: 1,
+          coordinate: (
+            type_char: 't',
+            coord: (-512, -256),
+          ),
+          zone_id: (
+            type_char: 'f',
+            coord: (-8, -4),
+          ),
+        ),
+        "gambler_bevy::editor::tile::Tile": (),
+      },
+    ),
+    8589934622: (
+      components: {
+        "bevy_render::primitives::Aabb": (
+          center: (16.0, 16.0, 0.0),
+          half_extents: (16.0, 16.0, 0.0),
+        ),
+        "bevy_render::sync_world::SyncToRenderWorld": (),
+        "bevy_render::view::visibility::InheritedVisibility": (true),
+        "bevy_render::view::visibility::ViewVisibility": (true),
+        "bevy_render::view::visibility::Visibility": Inherited,
+        "bevy_transform::components::global_transform::GlobalTransform": ((2.0, 0.0, 0.0, 0.0, 2.0, 0.0, 0.0, 0.0, 1.0, -448.0, -256.0, 0.0)),
+        "bevy_transform::components::transform::Transform": (
+          translation: (-448.0, -256.0, 0.0),
+          rotation: (0.0, 0.0, 0.0, 1.0),
+          scale: (2.0, 2.0, 1.0),
+        ),
+        "gambler_bevy::editor::EditorObject": (
+          internal_type: 1,
+          coordinate: (
+            type_char: 't',
+            coord: (-448, -256),
+          ),
+          zone_id: (
+            type_char: 'f',
+            coord: (-7, -4),
+          ),
+        ),
+        "gambler_bevy::editor::tile::Tile": (),
+      },
+    ),
+    8589934623: (
+      components: {
+        "bevy_render::primitives::Aabb": (
+          center: (16.0, 16.0, 0.0),
+          half_extents: (16.0, 16.0, 0.0),
+        ),
+        "bevy_render::sync_world::SyncToRenderWorld": (),
+        "bevy_render::view::visibility::InheritedVisibility": (true),
+        "bevy_render::view::visibility::ViewVisibility": (true),
+        "bevy_render::view::visibility::Visibility": Inherited,
+        "bevy_transform::components::global_transform::GlobalTransform": ((2.0, 0.0, 0.0, 0.0, 2.0, 0.0, 0.0, 0.0, 1.0, -448.0, -192.0, 0.0)),
+        "bevy_transform::components::transform::Transform": (
+          translation: (-448.0, -192.0, 0.0),
+          rotation: (0.0, 0.0, 0.0, 1.0),
+          scale: (2.0, 2.0, 1.0),
+        ),
+        "gambler_bevy::editor::EditorObject": (
+          internal_type: 1,
+          coordinate: (
+            type_char: 't',
+            coord: (-448, -192),
+          ),
+          zone_id: (
+            type_char: 'f',
+            coord: (-7, -3),
+          ),
+        ),
+        "gambler_bevy::editor::tile::Tile": (),
+      },
+    ),
+    8589934650: (
+      components: {
+        "bevy_render::primitives::Aabb": (
+          center: (16.0, 16.0, 0.0),
+          half_extents: (16.0, 16.0, 0.0),
+        ),
+        "bevy_render::sync_world::SyncToRenderWorld": (),
+        "bevy_render::view::visibility::InheritedVisibility": (true),
+        "bevy_render::view::visibility::ViewVisibility": (true),
+        "bevy_render::view::visibility::Visibility": Inherited,
+        "bevy_transform::components::global_transform::GlobalTransform": ((2.0, 0.0, 0.0, 0.0, 2.0, 0.0, 0.0, 0.0, 1.0, -448.0, -64.0, 0.0)),
+        "bevy_transform::components::transform::Transform": (
+          translation: (-448.0, -64.0, 0.0),
+          rotation: (0.0, 0.0, 0.0, 1.0),
+          scale: (2.0, 2.0, 1.0),
+        ),
+        "gambler_bevy::editor::EditorObject": (
+          internal_type: 0,
+          coordinate: (
+            type_char: 't',
+            coord: (-448, -64),
+          ),
+          zone_id: (
+            type_char: 'f',
+            coord: (-7, -1),
+          ),
+        ),
+        "gambler_bevy::editor::tile::Tile": (),
+      },
+    ),
+    8589934673: (
+      components: {
+        "bevy_render::primitives::Aabb": (
+          center: (16.0, 16.0, 0.0),
+          half_extents: (16.0, 16.0, 0.0),
+        ),
+        "bevy_render::sync_world::SyncToRenderWorld": (),
+        "bevy_render::view::visibility::InheritedVisibility": (true),
+        "bevy_render::view::visibility::ViewVisibility": (true),
+        "bevy_render::view::visibility::Visibility": Inherited,
+        "bevy_transform::components::global_transform::GlobalTransform": ((2.0, 0.0, 0.0, 0.0, 2.0, 0.0, 0.0, 0.0, 1.0, 0.0, -128.0, 0.0)),
+        "bevy_transform::components::transform::Transform": (
+          translation: (0.0, -128.0, 0.0),
+          rotation: (0.0, 0.0, 0.0, 1.0),
+          scale: (2.0, 2.0, 1.0),
+        ),
+        "gambler_bevy::editor::EditorObject": (
+          internal_type: 0,
+          coordinate: (
+            type_char: 't',
+            coord: (0, -128),
+          ),
+          zone_id: (
+            type_char: 'f',
+            coord: (0, -2),
+          ),
+        ),
+        "gambler_bevy::editor::tile::Tile": (),
+      },
+    ),
+    8589934674: (
+      components: {
+        "bevy_render::primitives::Aabb": (
+          center: (16.0, 16.0, 0.0),
+          half_extents: (16.0, 16.0, 0.0),
+        ),
+        "bevy_render::sync_world::SyncToRenderWorld": (),
+        "bevy_render::view::visibility::InheritedVisibility": (true),
+        "bevy_render::view::visibility::ViewVisibility": (true),
+        "bevy_render::view::visibility::Visibility": Inherited,
+        "bevy_transform::components::global_transform::GlobalTransform": ((2.0, 0.0, 0.0, 0.0, 2.0, 0.0, 0.0, 0.0, 1.0, -256.0, -128.0, 0.0)),
+        "bevy_transform::components::transform::Transform": (
+          translation: (-256.0, -128.0, 0.0),
+          rotation: (0.0, 0.0, 0.0, 1.0),
+          scale: (2.0, 2.0, 1.0),
+        ),
+        "gambler_bevy::editor::EditorObject": (
+          internal_type: 0,
+          coordinate: (
+            type_char: 't',
+            coord: (-256, -128),
+          ),
+          zone_id: (
+            type_char: 'f',
+            coord: (-4, -2),
+          ),
+        ),
+        "gambler_bevy::editor::tile::Tile": (),
+      },
+    ),
+    8589934675: (
+      components: {
+        "bevy_render::primitives::Aabb": (
+          center: (16.0, 16.0, 0.0),
+          half_extents: (16.0, 16.0, 0.0),
+        ),
+        "bevy_render::sync_world::SyncToRenderWorld": (),
+        "bevy_render::view::visibility::InheritedVisibility": (true),
+        "bevy_render::view::visibility::ViewVisibility": (false),
+        "bevy_render::view::visibility::Visibility": Inherited,
+        "bevy_transform::components::global_transform::GlobalTransform": ((2.0, 0.0, 0.0, 0.0, 2.0, 0.0, 0.0, 0.0, 1.0, 448.0, -128.0, 0.0)),
+        "bevy_transform::components::transform::Transform": (
+          translation: (448.0, -128.0, 0.0),
+          rotation: (0.0, 0.0, 0.0, 1.0),
+          scale: (2.0, 2.0, 1.0),
+        ),
+        "gambler_bevy::editor::EditorObject": (
+          internal_type: 0,
+          coordinate: (
+            type_char: 't',
+            coord: (448, -128),
+          ),
+          zone_id: (
+            type_char: 'f',
+            coord: (7, -2),
+          ),
+        ),
+        "gambler_bevy::editor::tile::Tile": (),
+      },
+    ),
+    8589934676: (
+      components: {
+        "bevy_render::primitives::Aabb": (
+          center: (16.0, 16.0, 0.0),
+          half_extents: (16.0, 16.0, 0.0),
+        ),
+        "bevy_render::sync_world::SyncToRenderWorld": (),
+        "bevy_render::view::visibility::InheritedVisibility": (true),
+        "bevy_render::view::visibility::ViewVisibility": (true),
+        "bevy_render::view::visibility::Visibility": Inherited,
+        "bevy_transform::components::global_transform::GlobalTransform": ((2.0, 0.0, 0.0, 0.0, 2.0, 0.0, 0.0, 0.0, 1.0, -64.0, -128.0, 0.0)),
+        "bevy_transform::components::transform::Transform": (
+          translation: (-64.0, -128.0, 0.0),
+          rotation: (0.0, 0.0, 0.0, 1.0),
+          scale: (2.0, 2.0, 1.0),
+        ),
+        "gambler_bevy::editor::EditorObject": (
+          internal_type: 0,
+          coordinate: (
+            type_char: 't',
+            coord: (-64, -128),
+          ),
+          zone_id: (
+            type_char: 'f',
+            coord: (-1, -2),
+          ),
+        ),
+        "gambler_bevy::editor::tile::Tile": (),
+      },
+    ),
+    8589934679: (
+      components: {
+        "bevy_render::primitives::Aabb": (
+          center: (16.0, 16.0, 0.0),
+          half_extents: (16.0, 16.0, 0.0),
+        ),
+        "bevy_render::sync_world::SyncToRenderWorld": (),
+        "bevy_render::view::visibility::InheritedVisibility": (true),
+        "bevy_render::view::visibility::ViewVisibility": (true),
+        "bevy_render::view::visibility::Visibility": Inherited,
+        "bevy_transform::components::global_transform::GlobalTransform": ((2.0, 0.0, 0.0, 0.0, 2.0, 0.0, 0.0, 0.0, 1.0, 64.0, -128.0, 0.0)),
+        "bevy_transform::components::transform::Transform": (
+          translation: (64.0, -128.0, 0.0),
+          rotation: (0.0, 0.0, 0.0, 1.0),
+          scale: (2.0, 2.0, 1.0),
+        ),
+        "gambler_bevy::editor::EditorObject": (
+          internal_type: 0,
+          coordinate: (
+            type_char: 't',
+            coord: (64, -128),
+          ),
+          zone_id: (
+            type_char: 'f',
+            coord: (1, -2),
+          ),
+        ),
+        "gambler_bevy::editor::tile::Tile": (),
+      },
+    ),
+    8589934680: (
+      components: {
+        "bevy_render::primitives::Aabb": (
+          center: (16.0, 16.0, 0.0),
+          half_extents: (16.0, 16.0, 0.0),
+        ),
+        "bevy_render::sync_world::SyncToRenderWorld": (),
+        "bevy_render::view::visibility::InheritedVisibility": (true),
+        "bevy_render::view::visibility::ViewVisibility": (true),
+        "bevy_render::view::visibility::Visibility": Inherited,
+        "bevy_transform::components::global_transform::GlobalTransform": ((2.0, 0.0, 0.0, 0.0, 2.0, 0.0, 0.0, 0.0, 1.0, 128.0, -128.0, 0.0)),
+        "bevy_transform::components::transform::Transform": (
+          translation: (128.0, -128.0, 0.0),
+          rotation: (0.0, 0.0, 0.0, 1.0),
+          scale: (2.0, 2.0, 1.0),
+        ),
+        "gambler_bevy::editor::EditorObject": (
+          internal_type: 0,
+          coordinate: (
+            type_char: 't',
+            coord: (128, -128),
+          ),
+          zone_id: (
+            type_char: 'f',
+            coord: (2, -2),
+          ),
+        ),
+        "gambler_bevy::editor::tile::Tile": (),
+      },
+    ),
+    8589934681: (
+      components: {
+        "bevy_render::primitives::Aabb": (
+          center: (16.0, 16.0, 0.0),
+          half_extents: (16.0, 16.0, 0.0),
+        ),
+        "bevy_render::sync_world::SyncToRenderWorld": (),
+        "bevy_render::view::visibility::InheritedVisibility": (true),
+        "bevy_render::view::visibility::ViewVisibility": (true),
+        "bevy_render::view::visibility::Visibility": Inherited,
+        "bevy_transform::components::global_transform::GlobalTransform": ((2.0, 0.0, 0.0, 0.0, 2.0, 0.0, 0.0, 0.0, 1.0, 192.0, -128.0, 0.0)),
+        "bevy_transform::components::transform::Transform": (
+          translation: (192.0, -128.0, 0.0),
+          rotation: (0.0, 0.0, 0.0, 1.0),
+          scale: (2.0, 2.0, 1.0),
+        ),
+        "gambler_bevy::editor::EditorObject": (
+          internal_type: 0,
+          coordinate: (
+            type_char: 't',
+            coord: (192, -128),
+          ),
+          zone_id: (
+            type_char: 'f',
+            coord: (3, -2),
+          ),
+        ),
+        "gambler_bevy::editor::tile::Tile": (),
+      },
+    ),
+    8589934682: (
+      components: {
+        "bevy_render::primitives::Aabb": (
+          center: (16.0, 16.0, 0.0),
+          half_extents: (16.0, 16.0, 0.0),
+        ),
+        "bevy_render::sync_world::SyncToRenderWorld": (),
+        "bevy_render::view::visibility::InheritedVisibility": (true),
+        "bevy_render::view::visibility::ViewVisibility": (true),
+        "bevy_render::view::visibility::Visibility": Inherited,
+        "bevy_transform::components::global_transform::GlobalTransform": ((2.0, 0.0, 0.0, 0.0, 2.0, 0.0, 0.0, 0.0, 1.0, 320.0, -128.0, 0.0)),
+        "bevy_transform::components::transform::Transform": (
+          translation: (320.0, -128.0, 0.0),
+          rotation: (0.0, 0.0, 0.0, 1.0),
+          scale: (2.0, 2.0, 1.0),
+        ),
+        "gambler_bevy::editor::EditorObject": (
+          internal_type: 0,
+          coordinate: (
+            type_char: 't',
+            coord: (320, -128),
+          ),
+          zone_id: (
+            type_char: 'f',
+            coord: (5, -2),
+          ),
+        ),
+        "gambler_bevy::editor::tile::Tile": (),
+      },
+    ),
+    8589934683: (
+      components: {
+        "bevy_render::primitives::Aabb": (
+          center: (16.0, 16.0, 0.0),
+          half_extents: (16.0, 16.0, 0.0),
+        ),
+        "bevy_render::sync_world::SyncToRenderWorld": (),
+        "bevy_render::view::visibility::InheritedVisibility": (true),
+        "bevy_render::view::visibility::ViewVisibility": (true),
+        "bevy_render::view::visibility::Visibility": Inherited,
+        "bevy_transform::components::global_transform::GlobalTransform": ((2.0, 0.0, 0.0, 0.0, 2.0, 0.0, 0.0, 0.0, 1.0, 256.0, -128.0, 0.0)),
+        "bevy_transform::components::transform::Transform": (
+          translation: (256.0, -128.0, 0.0),
+          rotation: (0.0, 0.0, 0.0, 1.0),
+          scale: (2.0, 2.0, 1.0),
+        ),
+        "gambler_bevy::editor::EditorObject": (
+          internal_type: 0,
+          coordinate: (
+            type_char: 't',
+            coord: (256, -128),
+          ),
+          zone_id: (
+            type_char: 'f',
+            coord: (4, -2),
+          ),
+        ),
+        "gambler_bevy::editor::tile::Tile": (),
+      },
+    ),
+    8589934684: (
+      components: {
+        "bevy_render::primitives::Aabb": (
+          center: (16.0, 16.0, 0.0),
+          half_extents: (16.0, 16.0, 0.0),
+        ),
+        "bevy_render::sync_world::SyncToRenderWorld": (),
+        "bevy_render::view::visibility::InheritedVisibility": (true),
+        "bevy_render::view::visibility::ViewVisibility": (true),
+        "bevy_render::view::visibility::Visibility": Inherited,
+        "bevy_transform::components::global_transform::GlobalTransform": ((2.0, 0.0, 0.0, 0.0, 2.0, 0.0, 0.0, 0.0, 1.0, -320.0, -64.0, 0.0)),
+        "bevy_transform::components::transform::Transform": (
+          translation: (-320.0, -64.0, 0.0),
+          rotation: (0.0, 0.0, 0.0, 1.0),
+          scale: (2.0, 2.0, 1.0),
+        ),
+        "gambler_bevy::editor::EditorObject": (
+          internal_type: 0,
+          coordinate: (
+            type_char: 't',
+            coord: (-320, -64),
+          ),
+          zone_id: (
+            type_char: 'f',
+            coord: (-5, -1),
+          ),
+        ),
+        "gambler_bevy::editor::tile::Tile": (),
+      },
+    ),
+    8589934689: (
+      components: {
+        "bevy_render::primitives::Aabb": (
+          center: (16.0, 16.0, 0.0),
+          half_extents: (16.0, 16.0, 0.0),
+        ),
+        "bevy_render::sync_world::SyncToRenderWorld": (),
+        "bevy_render::view::visibility::InheritedVisibility": (true),
+        "bevy_render::view::visibility::ViewVisibility": (true),
+        "bevy_render::view::visibility::Visibility": Inherited,
+        "bevy_transform::components::global_transform::GlobalTransform": ((2.0, 0.0, 0.0, 0.0, 2.0, 0.0, 0.0, 0.0, 1.0, -320.0, -128.0, 0.0)),
+        "bevy_transform::components::transform::Transform": (
+          translation: (-320.0, -128.0, 0.0),
+          rotation: (0.0, 0.0, 0.0, 1.0),
+          scale: (2.0, 2.0, 1.0),
+        ),
+        "gambler_bevy::editor::EditorObject": (
+          internal_type: 0,
+          coordinate: (
+            type_char: 't',
+            coord: (-320, -128),
+          ),
+          zone_id: (
+            type_char: 'f',
+            coord: (-5, -2),
+          ),
+        ),
+        "gambler_bevy::editor::tile::Tile": (),
+      },
+    ),
+    8589934691: (
+      components: {
+        "bevy_render::primitives::Aabb": (
+          center: (16.0, 16.0, 0.0),
+          half_extents: (16.0, 16.0, 0.0),
+        ),
+        "bevy_render::sync_world::SyncToRenderWorld": (),
+        "bevy_render::view::visibility::InheritedVisibility": (true),
+        "bevy_render::view::visibility::ViewVisibility": (true),
+        "bevy_render::view::visibility::Visibility": Inherited,
+        "bevy_transform::components::global_transform::GlobalTransform": ((2.0, 0.0, 0.0, 0.0, 2.0, 0.0, 0.0, 0.0, 1.0, -128.0, -128.0, 0.0)),
+        "bevy_transform::components::transform::Transform": (
+          translation: (-128.0, -128.0, 0.0),
+          rotation: (0.0, 0.0, 0.0, 1.0),
+          scale: (2.0, 2.0, 1.0),
+        ),
+        "gambler_bevy::editor::EditorObject": (
+          internal_type: 0,
+          coordinate: (
+            type_char: 't',
+            coord: (-128, -128),
+          ),
+          zone_id: (
+            type_char: 'f',
+            coord: (-2, -2),
+          ),
+        ),
+        "gambler_bevy::editor::tile::Tile": (),
+      },
+    ),
+    8589934696: (
+      components: {
+        "bevy_render::primitives::Aabb": (
+          center: (16.0, 16.0, 0.0),
+          half_extents: (16.0, 16.0, 0.0),
+        ),
+        "bevy_render::sync_world::SyncToRenderWorld": (),
+        "bevy_render::view::visibility::InheritedVisibility": (true),
+        "bevy_render::view::visibility::ViewVisibility": (false),
+        "bevy_render::view::visibility::Visibility": Inherited,
+        "bevy_transform::components::global_transform::GlobalTransform": ((2.0, 0.0, 0.0, 0.0, 2.0, 0.0, 0.0, 0.0, 1.0, 384.0, -128.0, 0.0)),
+        "bevy_transform::components::transform::Transform": (
+          translation: (384.0, -128.0, 0.0),
+          rotation: (0.0, 0.0, 0.0, 1.0),
+          scale: (2.0, 2.0, 1.0),
+        ),
+        "gambler_bevy::editor::EditorObject": (
+          internal_type: 0,
+          coordinate: (
+            type_char: 't',
+            coord: (384, -128),
+          ),
+          zone_id: (
+            type_char: 'f',
+            coord: (6, -2),
+          ),
+        ),
+        "gambler_bevy::editor::tile::Tile": (),
+      },
+    ),
+    8589934702: (
+      components: {
+        "bevy_render::primitives::Aabb": (
+          center: (16.0, 16.0, 0.0),
+          half_extents: (16.0, 16.0, 0.0),
+        ),
+        "bevy_render::sync_world::SyncToRenderWorld": (),
+        "bevy_render::view::visibility::InheritedVisibility": (true),
+        "bevy_render::view::visibility::ViewVisibility": (true),
+        "bevy_render::view::visibility::Visibility": Inherited,
+        "bevy_transform::components::global_transform::GlobalTransform": ((2.0, 0.0, 0.0, 0.0, 2.0, 0.0, 0.0, 0.0, 1.0, -384.0, -64.0, 0.0)),
+        "bevy_transform::components::transform::Transform": (
+          translation: (-384.0, -64.0, 0.0),
+          rotation: (0.0, 0.0, 0.0, 1.0),
+          scale: (2.0, 2.0, 1.0),
+        ),
+        "gambler_bevy::editor::EditorObject": (
+          internal_type: 0,
+          coordinate: (
+            type_char: 't',
+            coord: (-384, -64),
+          ),
+          zone_id: (
+            type_char: 'f',
+            coord: (-6, -1),
+          ),
+        ),
+        "gambler_bevy::editor::tile::Tile": (),
+      },
+    ),
+    8589934709: (
+      components: {
+        "bevy_render::primitives::Aabb": (
+          center: (16.0, 16.0, 0.0),
+          half_extents: (16.0, 16.0, 0.0),
+        ),
+        "bevy_render::sync_world::SyncToRenderWorld": (),
+        "bevy_render::view::visibility::InheritedVisibility": (true),
+        "bevy_render::view::visibility::ViewVisibility": (true),
+        "bevy_render::view::visibility::Visibility": Inherited,
+        "bevy_transform::components::global_transform::GlobalTransform": ((2.0, 0.0, 0.0, 0.0, 2.0, 0.0, 0.0, 0.0, 1.0, -512.0, -320.0, 0.0)),
+        "bevy_transform::components::transform::Transform": (
+          translation: (-512.0, -320.0, 0.0),
+          rotation: (0.0, 0.0, 0.0, 1.0),
+          scale: (2.0, 2.0, 1.0),
+        ),
+        "gambler_bevy::editor::EditorObject": (
+          internal_type: 1,
+          coordinate: (
+            type_char: 't',
+            coord: (-512, -320),
+          ),
+          zone_id: (
+            type_char: 'f',
+            coord: (-8, -5),
+          ),
+        ),
+        "gambler_bevy::editor::tile::Tile": (),
+      },
+    ),
+    8589934712: (
+      components: {
+        "bevy_render::primitives::Aabb": (
+          center: (16.0, 16.0, 0.0),
+          half_extents: (16.0, 16.0, 0.0),
+        ),
+        "bevy_render::sync_world::SyncToRenderWorld": (),
+        "bevy_render::view::visibility::InheritedVisibility": (true),
+        "bevy_render::view::visibility::ViewVisibility": (true),
+        "bevy_render::view::visibility::Visibility": Inherited,
+        "bevy_transform::components::global_transform::GlobalTransform": ((2.0, 0.0, 0.0, 0.0, 2.0, 0.0, 0.0, 0.0, 1.0, -576.0, -64.0, 0.0)),
+        "bevy_transform::components::transform::Transform": (
+          translation: (-576.0, -64.0, 0.0),
+          rotation: (0.0, 0.0, 0.0, 1.0),
+          scale: (2.0, 2.0, 1.0),
+        ),
+        "gambler_bevy::editor::EditorObject": (
+          internal_type: 0,
+          coordinate: (
+            type_char: 't',
+            coord: (-576, -64),
+          ),
+          zone_id: (
+            type_char: 'f',
+            coord: (-9, -1),
+          ),
+        ),
+        "gambler_bevy::editor::tile::Tile": (),
+      },
+    ),
+    8589934713: (
+      components: {
+        "bevy_render::primitives::Aabb": (
+          center: (16.0, 16.0, 0.0),
+          half_extents: (16.0, 16.0, 0.0),
+        ),
+        "bevy_render::sync_world::SyncToRenderWorld": (),
+        "bevy_render::view::visibility::InheritedVisibility": (true),
+        "bevy_render::view::visibility::ViewVisibility": (true),
+        "bevy_render::view::visibility::Visibility": Inherited,
+        "bevy_transform::components::global_transform::GlobalTransform": ((2.0, 0.0, 0.0, 0.0, 2.0, 0.0, 0.0, 0.0, 1.0, -448.0, -128.0, 0.0)),
+        "bevy_transform::components::transform::Transform": (
+          translation: (-448.0, -128.0, 0.0),
+          rotation: (0.0, 0.0, 0.0, 1.0),
+          scale: (2.0, 2.0, 1.0),
+        ),
+        "gambler_bevy::editor::EditorObject": (
+          internal_type: 0,
+          coordinate: (
+            type_char: 't',
+            coord: (-448, -128),
+          ),
+          zone_id: (
+            type_char: 'f',
+            coord: (-7, -2),
+          ),
+        ),
+        "gambler_bevy::editor::tile::Tile": (),
+      },
+    ),
+    12884901913: (
+      components: {
+        "bevy_render::primitives::Aabb": (
+          center: (16.0, 16.0, 0.0),
+          half_extents: (16.0, 16.0, 0.0),
+        ),
+        "bevy_render::sync_world::SyncToRenderWorld": (),
+        "bevy_render::view::visibility::InheritedVisibility": (true),
+        "bevy_render::view::visibility::ViewVisibility": (true),
+        "bevy_render::view::visibility::Visibility": Inherited,
+        "bevy_transform::components::global_transform::GlobalTransform": ((2.0, 0.0, 0.0, 0.0, 2.0, 0.0, 0.0, 0.0, 1.0, -512.0, -384.0, 0.0)),
+        "bevy_transform::components::transform::Transform": (
+          translation: (-512.0, -384.0, 0.0),
+          rotation: (0.0, 0.0, 0.0, 1.0),
+          scale: (2.0, 2.0, 1.0),
+        ),
+        "gambler_bevy::editor::EditorObject": (
+          internal_type: 1,
+          coordinate: (
+            type_char: 't',
+            coord: (-512, -384),
+          ),
+          zone_id: (
+            type_char: 'f',
+            coord: (-8, -6),
+          ),
+        ),
+        "gambler_bevy::editor::tile::Tile": (),
+      },
+    ),
+    12884901914: (
+      components: {
+        "bevy_render::primitives::Aabb": (
+          center: (16.0, 16.0, 0.0),
+          half_extents: (16.0, 16.0, 0.0),
+        ),
+        "bevy_render::sync_world::SyncToRenderWorld": (),
+        "bevy_render::view::visibility::InheritedVisibility": (true),
+        "bevy_render::view::visibility::ViewVisibility": (true),
+        "bevy_render::view::visibility::Visibility": Inherited,
+        "bevy_transform::components::global_transform::GlobalTransform": ((2.0, 0.0, 0.0, 0.0, 2.0, 0.0, 0.0, 0.0, 1.0, -448.0, -384.0, 0.0)),
+        "bevy_transform::components::transform::Transform": (
+          translation: (-448.0, -384.0, 0.0),
+          rotation: (0.0, 0.0, 0.0, 1.0),
+          scale: (2.0, 2.0, 1.0),
+        ),
+        "gambler_bevy::editor::EditorObject": (
+          internal_type: 1,
+          coordinate: (
+            type_char: 't',
+            coord: (-448, -384),
+          ),
+          zone_id: (
+            type_char: 'f',
+            coord: (-7, -6),
+          ),
+        ),
+        "gambler_bevy::editor::tile::Tile": (),
+      },
+    ),
+    12884901920: (
+      components: {
+        "bevy_render::primitives::Aabb": (
+          center: (16.0, 16.0, 0.0),
+          half_extents: (16.0, 16.0, 0.0),
+        ),
+        "bevy_render::sync_world::SyncToRenderWorld": (),
+        "bevy_render::view::visibility::InheritedVisibility": (true),
+        "bevy_render::view::visibility::ViewVisibility": (true),
+        "bevy_render::view::visibility::Visibility": Inherited,
+        "bevy_transform::components::global_transform::GlobalTransform": ((2.0, 0.0, 0.0, 0.0, 2.0, 0.0, 0.0, 0.0, 1.0, -384.0, -128.0, 0.0)),
+        "bevy_transform::components::transform::Transform": (
+          translation: (-384.0, -128.0, 0.0),
+          rotation: (0.0, 0.0, 0.0, 1.0),
+          scale: (2.0, 2.0, 1.0),
+        ),
+        "gambler_bevy::editor::EditorObject": (
+          internal_type: 0,
+          coordinate: (
+            type_char: 't',
+            coord: (-384, -128),
+          ),
+          zone_id: (
+            type_char: 'f',
+            coord: (-6, -2),
+          ),
+        ),
+        "gambler_bevy::editor::tile::Tile": (),
+      },
+    ),
+    12884901921: (
+      components: {
+        "bevy_render::primitives::Aabb": (
+          center: (16.0, 16.0, 0.0),
+          half_extents: (16.0, 16.0, 0.0),
+        ),
+        "bevy_render::sync_world::SyncToRenderWorld": (),
+        "bevy_render::view::visibility::InheritedVisibility": (true),
+        "bevy_render::view::visibility::ViewVisibility": (true),
+        "bevy_render::view::visibility::Visibility": Inherited,
+        "bevy_transform::components::global_transform::GlobalTransform": ((2.0, 0.0, 0.0, 0.0, 2.0, 0.0, 0.0, 0.0, 1.0, -512.0, -64.0, 0.0)),
+        "bevy_transform::components::transform::Transform": (
+          translation: (-512.0, -64.0, 0.0),
+          rotation: (0.0, 0.0, 0.0, 1.0),
+          scale: (2.0, 2.0, 1.0),
+        ),
+        "gambler_bevy::editor::EditorObject": (
+          internal_type: 0,
+          coordinate: (
+            type_char: 't',
+            coord: (-512, -64),
+          ),
+          zone_id: (
+            type_char: 'f',
+            coord: (-8, -1),
           ),
         ),
         "gambler_bevy::editor::tile::Tile": (),
