@@ -76,19 +76,20 @@ pub fn spawn_player(mut commands: Commands, asset_server: Res<AssetServer>) {
         },
         Sprite {
             image: player_sprite,
-            custom_size: Some(Vec2::new(SCALED_PLAYER_WIDTH as f32, SCALED_PLAYER_HEIGHT  as f32)),
+            anchor: bevy::sprite::Anchor::BottomLeft,
             ..Default::default()
         },
         Transform {
-            translation: Vec3::new(0.0, 0.0, 1.),
+            translation: Vec3::new(0.0, 200.0, 1.),
+            scale: Vec3::new(TILE_SCALE as f32, TILE_SCALE as f32, 1.),
             ..Default::default()
         },
     ));
 }
 
-pub fn do_player_collision(mut commands: Commands, players: Query<(Entity, &Player, &Transform)>, colliders: Query<(Entity, &Collider, &Transform)>) {
-    for (player_entity, player, player_transform) in players.iter() {
-        let collisions = Vec::new();
+pub fn do_player_collision(mut commands: Commands, mut players: Query<(Entity, &mut Player, &mut Transform)>, colliders: Query<(Entity, &Collider, &Transform), Without<Player>>) {
+    for (player_entity, mut player, mut player_transform) in players.iter_mut() {
+        let mut collisions = Vec::new();
         for (collider_entity, collider, collider_transform) in colliders.iter() {
             if player_transform.translation.x < collider_transform.translation.x + TILE_SIZE as f32
                 && player_transform.translation.x + SCALED_PLAYER_WIDTH as f32 > collider_transform.translation.x
@@ -99,7 +100,7 @@ pub fn do_player_collision(mut commands: Commands, players: Query<(Entity, &Play
             }
         }
 
-        collisions.into_par_iter().for_each(|(collider_entity, collider, collider_transform)| {
+        collisions.iter().for_each(|(collider_entity, collider, collider_transform)| {
             //handle collision
             if player.velocity.x > 0.0 {
                 //player is moving right and has hit this collider
@@ -108,7 +109,7 @@ pub fn do_player_collision(mut commands: Commands, players: Query<(Entity, &Play
             } else if player.velocity.x < 0.0 {
                 //player is moving left
                 player.velocity.x = 0.0;
-                player_transform.translation.x = collider_transform.translation.x + collider.size.x;
+                player_transform.translation.x = collider_transform.translation.x + collider.rect.width();
             }
             if player.velocity.y > 0.0 {
                 //player is moving up
@@ -117,7 +118,7 @@ pub fn do_player_collision(mut commands: Commands, players: Query<(Entity, &Play
             } else if player.velocity.y < 0.0 {
                 //player is falling
                 player.velocity.y = 0.0;
-                player_transform.translation.y = collider_transform.translation.y + collider.size.y;
+                player_transform.translation.y = collider_transform.translation.y + collider.rect.width();
             }
 
         }
