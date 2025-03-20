@@ -8,9 +8,6 @@ pub fn player_physics(
 ){
     for (mut player, mut transform) in query.iter_mut() {
 
-
-
-
         //apply gravity
         player.velocity.y -= GRAVITY * time.delta_secs();
 
@@ -91,14 +88,16 @@ pub fn spawn_player(mut commands: Commands, asset_server: Res<AssetServer>) {
 
 pub fn do_player_collision(mut commands: Commands, mut players: Query<(Entity, &mut Player, &mut Transform)>, colliders: Query<(Entity, &Collider, &Transform), Without<Player>>) {
     for (player_entity, mut player, mut player_transform) in players.iter_mut() {
+        let player_rect = Rect::new(
+            player_transform.translation.x,
+            player_transform.translation.y,
+            SCALED_PLAYER_WIDTH as f32,
+            SCALED_PLAYER_HEIGHT as f32,
+        );
         let mut collisions = Vec::new();
         for (collider_entity, collider, collider_transform) in colliders.iter() {
             
-            if ! collider.rect.intersect(Rect::new(
-                player_transform.translation.x,
-                player_transform.translation.y,
-                SCALED_PLAYER_WIDTH as f32,
-                SCALED_PLAYER_HEIGHT as f32,)).is_empty() {
+            if ! collider.rect.intersect(player_rect).is_empty() {
                 //collision detected
                 collisions.push((collider_entity, collider, collider_transform));
             }
@@ -122,7 +121,7 @@ pub fn do_player_collision(mut commands: Commands, mut players: Query<(Entity, &
             } else if player.velocity.y < 0.0 {
                 //player is falling
                 player.velocity.y = 0.0;
-                player_transform.translation.y = collider.rect.max.y - TILE_SCALE as f32;
+                player_transform.translation.y = collider.rect.max.y;
             }
 
         }

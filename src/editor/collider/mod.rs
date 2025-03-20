@@ -92,17 +92,27 @@ impl Collider {
             rect: Rect::new(0.0, 0.0, 1.0, 1.0),
         }
     }
+
+    
 }
 impl Default for Collider {
     fn default() -> Self {
         Self::new()
     }
 }
+
 impl SignificantComponent for Collider {
 
     fn place_rectangle(_rect: Rect, _commands: Commands) {
         //make a tile like normal in this rect, but use sliced tiles over the sprite sheet selection
         todo!();
+    }
+    fn from_rect(rect: Rect, coord: Coordinate) -> Self {
+        Self {
+            internal_type: 0,
+            coordinate: TCoordinate{type_char: 'c', coord},
+            rect,
+        }
     }
 }
 

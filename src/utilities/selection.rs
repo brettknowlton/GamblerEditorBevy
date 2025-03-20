@@ -49,7 +49,11 @@ impl SignificantComponent for SelectionRect {
         ));
     }
     
-    fn place_rectangle(rect: Rect, commands: Commands) {
+    fn place_rectangle(_rect: Rect,_commands: Commands) {
+        todo!();
+    }
+
+    fn from_rect(_rect: Rect, _coord: Coordinate) -> Self {
         todo!();
     }
 }

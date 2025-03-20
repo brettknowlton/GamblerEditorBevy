@@ -1,9 +1,13 @@
 - [ ] Changing placeholder object in tilemode is not consistent with all button presses
 - [ ] Tilesheet display is funky
-- [ ] Implement colliders and a debug sprite for colliders
+- [x] Implement colliders and a debug sprite for colliders
 - [ ] Begin on a "Test" Mode that allows player control
 	- [ ] Make controllable player
-	- [ ] drop crosshair control but NOT UI control in test mode.
+	- [x] drop crosshair control but NOT UI control in test mode.
 	- [ ] player will just spawn on the crosshair's position for now
 - [ ] Implement a rectangle tool for SignificantComponents
-- [ ] 
+- [ ] Get a functional/Moveable player
+	- [ ] see above for making player spawn on the crosshair
+	- [ ] jump with Space / W
+	- [ ] move left/right with A / D
+	- [ ] verify collision issues (colliders below x axis behaiving weirdly...)

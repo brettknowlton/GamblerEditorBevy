@@ -33,13 +33,6 @@ pub enum EditorState {
     Editing(EditingComponent),
 }
 
-#[derive(Clone, Copy, Default, Eq, PartialEq, Debug, Hash, States)]
-pub enum TestingState {
-    #[default]
-    Inactive,
-    Testing,
-}
-
 ///The EditingComponent enum is used to determine what type of object the user is currently trying to place in the scene, this is kind of like an "Internal Type" for the editor state.
 ///We will almost always be in EditorMode::Editing but its more granular than that
 #[derive(Clone, Copy, Default, Eq, PartialEq, Debug, Hash)]
@@ -121,10 +114,9 @@ fn create_crosshair(mut commands: Commands, asset_server: Res<AssetServer>) {
 struct BottomBarUpdate;
 
 fn stateful_keybinds(
-    mut next_state: ResMut<NextState<EditorState>>,
-    state: ResMut<State<EditorState>>,
-    mut next_test_state: ResMut<NextState<TestingState>>,
-    test_state: ResMut<State<TestingState>>,
+    editor_state: ResMut<State<EditorState>>,
+    mut next_editor_state: ResMut<NextState<EditorState>>,
+    game_state: ResMut<State<game::GameState>>,
     mut next_game_state: ResMut<NextState<game::GameState>>,
 
     
@@ -147,41 +139,40 @@ fn stateful_keybinds(
 
     // Q brings us back to normal mode
     if input.just_pressed(KeyCode::KeyQ) {
-        next_state.set(EditorState::Normal);
+        next_editor_state.set(EditorState::Normal);
         send_message!(Some('i'), messages, "Returning to Normal Mode");
     } else if
         //CTRL + S will enter saveAsk mode
-        input.all_pressed(vec![KeyCode::KeyS, KeyCode::ControlLeft]) &&
-        state.get() != &EditorState::SaveAsk
+        input.all_pressed(vec![KeyCode::KeyS, KeyCode::ControlLeft]) && ! input.just_pressed(KeyCode::ShiftLeft) &&
+        editor_state.get() != &EditorState::SaveAsk
     {
-        next_state.set(EditorState::SaveAsk);
+        next_editor_state.set(EditorState::SaveAsk);
         send_message!(Some('i'), messages, "Would you like to save the scene? Yenter/Noscape");
     } else if
         //CTRL + L will enter loadAsk mode
         input.all_pressed(vec![KeyCode::KeyL, KeyCode::ControlLeft]) &&
-        state.get() != &EditorState::LoadAsk
+        editor_state.get() != &EditorState::LoadAsk
     {
-        next_state.set(EditorState::LoadAsk);
+        next_editor_state.set(EditorState::LoadAsk);
         send_message!(Some('i'), messages, "Would you like to load a scene? Yenter/Noscape");
     } else if
         //CTRL + Q will enter QuitAsk mode
         input.all_pressed(vec![KeyCode::KeyQ, KeyCode::ControlLeft]) &&
-        state.get() != &EditorState::QuitAsk
+        editor_state.get() != &EditorState::QuitAsk
     {
-        next_state.set(EditorState::QuitAsk);
+        next_editor_state.set(EditorState::QuitAsk);
         send_message!(Some('i'), messages, "Would you like to exit the editor? Yenter/Noscape");
     } else if 
         //CTRL + T will toggle TEST mode, disabling the editor and enabling the game functionality.
         input.all_pressed(vec![KeyCode::KeyT, KeyCode::ControlLeft]) &&
-        state.get() != &EditorState::Inactive
+        editor_state.get() != &EditorState::Inactive
     {
-        if test_state.get() == &TestingState::Testing {
-            next_state.set(EditorState::Normal);
-            next_test_state.set(TestingState::Inactive);
+        if game_state.get() != &game::GameState::Inactive && editor_state.get() == &EditorState::Inactive {
+            next_editor_state.set(EditorState::Normal);
+            next_game_state.set(game::GameState::Inactive);
             send_message!(Some('i'), messages, "Exiting Test Mode");
         } else {
-            next_state.set(EditorState::Inactive);
-            next_test_state.set(TestingState::Testing);
+            next_editor_state.set(EditorState::Inactive);
             next_game_state.set(game::GameState::Running);
             send_message!(Some('i'), messages, "Entering Test Mode");
         }
@@ -224,27 +215,27 @@ fn stateful_keybinds(
     // 1 will switch to tile mode
     if input.just_pressed(KeyCode::Digit1) || input.just_pressed(KeyCode::Numpad1) {
         send_message!(Some('i'), messages, "Switching to Tile Mode");
-        next_state.set(EditorState::Editing(EditingComponent::Tile));
+        next_editor_state.set(EditorState::Editing(EditingComponent::Tile));
     }
 
     // 2 will switch to collider mode
     if input.just_pressed(KeyCode::Digit2) || input.just_pressed(KeyCode::Numpad2) {
         send_message!(Some('i'), messages, "Switching to Collider Mode");
-        next_state.set(EditorState::Editing(EditingComponent::Collider));
+        next_editor_state.set(EditorState::Editing(EditingComponent::Collider));
     }
 
     //state specific keybinds
-    match state.get() {
+    match editor_state.get() {
         EditorState::Normal => {
             //there is not a lot unique to normal mode
         }
         EditorState::LoadAsk => {
             if input.just_pressed(KeyCode::KeyY) || input.just_pressed(KeyCode::Enter) {
-                next_state.set(EditorState::Loading);
+                next_editor_state.set(EditorState::Loading);
                 send_message!(Some('i'), messages, "Attempting to load scene");
             }
             if input.just_pressed(KeyCode::KeyN) || input.just_pressed(KeyCode::Escape) {
-                next_state.set(EditorState::LoadingEmpty);
+                next_editor_state.set(EditorState::LoadingEmpty);
                 send_message!(Some('w'), messages, "No scene loaded");
             }
         }
@@ -263,27 +254,27 @@ fn stateful_keybinds(
                 input.just_pressed(KeyCode::KeyQ) ||
                 input.all_pressed(vec![KeyCode::ControlLeft, KeyCode::KeyS])
             {
-                next_state.set(EditorState::Normal);
+                next_editor_state.set(EditorState::Normal);
                 send_message!(Some('i'), messages, "Returning to Normal Mode");
             }
         }
 
         EditorState::SaveAsk => {
             if input.just_pressed(KeyCode::KeyY) || input.just_pressed(KeyCode::Enter) {
-                next_state.set(EditorState::Saving);
+                next_editor_state.set(EditorState::Saving);
                 send_message!(Some('i'), messages, "Saving scene...");
             } else if input.just_pressed(KeyCode::KeyN) || input.just_pressed(KeyCode::Escape) {
-                next_state.set(EditorState::Normal);
+                next_editor_state.set(EditorState::Normal);
                 send_message!(Some('w'), messages, "Saving aborted.");
             }
         }
 
         EditorState::QuitAsk => {
             if input.just_pressed(KeyCode::KeyY) || input.just_pressed(KeyCode::Enter) {
-                next_state.set(EditorState::Inactive);
+                next_editor_state.set(EditorState::Inactive);
                 send_message!(Some('i'), messages, "Exiting the editor...");
             } else if input.just_pressed(KeyCode::KeyN) || input.just_pressed(KeyCode::Escape) {
-                next_state.set(EditorState::Normal);
+                next_editor_state.set(EditorState::Normal);
                 send_message!(Some('w'), messages, "Exiting aborted.");
             }
         }
@@ -292,9 +283,9 @@ fn stateful_keybinds(
 
     //Anti-Stateful Keybinds
     if
-        state.get() != &EditorState::SaveAsk &&
-        state.get() != &EditorState::LoadAsk &&
-        state.get() != &EditorState::QuitAsk
+        editor_state.get() != &EditorState::SaveAsk &&
+        editor_state.get() != &EditorState::LoadAsk &&
+        editor_state.get() != &EditorState::QuitAsk
     {
         //Camera Controls, just dont work in the save/load/quit states
         let mut vel_y = 0.0;
@@ -425,7 +416,6 @@ pub fn editor_plugin(app: &mut App) {
         .init_state::<EditorState>()
         .init_state::<GridSnap>()
         .init_state::<ShowGrid>()
-        .init_state::<TestingState>()
 
         //registrations
         .register_type::<EditorObject>()

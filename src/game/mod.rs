@@ -29,7 +29,7 @@ pub fn game_plugin(app: &mut App) {
         )
         .add_systems(
             Update,
-            (player::do_player_collision, player::player_physics)
+            (game_keybinds, player::do_player_collision, player::player_physics)
                 .chain()
                 .run_if(in_state(GameState::Running)),
         );
@@ -38,6 +38,25 @@ pub fn game_plugin(app: &mut App) {
     //     ().chain()
     // );
 }
+
+fn game_keybinds(
+    editor_state: ResMut<State<EditorState>>,
+    mut next_editor_state: ResMut<NextState<EditorState>>,
+    mut next_game_state: ResMut<NextState<GameState>>,
+    input: Res<ButtonInput<KeyCode>>,
+) {
+    if input.all_pressed(vec![KeyCode::KeyR, KeyCode::ControlLeft]) {
+        if *editor_state.get() == EditorState::Inactive {
+            next_editor_state.set(EditorState::Normal);
+            next_game_state.set(GameState::Paused);
+        }
+    }
+}
+
+
+
+
+
 
 #[derive(States, Clone, Copy, Debug, Eq, PartialEq, Hash)]
 pub enum PlayerState {

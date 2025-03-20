@@ -159,6 +159,10 @@ impl SignificantComponent for Tile {
         //make a tile like normal in this rect, but use sliced tiles over the sprite sheet selection
         todo!();
     }
+
+    fn from_rect(_rect: Rect, _coord: Coordinate) -> Self {
+        Self {}
+    }
 }
 
 
