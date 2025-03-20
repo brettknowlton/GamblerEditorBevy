@@ -8,3 +8,4 @@ bevy = "0.15.1"
 anyhow = "1"
 serde_json = "1.0.134"
 serde = { version = "1.0.217", features = ["derive"] }
+rayon = "1.10.0"

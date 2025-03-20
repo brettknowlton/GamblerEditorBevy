@@ -1,5 +1,7 @@
 use super::*;
 
+use rayon;
+
 pub fn player_physics(
     time: Res<Time>,
     mut query: Query<(&mut Player, &mut Transform)>,
@@ -91,10 +93,12 @@ pub fn do_player_collision(mut commands: Commands, mut players: Query<(Entity, &
     for (player_entity, mut player, mut player_transform) in players.iter_mut() {
         let mut collisions = Vec::new();
         for (collider_entity, collider, collider_transform) in colliders.iter() {
-            if player_transform.translation.x < collider_transform.translation.x + TILE_SIZE as f32
-                && player_transform.translation.x + SCALED_PLAYER_WIDTH as f32 > collider_transform.translation.x
-                && player_transform.translation.y < collider_transform.translation.y + TILE_SIZE as f32
-                && player_transform.translation.y + SCALED_PLAYER_HEIGHT as f32 > collider_transform.translation.y {
+            
+            if ! collider.rect.intersect(Rect::new(
+                player_transform.translation.x,
+                player_transform.translation.y,
+                SCALED_PLAYER_WIDTH as f32,
+                SCALED_PLAYER_HEIGHT as f32,)).is_empty() {
                 //collision detected
                 collisions.push((collider_entity, collider, collider_transform));
             }
@@ -105,20 +109,20 @@ pub fn do_player_collision(mut commands: Commands, mut players: Query<(Entity, &
             if player.velocity.x > 0.0 {
                 //player is moving right and has hit this collider
                 player.velocity.x = 0.0;
-                player_transform.translation.x = collider_transform.translation.x - SCALED_PLAYER_WIDTH as f32;
+                player_transform.translation.x = collider.rect.min.x - SCALED_PLAYER_WIDTH as f32;
             } else if player.velocity.x < 0.0 {
                 //player is moving left
                 player.velocity.x = 0.0;
-                player_transform.translation.x = collider_transform.translation.x + collider.rect.width();
+                player_transform.translation.x = collider.rect.max.x;
             }
             if player.velocity.y > 0.0 {
                 //player is moving up
                 player.velocity.y = 0.0;
-                player_transform.translation.y = collider_transform.translation.y - SCALED_PLAYER_HEIGHT as f32;
+                player_transform.translation.y = collider.rect.min.y - SCALED_PLAYER_HEIGHT as f32;
             } else if player.velocity.y < 0.0 {
                 //player is falling
                 player.velocity.y = 0.0;
-                player_transform.translation.y = collider_transform.translation.y + collider.rect.width();
+                player_transform.translation.y = collider.rect.max.y - TILE_SCALE as f32;
             }
 
         }
