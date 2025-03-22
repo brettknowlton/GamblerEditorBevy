@@ -3,60 +3,56 @@ use bevy::color::Srgba;
 //WILD shit right? dont worry its not too bad.
 //disable dead code warnings with #[warn(dead...)]
 
-pub(crate)const 
-                        _WINDOW_TITLE:                                                                   &str
-                        =
-                            "Gambler";
+pub(crate) const _WINDOW_TITLE: &str = "Gambler";
 ///////////////////////////////////////
-pub const WINDOW_TITLE2:&str= "GamblerEditor";
+pub const WINDOW_TITLE2: &str = "GamblerEditor";
 
 //Default color that the background will be replaced by if nothing is being rendered
-pub const WINDOW_DEFAULT_BACKGROUND_COLOR: Srgba = Srgba::new(0.31, 0.643, 0.722, 1.);
+pub const WINDOW_DEFAULT_BACKGROUND_COLOR: Srgba = Srgba::new(0.31, 0.643, 0.722, 1.0);
 
-pub const ZONE_SIZE: u32 = 64;//width/height of a zone in tiles
+pub const ZONE_SIZE: u32 = 16; //width/height of a zone in tiles
 
-pub const PLAYER_SIZE_X: u32= 72;
-pub const PLAYER_SIZE_Y: u32= 90;
-pub const PLAYER_SCALE: u32= 2;
+pub const PLAYER_SIZE_X: u32 = 72;
+pub const PLAYER_SIZE_Y: u32 = 90;
+pub const PLAYER_SCALE: u32 = 2;
 
-pub const SCALED_PLAYER_WIDTH: u32= PLAYER_SIZE_X * PLAYER_SCALE;
-pub const SCALED_PLAYER_HEIGHT: u32= PLAYER_SIZE_Y * PLAYER_SCALE;
+pub const PLAYER_WALK_SPEED: u32 = 1;
+pub const MAX_PLAYER_WALK_SPEED: u32 = 10;
+pub const PLAYER_JUMP_FORCE: u32 = 20;
 
-pub const TILE_SCALE: u32 = PLAYER_SCALE;//scale factor of tiles
-pub const TILE_SIZE: u32 = 32;//number of pixels wide the tile source image is
+pub const SCALED_PLAYER_WIDTH: u32 = PLAYER_SIZE_X * PLAYER_SCALE;
+pub const SCALED_PLAYER_HEIGHT: u32 = PLAYER_SIZE_Y * PLAYER_SCALE;
+
+pub const TILE_SCALE: u32 = PLAYER_SCALE; //scale factor of tiles
+pub const TILE_SIZE: u32 = 32; //number of pixels wide the tile source image is
 
 pub const SCALED_TILE_WIDTH: u32 = TILE_SIZE * TILE_SCALE;
 pub const SCALED_TILE_HEIGHT: u32 = TILE_SIZE * TILE_SCALE;
 
+pub const UI_SCALE: f32 = 10.0; //a scale value we can use to scale UI elements
+pub const UI_Z_LAYER: f32 = 10.0; //z layer for UI elements, we can use this to make to relatively place UI elements correctly
 
-pub const UI_SCALE: f32 = 10.;//a scale value we can use to scale UI elements
-pub const UI_Z_LAYER: f32 = 10.;//z layer for UI elements, we can use this to make to relatively place UI elements correctly
+pub const DEFAULT_TEXT_HEIGHT: f32 = 20.0; //default height of text in pixels
 
-pub const DEFAULT_TEXT_HEIGHT: f32 = 20.;//default height of text in pixels
-
-
-pub const DEFAULT_WINDOW_WIDTH: f32 = 1200.;
-pub const DEFAULT_WINDOW_HEIGHT: f32 = 800.;
-
+pub const DEFAULT_WINDOW_WIDTH: f32 = 1200.0;
+pub const DEFAULT_WINDOW_HEIGHT: f32 = 800.0;
 
 pub const ASSETS_PATH: &str = "assets/";
 pub const TEXTURES_PATH: &str = "assets/textures/";
 pub const DEFAULT_SCENE_PATH: &str = "scenes/scene";
 
-pub const SPRITESHEET_WIDTH: u64 = 8;//how many tiles wide our spritesheet is allowed to be
+pub const SPRITESHEET_WIDTH: u64 = 8; //how many tiles wide our spritesheet is allowed to be
 pub const MAX_SPRITESHEET_ITEMS: u64 = 32;
 
-
-pub const UI_BORDER_PX: f32 = 2.;//border around the UI elements
-pub const UI_BORDER_REAL: f32 = UI_BORDER_PX * UI_SCALE;//border around the UI elements as a fraction of the window height
-
-
+pub const UI_BORDER_PX: f32 = 2.0; //border around the UI elements
+pub const UI_BORDER_REAL: f32 = UI_BORDER_PX * UI_SCALE; //border around the UI elements as a fraction of the window height
 
 //PHYSICS CONSTS
-pub const GRAVITY: f32 = 9.8;
-pub const FRICTION: f32 = 0.1;
-pub const MAX_SPEED: f32 = 10.0;
-pub const JUMP_FORCE: f32 = 10.0;
+pub const GRAVITY: f32 = 15.6;
+pub const FRICTION: f32 = 0.25;
+
+//Epsilon
+pub const EPSILON: f32 = 0.0001;
 /*
 
 alright what the hell does this mean? im sure hyrum just said that in his head lol

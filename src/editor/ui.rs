@@ -78,6 +78,12 @@ pub fn spawn_general_editor_ui(mut commands: Commands, asset_server: Res<AssetSe
             anchor: Anchor::BottomLeft,
             ..default()
         },
+        Node {
+            position_type: PositionType::Absolute,
+            bottom: Val::Px(0.0),
+            left: Val::Px(0.0),
+            ..default()
+        },
         Transform {
             translation: Vec3::new(x_offset, y_offset, UI_Z_LAYER),
             ..default()

@@ -28,8 +28,8 @@ pub fn game_plugin(app: &mut App) {
             (load_save_data, player::spawn_player).chain(),
         )
         .add_systems(
-            Update,
-            (game_keybinds, player::do_player_collision, player::player_physics)
+            FixedUpdate,
+            (game_keybinds, player::player_controls, player::player_physics, player::do_player_collision,)
                 .chain()
                 .run_if(in_state(GameState::Running)),
         );
