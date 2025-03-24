@@ -1,5 +1,6 @@
 #[macro_use]
 pub mod ui;
+use bevy::utils::tracing::event;
 use selection::ActiveSelection;
 use selection::SelectionRect;
 pub use ui::*;
@@ -113,6 +114,9 @@ fn create_crosshair(mut commands: Commands, asset_server: Res<AssetServer>) {
 #[derive(Event)]
 struct BottomBarUpdate;
 
+#[derive(Event)]
+struct ResetScene;
+
 fn stateful_keybinds(
     editor_state: ResMut<State<EditorState>>,
     mut next_editor_state: ResMut<NextState<EditorState>>,
@@ -130,7 +134,8 @@ fn stateful_keybinds(
     mut crosshairs: Query<(&mut Crosshair, &mut Transform, &mut Sprite), Without<Camera2d>>,
     mut active_selection: ResMut<PlaceholderHandle>,
     mut uiitems: Query<(&mut UIItem, &mut Transform), (Without<Camera2d>, Without<Crosshair>)>,
-    mut cameras: Query<(&mut UIItem, &mut Transform, &mut Camera2d)>
+    mut cameras: Query<(&mut UIItem, &mut Transform, &mut Camera2d)>,
+    mut event_writer: EventWriter<ResetScene>,
 ) {
     let messages = &mut message_queue;
     //manage the editor state, you can switch between modes with their letter call or number keys except if you are attempting to save/load the document
@@ -143,28 +148,28 @@ fn stateful_keybinds(
         send_message!(Some('i'), messages, "Returning to Normal Mode");
     } else if
         //CTRL + S will enter saveAsk mode
-        input.all_pressed(vec![KeyCode::KeyS, KeyCode::ControlLeft]) && ! input.just_pressed(KeyCode::ShiftLeft) &&
+        input.pressed(KeyCode::ControlLeft) && input.just_pressed(KeyCode::KeyS) && ! input.just_pressed(KeyCode::ShiftLeft) &&
         editor_state.get() != &EditorState::SaveAsk
     {
         next_editor_state.set(EditorState::SaveAsk);
         send_message!(Some('i'), messages, "Would you like to save the scene? Yenter/Noscape");
     } else if
         //CTRL + L will enter loadAsk mode
-        input.all_pressed(vec![KeyCode::KeyL, KeyCode::ControlLeft]) &&
+        input.pressed(KeyCode::ControlLeft) && input.just_pressed(KeyCode::KeyL) &&
         editor_state.get() != &EditorState::LoadAsk
     {
         next_editor_state.set(EditorState::LoadAsk);
         send_message!(Some('i'), messages, "Would you like to load a scene? Yenter/Noscape");
     } else if
         //CTRL + Q will enter QuitAsk mode
-        input.all_pressed(vec![KeyCode::KeyQ, KeyCode::ControlLeft]) &&
+        input.pressed(KeyCode::ControlLeft) && input.just_pressed(KeyCode::KeyQ) &&
         editor_state.get() != &EditorState::QuitAsk
     {
         next_editor_state.set(EditorState::QuitAsk);
         send_message!(Some('i'), messages, "Would you like to exit the editor? Yenter/Noscape");
     } else if 
         //CTRL + T will toggle TEST mode, disabling the editor and enabling the game functionality.
-        input.all_pressed(vec![KeyCode::KeyT, KeyCode::ControlLeft]) &&
+        input.pressed(KeyCode::ControlLeft) && input.just_pressed(KeyCode::KeyT) &&
         editor_state.get() != &EditorState::Inactive
     {
         if game_state.get() != &game::GameState::Inactive && editor_state.get() == &EditorState::Inactive {
@@ -176,15 +181,28 @@ fn stateful_keybinds(
             next_game_state.set(game::GameState::Running);
             send_message!(Some('i'), messages, "Entering Test Mode");
         }
+    } else if 
+        //CTRL + R will "reset" the editor, for now that willjust move the player to the crosshair position
+        input.pressed(KeyCode::ControlLeft) && input.just_pressed(KeyCode::KeyR) && editor_state.get() != &EditorState::Inactive
+    {
+        // game::player::move_player_to_cursor(crosshairs.single_mut().unwrap().1, &mut cameras.single_mut().unwrap().1);
+        send_message!(Some('i'), messages, "Resetting Scene");
+        next_editor_state.set(EditorState::Normal);
+        //send a ResetScene event to the ResetScene system
+        event_writer.send(ResetScene);
+    } else if 
+        //CTRL + G will toggle the grid
+        input.pressed(KeyCode::ControlLeft) && input.just_pressed(KeyCode::KeyG) && editor_state.get() != &EditorState::Inactive
+    {
+        if showgrid_state.get() == &ShowGrid::Yes {
+            next_showgrid_state.set(ShowGrid::No);
+            send_message!(Some('i'), messages, "Hiding Grid");
+        } else {
+            next_showgrid_state.set(ShowGrid::Yes);
+            send_message!(Some('i'), messages, "Showing Grid");
+        }
     }
 
-    //G will toggle the grid visibility
-    if input.just_pressed(KeyCode::KeyG) {
-        next_showgrid_state.set(match showgrid_state.get() {
-            ShowGrid::Yes => ShowGrid::No,
-            ShowGrid::No => ShowGrid::Yes,
-        });
-    }
 
     //O is the main button to directly use the Rectangle Tool
     if input.just_pressed(KeyCode::KeyO) {
@@ -262,7 +280,7 @@ fn stateful_keybinds(
         EditorState::SaveAsk => {
             if input.just_pressed(KeyCode::KeyY) || input.just_pressed(KeyCode::Enter) {
                 next_editor_state.set(EditorState::Saving);
-                send_message!(Some('i'), messages, "Saving scene...");
+                send_message!(Some('i'), messages, "Saving scene.");
             } else if input.just_pressed(KeyCode::KeyN) || input.just_pressed(KeyCode::Escape) {
                 next_editor_state.set(EditorState::Normal);
                 send_message!(Some('w'), messages, "Saving aborted.");
@@ -382,6 +400,20 @@ impl EditorObject {
     // }
 }
 
+fn reset_scene(
+    mut players: Query<(&mut game::player::Player, &mut Transform), Without<Crosshair>>,
+    crosshairs: Query<(&Transform, &Crosshair)>,
+    // mut ui_items: Query<(&mut UIItem, &mut Transform), Without<Crosshair>>,
+){
+    //reset the player to the crosshair position
+    let cs = crosshairs.single().0.clone();
+    for (mut player, mut t) in players.iter_mut() {
+        game::player::move_player_to_cursor(cs, &mut t);
+        player.velocity = Vec2::new(0.0, 0.0);
+    }
+
+}
+
 fn draw_rect_placeholder(
     mut commands: Commands,
     spritesheet: Res<PlaceholderHandle>,
@@ -422,6 +454,8 @@ pub fn editor_plugin(app: &mut App) {
         .add_event::<BottomBarUpdate>()
         .add_event::<UpdatePlaceholderEvent>()
 
+        .add_event::<ResetScene>()
+
         //resources
         .init_resource::<EditorBottomBarDisplayed>()
         .init_resource::<EditorBottomBarMessage>()
@@ -454,7 +488,9 @@ pub fn editor_plugin(app: &mut App) {
         //universal update systems for all editing modes
         .add_systems(Update, stateful_keybinds.run_if(not(in_state(EditorState::Inactive))))
         .add_systems(Update, draw_grid.run_if(in_state(ShowGrid::Yes)))
-        .add_systems(Update, ui::trigger_placeholder_update);
-    //placeholder resource for whatever tile we are trying to place
+        .add_systems(Update, ui::trigger_placeholder_update)
+        
+        .add_systems(Update, (reset_scene).chain().run_if(on_event::<ResetScene>));
+
 }
 //NOTHING BELOW THE PLUGINS >:(

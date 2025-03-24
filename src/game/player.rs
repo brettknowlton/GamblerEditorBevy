@@ -56,6 +56,11 @@ pub fn player_physics(
     }
 }
 
+pub fn move_player_to_cursor(cursor_transform: Transform, player_transform: &mut Transform) {
+    //since everything is anchored bottom left, we will need to adjust the player's position to be centered on the cursor
+    player_transform.translation = cursor_transform.translation + Vec3::new(-(SCALED_PLAYER_WIDTH as f32) / 2., -(SCALED_PLAYER_HEIGHT as f32) / 2., 0.0);
+    player_transform.translation.z = 1.0;
+}
 
 #[derive(Component, Debug)]
 pub struct Player {
