@@ -16,7 +16,7 @@ pub fn player_controls(
             
         }
         if keyboard_input.pressed(KeyCode::KeyS) {
-            continue;
+            player.on_ground = false;
         }
         if keyboard_input.pressed(KeyCode::KeyA) {
             player.velocity.x -= PLAYER_WALK_SPEED as f32;
@@ -133,8 +133,8 @@ pub fn do_player_collision(mut commands: Commands, mut players: Query<(Entity, &
         let player_rect = Rect::new(
             player_transform.translation.x + SCALED_PLAYER_WIDTH as f32 / 3.,
             player_transform.translation.y,
-            SCALED_PLAYER_WIDTH as f32 - SCALED_PLAYER_WIDTH as f32 / 3.,
-            SCALED_PLAYER_HEIGHT as f32 - SCALED_PLAYER_HEIGHT as f32 / 5.,
+            player_transform.translation.x + SCALED_PLAYER_WIDTH as f32 - SCALED_PLAYER_WIDTH as f32 / 3.,
+            player_transform.translation.y + SCALED_PLAYER_HEIGHT as f32 - SCALED_PLAYER_HEIGHT as f32 / 5.,
         );
         let mut collisions = Vec::new();
         for (_, _, collider_transform) in colliders.iter() {
@@ -157,27 +157,28 @@ pub fn do_player_collision(mut commands: Commands, mut players: Query<(Entity, &
             if intersection.width() > intersection.height() {
                 //player is colliding with the top or bottom of the collider
                 if player.velocity.y > 0.0 {
-                    //player is colliding with the bottom of the collider
-                    player_transform.translation.y = collider_rect.min.y - SCALED_PLAYER_HEIGHT as f32;
+                    //player is colliding with the bottom of the collider (jumping case)
+                    player_transform.translation.y = collider_rect.min.y - player_rect.height();
+                    player.velocity.y = 0.0;
                     player.acceleration.y = 0.0;
                 } else {
-                    //player is colliding with the bottom of the collider
+                    //player is colliding with the top of the collider (falling case)
                     player_transform.translation.y = collider_rect.max.y;
                     player.velocity.y = 0.0;
                     player.on_ground = true;
                 }
-            } //else {
-            //     //player is colliding with the left or right of the collider
-            //     if player.velocity.x > 0.0 {
-            //         //player is colliding with the left of the collider
-            //         player_transform.translation.x = collider_rect.max.x;
-            //         player.velocity.x = 0.0;
-            //     } else {
-            //         //player is colliding with the right of the collider
-            //         player_transform.translation.x = collider_rect.min.x - SCALED_PLAYER_WIDTH as f32;
-            //         player.velocity.x = 0.0;
-            //     }
-            // }
+            } else {
+                //player is colliding with the left or right of the collider (player moving right)
+                if player.velocity.x > 0.0 {
+                    //player is colliding with the left of the collider
+                    player_transform.translation.x = collider_rect.min.x- player_rect.width() + SCALED_PLAYER_WIDTH as f32 / 3.;
+                    player.velocity.x = 0.0;
+                } else {
+                    //player is colliding with the right of the collider (player moving left)
+                    player_transform.translation.x = collider_rect.max.x - SCALED_PLAYER_WIDTH as f32 / 3.;
+                    player.velocity.x = 0.0;
+                }
+            }
         }
 
         );

@@ -76,7 +76,7 @@ pub fn create_tilemode_ui(
             ..default()
         },
         Transform {
-            translation: Vec3::new(ui_x_off, ui_y_off, 0.0),
+            translation: Vec3::new(ui_x_off, ui_y_off, UI_Z_LAYER),
             ..default()
         },
         UIItem {
@@ -105,7 +105,7 @@ pub fn create_tilemode_ui(
         },
         Transform {
             translation: Vec3::new(ui_x_off + UI_BORDER_PX, (ui_panel_height / 2.) - DEFAULT_TEXT_HEIGHT, -0.01),
-            scale: Vec3::new(1.0, 1.0, 0.0),
+            scale: Vec3::new(1.0, 1.0, UI_Z_LAYER + 0.1),
             ..default()
         },
     ));

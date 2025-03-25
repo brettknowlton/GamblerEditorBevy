@@ -32,7 +32,9 @@ pub fn game_plugin(app: &mut App) {
             (game_keybinds, player::player_controls, player::player_physics, player::do_player_collision,)
                 .chain()
                 .run_if(in_state(GameState::Running)),
-        );
+        )
+        .add_systems(Update, player_camera.run_if(in_state(GameState::Running)));
+
     // .add_systems(
     //     OnEnter(GameState::Loading),
     //     ().chain()
@@ -53,7 +55,20 @@ fn game_keybinds(
     }
 }
 
+fn player_camera(
+    mut query: Query<(&player::Player, &Transform), Without<Camera>>,
+    mut camera_query: Query<(&Camera, &mut Transform)>,
+) {
+    for (_, player_transform) in query.iter() {
+        for (_, mut camera_transform) in camera_query.iter_mut() {
+            //since everything is anchored bottom left, we will need to adjust the camera's position to be centered on the player
+            let mut transform_difference = player_transform.translation - camera_transform.translation;
+            transform_difference.z = 0.0;
+            camera_transform.translation += transform_difference;
 
+        }
+    }
+}
 
 
 

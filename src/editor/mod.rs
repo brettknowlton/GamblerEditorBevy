@@ -1,5 +1,6 @@
 #[macro_use]
 pub mod ui;
+use bevy::render::camera;
 use bevy::utils::tracing::event;
 use selection::ActiveSelection;
 use selection::SelectionRect;
@@ -401,15 +402,22 @@ impl EditorObject {
 }
 
 fn reset_scene(
-    mut players: Query<(&mut game::player::Player, &mut Transform), Without<Crosshair>>,
-    crosshairs: Query<(&Transform, &Crosshair)>,
+    mut players: Query<(&mut game::player::Player, &mut Transform), (Without<Crosshair>, Without<Camera2d>)>,
+    mut cameras: Query<(&mut Transform, &mut Camera2d), Without<Crosshair>>,
+    crosshairs: Query<(&Transform), (With<Crosshair>, Without<Camera2d>)>,
     // mut ui_items: Query<(&mut UIItem, &mut Transform), Without<Crosshair>>,
 ){
     //reset the player to the crosshair position
-    let cs = crosshairs.single().0.clone();
+    let cs = crosshairs.single().clone();
     for (mut player, mut t) in players.iter_mut() {
         game::player::move_player_to_cursor(cs, &mut t);
         player.velocity = Vec2::new(0.0, 0.0);
+    }
+
+    //reset the camera to the crosshair position
+    let cs = crosshairs.single().clone();
+    for (mut t, _) in cameras.iter_mut() {
+        t.translation = cs.translation;
     }
 
 }
