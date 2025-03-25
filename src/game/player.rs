@@ -171,7 +171,7 @@ pub fn do_player_collision(mut commands: Commands, mut players: Query<(Entity, &
                 //player is colliding with the left or right of the collider (player moving right)
                 if player.velocity.x > 0.0 {
                     //player is colliding with the left of the collider
-                    player_transform.translation.x = collider_rect.min.x- player_rect.width() + SCALED_PLAYER_WIDTH as f32 / 3.;
+                    player_transform.translation.x = collider_rect.min.x - SCALED_PLAYER_WIDTH as f32 / 3.;
                     player.velocity.x = 0.0;
                 } else {
                     //player is colliding with the right of the collider (player moving left)
