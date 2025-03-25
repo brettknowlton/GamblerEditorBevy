@@ -1,9 +1,10 @@
+use super::editor::collider::*;
 use super::editor::*;
 use super::utilities::*;
-use super::editor::collider::*;
 use std::path::PathBuf;
 
 use bevy::prelude::*;
+use bevy::transform;
 
 pub mod player;
 
@@ -29,7 +30,12 @@ pub fn game_plugin(app: &mut App) {
         )
         .add_systems(
             FixedUpdate,
-            (game_keybinds, player::player_controls, player::player_physics, player::do_player_collision,)
+            (
+                game_keybinds,
+                player::player_controls,
+                player::player_physics,
+                player::do_player_collision,
+            )
                 .chain()
                 .run_if(in_state(GameState::Running)),
         )
@@ -56,22 +62,20 @@ fn game_keybinds(
 }
 
 fn player_camera(
-    mut query: Query<(&player::Player, &Transform), Without<Camera>>,
-    mut camera_query: Query<(&Camera, &mut Transform)>,
+    mut players: Query<(&player::Player, &Transform), Without<Camera>>,
+    mut camera_query: Query<(&mut Camera, &mut Transform)>,
 ) {
-    for (_, player_transform) in query.iter() {
-        for (_, mut camera_transform) in camera_query.iter_mut() {
-            //since everything is anchored bottom left, we will need to adjust the camera's position to be centered on the player
-            let mut transform_difference = player_transform.translation - camera_transform.translation;
-            transform_difference.z = 0.0;
-            camera_transform.translation += transform_difference;
+    for (_, player_t) in players.iter() {
+        for (_, mut t) in camera_query.iter_mut() {
+            let mut new_t = player_t.clone();
+            new_t.translation.z = t.translation.z;
+            new_t.translation.x += SCALED_PLAYER_WIDTH as f32 / 2.;
+            new_t.translation.y += SCALED_PLAYER_HEIGHT as f32 / 2.;
 
+            t.translation = new_t.translation;
         }
     }
 }
-
-
-
 
 #[derive(States, Clone, Copy, Debug, Eq, PartialEq, Hash)]
 pub enum PlayerState {

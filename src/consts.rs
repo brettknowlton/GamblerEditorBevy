@@ -10,20 +10,29 @@ pub const WINDOW_TITLE2: &str = "GamblerEditor";
 //Default color that the background will be replaced by if nothing is being rendered
 pub const WINDOW_DEFAULT_BACKGROUND_COLOR: Srgba = Srgba::new(0.31, 0.643, 0.722, 1.0);
 
+pub const DEFAULT_GENERAL_SCALE_FACTOR: u32 = 2;
+
 pub const ZONE_SIZE: u32 = 16; //width/height of a zone in tiles
 
 pub const PLAYER_SIZE_X: u32 = 72;
 pub const PLAYER_SIZE_Y: u32 = 90;
-pub const PLAYER_SCALE: u32 = 2;
-
-pub const PLAYER_WALK_SPEED: u32 = 1;
-pub const MAX_PLAYER_WALK_SPEED: u32 = 10;
-pub const PLAYER_JUMP_FORCE: u32 = 20;
+pub const PLAYER_SCALE: u32 = DEFAULT_GENERAL_SCALE_FACTOR;
 
 pub const SCALED_PLAYER_WIDTH: u32 = PLAYER_SIZE_X * PLAYER_SCALE;
 pub const SCALED_PLAYER_HEIGHT: u32 = PLAYER_SIZE_Y * PLAYER_SCALE;
 
-pub const TILE_SCALE: u32 = PLAYER_SCALE; //scale factor of tiles
+pub const PLAYER_HB_X_OFFSET: u32 = SCALED_PLAYER_WIDTH / 3;
+pub const PLAYER_HB_Y_OFFSET: u32 = SCALED_PLAYER_HEIGHT / 3;
+
+pub const PLAYER_WALK_SPEED: u32 = 1;
+pub const MAX_PLAYER_WALK_SPEED: u32 = 10;
+pub const PLAYER_JUMP_FORCE: u32 = 22;
+
+
+
+
+
+pub const TILE_SCALE: u32 = DEFAULT_GENERAL_SCALE_FACTOR; //scale factor of tiles
 pub const TILE_SIZE: u32 = 32; //number of pixels wide the tile source image is
 
 pub const SCALED_TILE_WIDTH: u32 = TILE_SIZE * TILE_SCALE;

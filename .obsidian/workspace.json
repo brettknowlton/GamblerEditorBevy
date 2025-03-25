@@ -11,17 +11,14 @@
             "id": "5164161d9a27d8a0",
             "type": "leaf",
             "state": {
-              "type": "canvas",
+              "type": "markdown",
               "state": {
-                "file": "planning/Planning Canvas.canvas",
-                "viewState": {
-                  "x": 3850.562007245259,
-                  "y": -1480.2843913625597,
-                  "zoom": -1.3336077520720173
-                }
+                "file": "planning/Credits.md",
+                "mode": "source",
+                "source": false
               },
-              "icon": "lucide-layout-dashboard",
-              "title": "Planning Canvas"
+              "icon": "lucide-file",
+              "title": "Credits"
             }
           }
         ]
@@ -165,21 +162,22 @@
   },
   "active": "5164161d9a27d8a0",
   "lastOpenFiles": [
+    "planning/Descriptions -thx gpt.md",
+    "planning/Credits.md",
     "target/debug/deps/gambler_bevy-611733eab0f9239a",
-    "target/debug/incremental/gambler_bevy-21uphrpt9fkq9/s-h5n13iugwe-07rgpoz-1joxj2hrkypacf4z7qe715hov/work-products.bin",
-    "target/debug/incremental/gambler_bevy-21uphrpt9fkq9/s-h5n13iugwe-07rgpoz-1joxj2hrkypacf4z7qe715hov/query-cache.bin",
-    "target/debug/incremental/gambler_bevy-21uphrpt9fkq9/s-h5n13iugwe-07rgpoz-1joxj2hrkypacf4z7qe715hov/f56lgli2h7x614a5sb7m3v6g6.o",
-    "target/debug/incremental/gambler_bevy-21uphrpt9fkq9/s-h5n13iugwe-07rgpoz-1joxj2hrkypacf4z7qe715hov/f1bo7cvlzbkor8wzfmlh7ebtt.o",
-    "target/debug/incremental/gambler_bevy-21uphrpt9fkq9/s-h5n13iugwe-07rgpoz-1joxj2hrkypacf4z7qe715hov/f0zzz1inyfbdd5arjhrpm3ngn.o",
-    "target/debug/incremental/gambler_bevy-21uphrpt9fkq9/s-h5n13iugwe-07rgpoz-1joxj2hrkypacf4z7qe715hov/eykwr24ccekf1w19s340016d6.o",
-    "target/debug/incremental/gambler_bevy-21uphrpt9fkq9/s-h5n13iugwe-07rgpoz-1joxj2hrkypacf4z7qe715hov/eufxi3th0lqtzjxm909j2sq5p.o",
-    "target/debug/incremental/gambler_bevy-21uphrpt9fkq9/s-h5n13iugwe-07rgpoz-1joxj2hrkypacf4z7qe715hov/etns89vljjk7sb36ns9ijihru.o",
-    "target/debug/incremental/gambler_bevy-21uphrpt9fkq9/s-h5n13iugwe-07rgpoz-1joxj2hrkypacf4z7qe715hov/enrzl434xhy2c6izk8ugcf5a0.o",
-    "target/debug/incremental/gambler_bevy-21uphrpt9fkq9/s-h5n13iugwe-07rgpoz-1joxj2hrkypacf4z7qe715hov/enjjcu1vr4cxvbc98k1j733tx.o",
+    "target/debug/incremental/gambler_bevy-21uphrpt9fkq9/s-h5thujczdy-17ec8ob-4b15wo3snzr1luekwr4qt8wcg/work-products.bin",
+    "target/debug/incremental/gambler_bevy-21uphrpt9fkq9/s-h5thujczdy-17ec8ob-4b15wo3snzr1luekwr4qt8wcg/query-cache.bin",
+    "target/debug/incremental/gambler_bevy-21uphrpt9fkq9/s-h5thujczdy-17ec8ob-4b15wo3snzr1luekwr4qt8wcg/f56lgli2h7x614a5sb7m3v6g6.o",
+    "target/debug/incremental/gambler_bevy-21uphrpt9fkq9/s-h5thujczdy-17ec8ob-4b15wo3snzr1luekwr4qt8wcg/f1bo7cvlzbkor8wzfmlh7ebtt.o",
+    "target/debug/incremental/gambler_bevy-21uphrpt9fkq9/s-h5thujczdy-17ec8ob-4b15wo3snzr1luekwr4qt8wcg/f0zzz1inyfbdd5arjhrpm3ngn.o",
+    "target/debug/incremental/gambler_bevy-21uphrpt9fkq9/s-h5thujczdy-17ec8ob-4b15wo3snzr1luekwr4qt8wcg/eztej6w3xfssckyyapy5f1iti.o",
+    "target/debug/incremental/gambler_bevy-21uphrpt9fkq9/s-h5thujczdy-17ec8ob-4b15wo3snzr1luekwr4qt8wcg/eykwr24ccekf1w19s340016d6.o",
+    "target/debug/incremental/gambler_bevy-21uphrpt9fkq9/s-h5thujczdy-17ec8ob-4b15wo3snzr1luekwr4qt8wcg/eufxi3th0lqtzjxm909j2sq5p.o",
+    "target/debug/incremental/gambler_bevy-21uphrpt9fkq9/s-h5thujczdy-17ec8ob-4b15wo3snzr1luekwr4qt8wcg/etns89vljjk7sb36ns9ijihru.o",
+    "planning/Planning Canvas.canvas",
     "assets/textures/player/PlayerHD.png",
     "assets/textures/player/PlayerLD.png",
     "planning/To-Do's.md",
-    "planning/Planning Canvas.canvas",
     "planning/Art/Art.md",
     "planning/Art/Player/Player Concept Art.md",
     "planning/Art/Cards/Card Concept Art.md",

@@ -130,11 +130,13 @@ pub fn spawn_player(mut commands: Commands, asset_server: Res<AssetServer>) {
 
 pub fn do_player_collision(mut commands: Commands, mut players: Query<(Entity, &mut Player, &mut Transform)>, colliders: Query<(Entity, &Collider, &Transform), Without<Player>>) {
     for (_, mut player, mut player_transform) in players.iter_mut() {
+
+
         let player_rect = Rect::new(
-            player_transform.translation.x + SCALED_PLAYER_WIDTH as f32 / 3.,
+            player_transform.translation.x + PLAYER_HB_X_OFFSET as f32,
             player_transform.translation.y,
-            player_transform.translation.x + SCALED_PLAYER_WIDTH as f32 - SCALED_PLAYER_WIDTH as f32 / 3.,
-            player_transform.translation.y + SCALED_PLAYER_HEIGHT as f32 - SCALED_PLAYER_HEIGHT as f32 / 5.,
+            player_transform.translation.x + SCALED_PLAYER_WIDTH as f32 - PLAYER_HB_X_OFFSET as f32,
+            player_transform.translation.y + (SCALED_PLAYER_HEIGHT - PLAYER_HB_Y_OFFSET) as f32,
         );
         let mut collisions = Vec::new();
         for (_, _, collider_transform) in colliders.iter() {
@@ -161,21 +163,25 @@ pub fn do_player_collision(mut commands: Commands, mut players: Query<(Entity, &
                     player_transform.translation.y = collider_rect.min.y - player_rect.height();
                     player.velocity.y = 0.0;
                     player.acceleration.y = 0.0;
-                } else {
+                }
+                if player.velocity.y < 0.0 {
                     //player is colliding with the top of the collider (falling case)
                     player_transform.translation.y = collider_rect.max.y;
                     player.velocity.y = 0.0;
                     player.on_ground = true;
                 }
-            } else {
-                //player is colliding with the left or right of the collider (player moving right)
+            }
+            
+            if intersection.width() < intersection.height() {
+                //player is colliding with the left or right of the collider 
                 if player.velocity.x > 0.0 {
-                    //player is colliding with the left of the collider
-                    player_transform.translation.x = collider_rect.min.x - SCALED_PLAYER_WIDTH as f32 / 3.;
+                    //player is colliding with the left of the collider (player moving right)
+                    player_transform.translation.x = collider_rect.min.x - SCALED_PLAYER_WIDTH as f32 + PLAYER_HB_X_OFFSET as f32;
                     player.velocity.x = 0.0;
-                } else {
+                }
+                if player.velocity.x < 0.0 {
                     //player is colliding with the right of the collider (player moving left)
-                    player_transform.translation.x = collider_rect.max.x - SCALED_PLAYER_WIDTH as f32 / 3.;
+                    player_transform.translation.x = collider_rect.max.x - PLAYER_HB_X_OFFSET as f32;
                     player.velocity.x = 0.0;
                 }
             }
