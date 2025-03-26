@@ -8,7 +8,6 @@ use crate::{ utilities::*, EditorObject, TILE_SIZE };
 use crate::consts::*;
 use super::*;
 
-use ui::*;
 
 
 fn load_spritesheet(asset_server: Res<AssetServer>, mut message_queue: ResMut<EditorBottomBarQueuedMessages>, mut textures: ResMut<TextureHandles>) {
@@ -30,7 +29,6 @@ fn tilemode_keybinds(
     tiles: Query<(Entity, &EditorObject), With<Tile>>,
     gridsnap: Res<State<GridSnap>>,
     mut selected_tile_id: ResMut<SelectedTileID>,
-    mut needs_update: ResMut<TileUpdateNeeded>,
 
     mut placeholder_update_ev: EventWriter<UpdatePlaceholderEvent>
 

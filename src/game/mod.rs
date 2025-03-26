@@ -1,10 +1,7 @@
 use super::editor::collider::*;
 use super::editor::*;
-use super::utilities::*;
-use std::path::PathBuf;
 
 use bevy::prelude::*;
-use bevy::transform;
 
 pub mod player;
 
@@ -62,7 +59,7 @@ fn game_keybinds(
 }
 
 fn player_camera(
-    mut players: Query<(&player::Player, &Transform), Without<Camera>>,
+    players: Query<(&player::Player, &Transform), Without<Camera>>,
     mut camera_query: Query<(&mut Camera, &mut Transform)>,
 ) {
     for (_, player_t) in players.iter() {
@@ -97,15 +94,15 @@ pub enum Direction {
 
 #[derive(Component, Debug)]
 pub struct AnimationDef {
-    frame_size: Vec2,
-    layout: Vec2, //(rows, columns), ie # of frames in each direction of the spritesheet a 3x4 spritesheet would be (3, 4)
+    pub frame_size: Vec2,
+    pub layout: Vec2, //(rows, columns), ie # of frames in each direction of the spritesheet a 3x4 spritesheet would be (3, 4)
     pub frame_count: u32, //total number of frames in the animation
     pub frame_duration: f32,
     pub current_frame: u32,
     pub frame_timer: f32,
 }
 
-fn load_save_data(mut commands: Commands, asset_server: Res<AssetServer>) {
+fn load_save_data(_commands: Commands, _asset_server: Res<AssetServer>) {
     // let save_data = asset_server.load("save_data.json");
     // commands.insert_resource(SaveData(save_data));
     println!("you will be loading save data in this funciton... ");

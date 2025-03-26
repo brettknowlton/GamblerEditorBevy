@@ -1,5 +1,3 @@
-use bevy::asset;
-
 use super::*;
 
 pub fn spawn_tile_placeholder(
@@ -41,7 +39,6 @@ pub fn create_tilemode_ui(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
     crosshairs: Query<(&Transform, &Crosshair)>,
-    tilesheet_handle: Res<PlaceholderHandle>,
     textures: Res<TextureHandles>
 ) {
     //offsets to make UI appear in the top left corner of the screen while still being anchored to the crosshair location

@@ -1,0 +1,20 @@
+{
+	"nodes":[
+		{"id":"e91f096de9fa7054","x":-600,"y":80,"width":455,"height":116,"type":"file","file":"Intro.md"},
+		{"id":"62ed187bd3a2097f","x":-558,"y":-840,"width":438,"height":300,"color":"3","type":"file","file":"Torat Clan Intro.md"},
+		{"id":"62fd7d26dc2bb7f5","x":-464,"y":-300,"width":250,"height":60,"type":"text","text":"Character Creation Day"},
+		{"id":"2f2be1fb90d6595b","x":-179,"y":-180,"width":339,"height":60,"type":"text","text":"Torat's discover the Runes"},
+		{"id":"6d3e85ad4d29f5d4","x":-179,"y":-120,"width":339,"height":60,"type":"text","text":"Torats are not all in agreement on how to approach immortality"},
+		{"id":"01fd0d2736e1d2c4","x":-340,"y":196,"width":400,"height":94,"type":"text","text":"Gaia leaves camp at night towards ressurection cave known to house a rune"},
+		{"id":"2fc5c0e7bdd1e82f","x":-280,"y":-520,"width":408,"height":91,"type":"text","text":"Great rot is taking over the world and causing great distabilization"},
+		{"id":"bb8db2610e794bd8","x":255,"y":-228,"width":250,"height":60,"type":"text","text":"Runes grant immortality"},
+		{"id":"7e30400eb3a8f860","x":-740,"y":-520,"width":342,"height":91,"type":"text","text":"The Grand west stands as a last bastion of hope but is very taboo"},
+		{"id":"e5b92a8548f7eb00","x":-840,"y":196,"width":399,"height":90,"type":"text","text":"Player enter ressurection cave to find Gaia"},
+		{"id":"c6cc10bc7a580a85","x":-600,"y":420,"width":385,"height":121,"type":"text","text":"Players encounter Gaia as she is trying to touch the last rune"},
+		{"id":"0524a0ae9909f213","x":-532,"y":700,"width":250,"height":60,"type":"text","text":"Gaia touches the rune"},
+		{"id":"78d11ca324ff3fea","x":-532,"y":880,"width":250,"height":80,"type":"text","text":"All players are knocked unconcious"}
+	],
+	"edges":[
+		{"id":"c17d725b5a9a0dc6","fromNode":"62ed187bd3a2097f","fromSide":"bottom","toNode":"62fd7d26dc2bb7f5","toSide":"top"}
+	]
+}

@@ -169,60 +169,34 @@ pub fn trigger_placeholder_update(
     mut commands: Commands,
 
     state: ResMut<State<EditorState>>,
-    mut placeholder: ResMut<PlaceholderHandle>,
-    textures: Res<TextureHandles>,
+    placeholder: ResMut<PlaceholderHandle>,
 
-    crosshairs: Query<(&Crosshair, &Transform)>,
+    // crosshairs: Query<(&Crosshair, &Transform)>,
     placeholders: Query<(Entity, &PlaceholderObjectTag)>,
 ) {
     for e in ev.read() {
         println!("Placeholder Update Event Triggered");
-        let m = match state.get() {
+        match state.get() {
             EditorState::Editing(EditingComponent::Tile) => { 't' }
-            // EditorState::Editing(EditingComponent::Collider) => { 'c' }
+            EditorState::Editing(EditingComponent::Collider) => { 'c' }
             _ => {
                 '_' //blank here as a fallback to cause a panic
             }
         };
 
-        let t = crosshairs.single().1.clone();
         //update the placeholder object's texture rect to align with the rect given by the event
         for ent in placeholders.iter() {
             commands.entity(ent.0).insert(
-                (
-                    Sprite {
-                        image: placeholder.0.clone(),
-                        rect: Some(Rect {
-                            min: Vec2::new(e.rect.min.x, e.rect.min.y),
-                            max: Vec2::new(e.rect.max.x, e.rect.max.y),
-                        }),
-                        ..default()
-                    }
-                )
+                Sprite {
+                    image: placeholder.0.clone(),
+                    rect: Some(Rect {
+                        min: Vec2::new(e.rect.min.x, e.rect.min.y),
+                        max: Vec2::new(e.rect.max.x, e.rect.max.y),
+                    }),
+                    ..default()
+                }
             );
         }
-
-
-        // commands.spawn((
-        //     T::default(),
-        //     Sprite {
-        //         image: placeholder.0.clone(),
-        //         rect: Some(Rect {
-        //             min: Vec2::new(0.0, 0.0),
-        //             max: Vec2::new(TILE_SIZE as f32, TILE_SIZE as f32),
-        //         }),
-        //         ..default()
-        //     },
-        //     Transform {
-        //         translation: Vec3::new(t.translation.x, t.translation.y, UI_Z_LAYER),
-        //         ..default()
-        //     },
-        //     UIItem {
-        //         ..default()
-        //     },
-        //     ui::NormalModeUI, // give it normalModeUI so it will just be destroyed when we exit normalMode
-        //     PlaceholderObjectTag, //tag it as a placeholder object so we can delete it when we switch from this mode.
-        // ));
     }
 }
 

@@ -1,7 +1,5 @@
 #[macro_use]
 pub mod ui;
-use bevy::render::camera;
-use bevy::utils::tracing::event;
 use selection::ActiveSelection;
 use selection::SelectionRect;
 pub use ui::*;
@@ -133,7 +131,7 @@ fn stateful_keybinds(
     mut message_queue: ResMut<EditorBottomBarQueuedMessages>,
     // m_input: Res<ButtonInput<MouseButton>>,
     mut crosshairs: Query<(&mut Crosshair, &mut Transform, &mut Sprite), Without<Camera2d>>,
-    mut active_selection: ResMut<PlaceholderHandle>,
+    // mut active_selection: ResMut<PlaceholderHandle>,
     mut uiitems: Query<(&mut UIItem, &mut Transform), (Without<Camera2d>, Without<Crosshair>)>,
     mut cameras: Query<(&mut UIItem, &mut Transform, &mut Camera2d)>,
     mut event_writer: EventWriter<ResetScene>,
@@ -208,8 +206,7 @@ fn stateful_keybinds(
     //O is the main button to directly use the Rectangle Tool
     if input.just_pressed(KeyCode::KeyO) {
         //use crosshair's coordinate as start
-        let (_, t, _) = crosshairs.single();
-        let coord = Coordinate { 0: t.translation.x as i64, 1: t.translation.y as i64 };
+        let (_, _, _) = crosshairs.single();
 
         // active_selection.selection_rect = Some(selection::SelectionRect::start(coord));
 
@@ -217,7 +214,7 @@ fn stateful_keybinds(
     } else if input.just_released(KeyCode::KeyO) {
         //use crosshair's coordinate as end
         let (_, t, _) = crosshairs.single();
-        let coord = Coordinate { 0: t.translation.x as i64, 1: t.translation.y as i64 };
+        let _ = Coordinate { 0: t.translation.x as i64, 1: t.translation.y as i64 };
 
         // active_selection.selection_rect = active_selection.selection_rect.clone().map(|mut r| {
         //     r.end(coord);
@@ -404,7 +401,7 @@ impl EditorObject {
 fn reset_scene(
     mut players: Query<(&mut game::player::Player, &mut Transform), (Without<Crosshair>, Without<Camera2d>)>,
     mut cameras: Query<(&mut Transform, &mut Camera2d), Without<Crosshair>>,
-    crosshairs: Query<(&Transform), (With<Crosshair>, Without<Camera2d>)>,
+    crosshairs: Query<&Transform, (With<Crosshair>, Without<Camera2d>)>,
     // mut ui_items: Query<(&mut UIItem, &mut Transform), Without<Crosshair>>,
 ){
     //reset the player to the crosshair position
@@ -420,14 +417,6 @@ fn reset_scene(
         t.translation = cs.translation;
     }
 
-}
-
-fn draw_rect_placeholder(
-    mut commands: Commands,
-    spritesheet: Res<PlaceholderHandle>,
-    crosshairs: Query<(&Transform, &Crosshair)>
-) {
-    let (t, _) = crosshairs.single();
 }
 
 fn draw_grid(mut gizmos: Gizmos) {
@@ -486,7 +475,7 @@ pub fn editor_plugin(app: &mut App) {
         //on entrance to this state, we give our placeholder object a handle to the default SignificantComponent of this mode- in normal mode this is a SelectionRect
         .add_systems(
             OnEnter(EditorState::Normal),
-            (ui::update_placeholder::<SelectionRect>, draw_rect_placeholder).chain()
+            (ui::update_placeholder::<SelectionRect>).chain()
         )
 
 

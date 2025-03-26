@@ -5,7 +5,7 @@ pub fn player_controls(
     keyboard_input: Res<ButtonInput<KeyCode>>,
     mut query: Query<(&mut Player, &mut Transform)>,
 ) {
-    for (mut player, mut transform) in query.iter_mut() {
+    for (mut player, _) in query.iter_mut() {
         if keyboard_input.just_pressed(KeyCode::KeyW) {
             
             if player.on_ground == true {
@@ -128,7 +128,7 @@ pub fn spawn_player(mut commands: Commands, asset_server: Res<AssetServer>) {
     ));
 }
 
-pub fn do_player_collision(mut commands: Commands, mut players: Query<(Entity, &mut Player, &mut Transform)>, colliders: Query<(Entity, &Collider, &Transform), Without<Player>>) {
+pub fn do_player_collision(mut players: Query<(Entity, &mut Player, &mut Transform)>, colliders: Query<(Entity, &Collider, &Transform), Without<Player>>) {
     for (_, mut player, mut player_transform) in players.iter_mut() {
 
 

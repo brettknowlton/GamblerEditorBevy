@@ -21,7 +21,7 @@ fn load_scene(mut commands: Commands, asset_server: Res<AssetServer>) {
     commands.spawn(DynamicSceneRoot(asset_server.load(format!("{DEFAULT_SCENE_PATH}.ron"))));
 }
 
-fn spawn_sprites(mut tiles: Query<(Entity, &mut EditorObject), Without<Sprite>>, mut commands: Commands, spritesheets: Res<TextureHandles>, asset_server: Res<AssetServer>){
+fn spawn_sprites(mut tiles: Query<(Entity, &mut EditorObject), Without<Sprite>>, mut commands: Commands, spritesheets: Res<TextureHandles>){
     //spawn the sprites for each tile, use the editorObject's tcoords to determine the sprite's position
     //if the EditorObject has a tcoord beginning with 'T'
     for (entity, eo) in tiles.iter_mut() {
