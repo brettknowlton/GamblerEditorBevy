@@ -24,18 +24,15 @@ pub fn send_messages(
             Some((k, m)) => {
                 let k = k.unwrap_or('i');
                 println!("{}:> {}", k, m);
-
-                let (_, mut t) = display_message.single_mut();
-                **t = format!(":]>{m}");
             }
             None => {}
         }
     }
 
-    // if let Some((_, message)) = queued_messages.messages.first() {
-    //     let (_, mut t) = display_message.single_mut();
-    //     **t = format!("{message}",);
-    // }
+    if let Some((_, message)) = queued_messages.messages.first() {
+        let (_, mut t) = display_message.single_mut();
+        **t = format!("{message}",);
+    }
 }
 
 ///Systems can be added for this comonent to keep all UI items moving at the same speed, and therefore always relatively positioned to eachother.

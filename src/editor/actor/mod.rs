@@ -88,13 +88,13 @@ pub fn actor_mode_keybinds(
         let def_actor_id = Actor::new().internal_type;
 
         let to_place = EditorObject {
-            coordinate: TCoordinate::new('t', coord),
+            coordinate: TCoordinate::new('a', coord),
             internal_type: def_actor_id as u64,
-            zone_id: TCoordinate::new('f', Coordinate{0: coord.0 / ZONE_SIZE as i64, 1: coord.1 / ZONE_SIZE as i64}),
+            zone_id: TCoordinate::new('a', Coordinate{0: coord.0 / ZONE_SIZE as i64, 1: coord.1 / ZONE_SIZE as i64}),
         };
 
         //place the tile using our SignificantComponent trait
-        Actor::place(&mut commands, to_place, 't', coord, &actors);
+        Actor::place(&mut commands, to_place, 'a', coord, &actors);
         send_message!(Some('i'), message_queue, format!("Placed actor at: ({}, {})", coord.0, coord.1));
     }
 
