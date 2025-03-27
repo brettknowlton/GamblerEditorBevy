@@ -28,7 +28,7 @@ pub fn game_plugin(app: &mut App) {
             (
                 game_keybinds,
                 actor::player::player_controls,
-                actor::player::player_physics,
+                // actor::player::player_physics,
                 // player::do_player_collision,
             )
                 .chain()

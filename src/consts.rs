@@ -14,12 +14,12 @@ pub const DEFAULT_GENERAL_SCALE_FACTOR: u32 = 2;
 
 pub const ZONE_SIZE: u32 = 16; //width/height of a zone in tiles
 
-pub const PLAYER_SIZE_X: u32 = 72;
-pub const PLAYER_SIZE_Y: u32 = 90;
-pub const PLAYER_SCALE: u32 = DEFAULT_GENERAL_SCALE_FACTOR;
+pub const PLAYER_SIZE_X: u32 = 72;//pixels wide the player source image
+pub const PLAYER_SIZE_Y: u32 = 90;//pixels tall the player source image
+pub const PLAYER_SCALE: u32 = DEFAULT_GENERAL_SCALE_FACTOR;//by default player has normal scaling
 
-pub const SCALED_PLAYER_WIDTH: u32 = PLAYER_SIZE_X * PLAYER_SCALE;
-pub const SCALED_PLAYER_HEIGHT: u32 = PLAYER_SIZE_Y * PLAYER_SCALE;
+pub const SCALED_PLAYER_WIDTH: u32 = PLAYER_SIZE_X * PLAYER_SCALE;//total pixel size the player width takes up IN GAME
+pub const SCALED_PLAYER_HEIGHT: u32 = PLAYER_SIZE_Y * PLAYER_SCALE;//total pixel size the player height takes up IN GAME
 
 pub const PLAYER_HB_X_OFFSET: u32 = SCALED_PLAYER_WIDTH / 3;
 pub const PLAYER_HB_Y_OFFSET: u32 = SCALED_PLAYER_HEIGHT / 3;
@@ -36,7 +36,7 @@ pub const TILE_SCALE: u32 = DEFAULT_GENERAL_SCALE_FACTOR; //scale factor of tile
 pub const TILE_SIZE: u32 = 32; //number of pixels wide the tile source image is
 
 pub const SCALED_TILE_WIDTH: u32 = TILE_SIZE * TILE_SCALE;
-pub const SCALED_TILE_HEIGHT: u32 = TILE_SIZE * TILE_SCALE;
+pub const SCALED_TILE_HEIGHT: u32 = SCALED_TILE_WIDTH;
 
 pub const UI_SCALE: f32 = 10.0; //a scale value we can use to scale UI elements
 pub const UI_Z_LAYER: f32 = 10.0; //z layer for UI elements, we can use this to make to relatively place UI elements correctly
@@ -63,7 +63,7 @@ pub const GRAVITY: f32 = 15.6;
 pub const FRICTION: f32 = 0.25;
 
 //Epsilon
-pub const EPSILON: f32 = 0.0001;
+pub const EPSILON: f32 = 0.0001;//A small value
 /*
 
 alright what the hell does this mean? im sure hyrum just said that in his head lol

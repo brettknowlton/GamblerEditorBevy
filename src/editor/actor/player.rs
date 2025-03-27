@@ -1,7 +1,6 @@
-use bevy_rapier2d::prelude::RigidBody;
+use bevy_rapier2d::prelude::{Collider, LockedAxes, Restitution, RigidBody};
 
 use super::*;
-
 
 pub fn player_controls(
     keyboard_input: Res<ButtonInput<KeyCode>>,
@@ -9,13 +8,11 @@ pub fn player_controls(
 ) {
     for (mut player, _, rb) in query.iter_mut() {
         if keyboard_input.just_pressed(KeyCode::KeyW) {
-            
             if player.on_ground == true {
                 player.velocity.y += PLAYER_JUMP_FORCE as f32;
                 // player.facing = Direction::Up;
                 player.on_ground = false;
             }
-            
         }
         if keyboard_input.pressed(KeyCode::KeyS) {
             player.on_ground = false;
@@ -31,39 +28,16 @@ pub fn player_controls(
     }
 }
 
-pub fn player_physics(
-    time: Res<Time>,
-    mut query: Query<(&mut Player, &mut Transform)>,
-){
+pub fn player_physics(time: Res<Time>, mut query: Query<(&mut Player, &mut Transform)>) {
     for (mut player, mut transform) in query.iter_mut() {
-
-        //apply gravity
-        player.velocity.y += player.acceleration.y - GRAVITY * time.delta_secs();
-        player.acceleration.y = 0.0;
-
-        player.velocity.x += player.acceleration.x;
-        player.acceleration.x = 0.0;
-
-        //apply friction
-        player.velocity.x *= 1.0 - FRICTION * time.delta_secs();
-        player.velocity.y *= 1.0 - FRICTION * time.delta_secs();
-
-        //clamp velocity
-        player.velocity.x = player.velocity.x.clamp(-(MAX_PLAYER_WALK_SPEED as f32), MAX_PLAYER_WALK_SPEED as f32);
-        player.velocity.y = player.velocity.y.clamp(-(MAX_PLAYER_WALK_SPEED as f32), MAX_PLAYER_WALK_SPEED as f32);
-
-        transform.translation += Vec3::new(player.velocity.x, player.velocity.y, 0.0);//appending player velocity to player position
-
         player.animate(time.delta_secs());
     }
 }
 
 pub fn move_player_to_cursor(cursor_transform: Transform, player_transform: &mut Transform) {
-    //since everything is anchored bottom left, we will need to adjust the player's position to be centered on the cursor
-    player_transform.translation = cursor_transform.translation + Vec3::new(-(SCALED_PLAYER_WIDTH as f32) / 2., -(SCALED_PLAYER_HEIGHT as f32) / 2., 0.0);
+    player_transform.translation = cursor_transform.translation;
     player_transform.translation.z = 1.0;
 }
-
 
 #[derive(Component, Debug, Reflect)]
 pub enum PlayerState {
@@ -85,8 +59,6 @@ pub struct AnimationDef {
     pub frame_timer: f32,
 }
 
-
-
 #[derive(Component, Debug, Reflect)]
 pub struct Player {
     pub state: PlayerState,
@@ -95,7 +67,6 @@ pub struct Player {
     pub on_ground: bool,
     pub velocity: Vec2,
     pub acceleration: Vec2,
-
 }
 
 impl Player {
@@ -131,22 +102,41 @@ impl Default for Player {
     }
 }
 
-pub fn spawn_player(mut commands: Commands, asset_server: Res<AssetServer>) {
+pub fn spawn_player(
+    mut commands: Commands,
+    asset_server: Res<AssetServer>,
+    crosshairs: Query<&Transform, With<Crosshair>>,
+) {
     println!("spawning player...");
     let path = PathBuf::from("textures/player/PlayerHD.png");
     let player_sprite = asset_server.load(path);
-    commands.spawn((
-        Player {
-            ..Default::default()
-        },
+    let mut ec = commands.spawn(
+        ((
+            Transform {
+                translation: Vec3::new(0.0, 100.0, 0.0),
+                scale: Vec3::new(PLAYER_SCALE as f32, PLAYER_SCALE as f32, 1.),
+                ..Default::default()
+            },
+            RigidBody::Dynamic,
+            Collider::cuboid(
+                ((PLAYER_SIZE_X) / 2 - (PLAYER_HB_X_OFFSET / 2)) as f32,
+                ((PLAYER_SIZE_Y) / 2 - (PLAYER_HB_Y_OFFSET / 4)) as f32,
+            ),
+            LockedAxes::ROTATION_LOCKED,
+            Restitution::coefficient(0.0),
+            Player {
+                ..Default::default()
+            },
+        )),
+    );
+    ec.with_child((
         Sprite {
             image: player_sprite,
-            anchor: bevy::sprite::Anchor::BottomLeft,
+            anchor: bevy::sprite::Anchor::Center,
             ..Default::default()
         },
         Transform {
-            translation: Vec3::new(0.0, 200.0, 1.),
-            scale: Vec3::new(TILE_SCALE as f32, TILE_SCALE as f32, 1.),
+            translation: Vec3::new(0.0, 0.0 + (PLAYER_HB_Y_OFFSET as f32 / 4.), 1.),
             ..Default::default()
         },
     ));

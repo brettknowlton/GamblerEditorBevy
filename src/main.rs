@@ -30,7 +30,7 @@ fn main() {
         )
 
         //Rapier physics plugins
-        .add_plugins(RapierPhysicsPlugin::<NoUserData>::pixels_per_meter(128.0))
+        .add_plugins(RapierPhysicsPlugin::<NoUserData>::pixels_per_meter(32.0))
         .add_plugins(RapierDebugRenderPlugin::default())
         .add_systems(Startup, setup_physics)
 

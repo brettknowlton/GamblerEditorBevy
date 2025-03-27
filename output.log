@@ -1,0 +1,695 @@
+18:52:22 [INFO] Guessed window scale factor: 1
+18:52:22 [INFO] perform;
+18:52:22 [INFO] authenticate;
+18:52:22 [INFO] write_command; command=Auth(Some(External), Some([49, 48, 48, 48]))
+18:52:22 [INFO] write_commands; commands=[Auth(Some(External), Some([49, 48, 48, 48]))] extra_bytes=None
+18:52:22 [INFO] read_command;
+18:52:22 [INFO] read_commands; n_commands=1
+18:52:22 [INFO] send_secondary_commands; challenge_response=None
+18:52:22 [INFO] write_commands; commands=[NegotiateUnixFD, Begin] extra_bytes=Some([108, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 109, 0, 0, 0, 1, 1, 111, 0, 21, 0, 0, 0, 47, 111, 114, 103, 47, 102, 114, 101, 101, 100, 101, 115, 107, 116, 111, 112, 47, 68, 66, 117, 115, 0, 0, 0, 3, 1, 115, 0, 5, 0, 0, 0, 72, 101, 108, 108, 111, 0, 0, 0, 6, 1, 115, 0, 20, 0, 0, 0, 111, 114, 103, 46, 102, 114, 101, 101, 100, 101, 115, 107, 116, 111, 112, 46, 68, 66, 117, 115, 0, 0, 0, 0, 2, 1, 115, 0, 20, 0, 0, 0, 111, 114, 103, 46, 102, 114, 101, 101, 100, 101, 115, 107, 116, 111, 112, 46, 68, 66, 117, 115, 0, 0, 0, 0])
+18:52:22 [INFO] receive_secondary_responses; expected_n_responses=1
+18:52:22 [INFO] read_commands; n_commands=1
+18:52:22 [INFO] new;
+18:52:22 [INFO] {}; task_name="org.a11y.Status proxy caching"
+18:52:22 [INFO] socket reader;
+18:52:22 [INFO] read_socket; self=SocketReader { socket: Async { source: Source { registration: 32, key: 0, state: Mutex { data: [Direction { tick: 1, ticks: Some((1, 0)), waker: None, wakers: Slab { len: 0, cap: 0 } }, Direction { tick: 0, ticks: None, waker: None, wakers: Slab { len: 0, cap: 0 } }], poisoned: false, .. } }, io: Some(UnixStream { fd: FileDesc(OwnedFd { fd: 32 }), local: (unnamed), peer: "/run/user/1000/bus" (pathname) }) }, senders: Mutex { data: {None: Sender { inner: RwLock { data: Inner { queue: [], capacity: 64, receiver_count: 0, inactive_receiver_count: 1, sender_count: 1, head_pos: 0, overflow: false, await_active: false, is_closed: false, send_ops: Event(<uninitialized>), recv_ops: Event(<uninitialized>) }, poisoned: false, .. } }, Some(OwnedMatchRule(MatchRule { msg_type: Some(Error), sender: None, interface: None, member: None, path_spec: None, destination: None, args: [], arg_paths: [], arg0ns: None })): Sender { inner: RwLock { data: Inner { queue: [], capacity: 8, receiver_count: 0, inactive_receiver_count: 1, sender_count: 2, head_pos: 0, overflow: false, await_active: false, is_closed: false, send_ops: Event(<uninitialized>), recv_ops: Event(<uninitialized>) }, poisoned: false, .. } }, Some(OwnedMatchRule(MatchRule { msg_type: Some(MethodReturn), sender: None, interface: None, member: None, path_spec: None, destination: None, args: [], arg_paths: [], arg0ns: None })): Sender { inner: RwLock { data: Inner { queue: [], capacity: 8, receiver_count: 0, inactive_receiver_count: 1, sender_count: 2, head_pos: 0, overflow: false, await_active: false, is_closed: false, send_ops: Event(<uninitialized>), recv_ops: Event(<uninitialized>) }, poisoned: false, .. } }} }, already_received_bytes: [108, 4, 1, 1, 12, 0, 0, 0, 255, 255, 255, 255, 143, 0, 0, 0, 7, 1, 115, 0, 20, 0, 0, 0, 111, 114, 103, 46, 102, 114, 101, 101, 100, 101, 115, 107, 116, 111, 112, 46, 68, 66, 117, 115, 0, 0, 0, 0, 6, 1, 115, 0, 7, 0, 0, 0, 58, 49, 46, 53, 57, 48, 50, 0, 1, 1, 111, 0, 21, 0, 0, 0, 47, 111, 114, 103, 47, 102, 114, 101, 101, 100, 101, 115, 107, 116, 111, 112, 47, 68, 66, 117, 115, 0, 0, 0, 2, 1, 115, 0, 20, 0, 0, 0, 111, 114, 103, 46, 102, 114, 101, 101, 100, 101, 115, 107, 116, 111, 112, 46, 68, 66, 117, 115, 0, 0, 0, 0, 3, 1, 115, 0, 12, 0, 0, 0, 78, 97, 109, 101, 65, 99, 113, 117, 105, 114, 101, 100, 0, 0, 0, 0, 8, 1, 103, 0, 1, 115, 0, 0, 7, 0, 0, 0, 58, 49, 46, 53, 57, 48, 50, 0], already_received_fds: [], prev_seq: 0, activity_event: Event(<uninitialized>) }
+18:52:22 [INFO] read_socket; self=SocketReader { socket: Async { source: Source { registration: 32, key: 0, state: Mutex { data: [Direction { tick: 1, ticks: Some((1, 0)), waker: None, wakers: Slab { len: 0, cap: 0 } }, Direction { tick: 0, ticks: None, waker: None, wakers: Slab { len: 0, cap: 0 } }], poisoned: false, .. } }, io: Some(UnixStream { fd: FileDesc(OwnedFd { fd: 32 }), local: (unnamed), peer: "/run/user/1000/bus" (pathname) }) }, senders: Mutex { data: {None: Sender { inner: RwLock { data: Inner { queue: [], capacity: 64, receiver_count: 0, inactive_receiver_count: 1, sender_count: 1, head_pos: 0, overflow: false, await_active: false, is_closed: false, send_ops: Event(<uninitialized>), recv_ops: Event(<uninitialized>) }, poisoned: false, .. } }, Some(OwnedMatchRule(MatchRule { msg_type: Some(Error), sender: None, interface: None, member: None, path_spec: None, destination: None, args: [], arg_paths: [], arg0ns: None })): Sender { inner: RwLock { data: Inner { queue: [], capacity: 8, receiver_count: 0, inactive_receiver_count: 1, sender_count: 2, head_pos: 0, overflow: false, await_active: false, is_closed: false, send_ops: Event(<uninitialized>), recv_ops: Event(<uninitialized>) }, poisoned: false, .. } }, Some(OwnedMatchRule(MatchRule { msg_type: Some(MethodReturn), sender: None, interface: None, member: None, path_spec: None, destination: None, args: [], arg_paths: [], arg0ns: None })): Sender { inner: RwLock { data: Inner { queue: [], capacity: 8, receiver_count: 0, inactive_receiver_count: 1, sender_count: 2, head_pos: 0, overflow: false, await_active: false, is_closed: false, send_ops: Event(<uninitialized>), recv_ops: Event(<uninitialized>) }, poisoned: false, .. } }} }, already_received_bytes: [], already_received_fds: [], prev_seq: 1, activity_event: Event { listeners_notified: 18446744073709551615, listeners_total: 0 } }
+18:52:22 [INFO] read_socket; self=SocketReader { socket: Async { source: Source { registration: 32, key: 0, state: Mutex { data: [Direction { tick: 2, ticks: Some((2, 1)), waker: None, wakers: Slab { len: 0, cap: 0 } }, Direction { tick: 0, ticks: None, waker: None, wakers: Slab { len: 0, cap: 0 } }], poisoned: false, .. } }, io: Some(UnixStream { fd: FileDesc(OwnedFd { fd: 32 }), local: (unnamed), peer: "/run/user/1000/bus" (pathname) }) }, senders: Mutex { data: {None: Sender { inner: RwLock { data: Inner { queue: [], capacity: 64, receiver_count: 0, inactive_receiver_count: 1, sender_count: 1, head_pos: 0, overflow: false, await_active: false, is_closed: false, send_ops: Event(<uninitialized>), recv_ops: Event(<uninitialized>) }, poisoned: false, .. } }, Some(OwnedMatchRule(MatchRule { msg_type: Some(Error), sender: None, interface: None, member: None, path_spec: None, destination: None, args: [], arg_paths: [], arg0ns: None })): Sender { inner: RwLock { data: Inner { queue: [(Ok(Msg { type: MethodReturn, serial: 4294967295, sender: UniqueName("org.freedesktop.DBus"), reply-serial: 2, body: Signature(""), fds: [] }), 1)], capacity: 8, receiver_count: 1, inactive_receiver_count: 1, sender_count: 2, head_pos: 0, overflow: false, await_active: false, is_closed: false, send_ops: Event { listeners_notified: 18446744073709551615, listeners_total: 0 }, recv_ops: Event { listeners_notified: 18446744073709551615, listeners_total: 1 } }, poisoned: false, .. } }, Some(OwnedMatchRule(MatchRule { msg_type: Some(MethodReturn), sender: None, interface: None, member: None, path_spec: None, destination: None, args: [], arg_paths: [], arg0ns: None })): Sender { inner: RwLock { data: Inner { queue: [(Ok(Msg { type: MethodReturn, serial: 4294967295, sender: UniqueName("org.freedesktop.DBus"), reply-serial: 2, body: Signature(""), fds: [] }), 1)], capacity: 8, receiver_count: 1, inactive_receiver_count: 1, sender_count: 2, head_pos: 0, overflow: false, await_active: false, is_closed: false, send_ops: Event { listeners_notified: 18446744073709551615, listeners_total: 0 }, recv_ops: Event { listeners_notified: 18446744073709551615, listeners_total: 1 } }, poisoned: false, .. } }} }, already_received_bytes: [], already_received_fds: [], prev_seq: 2, activity_event: Event { listeners_notified: 18446744073709551615, listeners_total: 0 } }
+18:52:22 [INFO] read_socket; self=SocketReader { socket: Async { source: Source { registration: 32, key: 0, state: Mutex { data: [Direction { tick: 3, ticks: Some((3, 2)), waker: None, wakers: Slab { len: 0, cap: 0 } }, Direction { tick: 0, ticks: None, waker: None, wakers: Slab { len: 0, cap: 0 } }], poisoned: false, .. } }, io: Some(UnixStream { fd: FileDesc(OwnedFd { fd: 32 }), local: (unnamed), peer: "/run/user/1000/bus" (pathname) }) }, senders: Mutex { data: {None: Sender { inner: RwLock { data: Inner { queue: [], capacity: 64, receiver_count: 0, inactive_receiver_count: 1, sender_count: 1, head_pos: 0, overflow: false, await_active: false, is_closed: false, send_ops: Event(<uninitialized>), recv_ops: Event(<uninitialized>) }, poisoned: false, .. } }, Some(OwnedMatchRule(MatchRule { msg_type: Some(Signal), sender: Some(BusName::Unique("org.freedesktop.DBus")), interface: Some(InterfaceName("org.freedesktop.DBus")), member: Some(MemberName("NameOwnerChanged")), path_spec: Some(Path(ObjectPath("/org/freedesktop/DBus"))), destination: None, args: [(0, "org.a11y.Bus")], arg_paths: [], arg0ns: None })): Sender { inner: RwLock { data: Inner { queue: [], capacity: 8, receiver_count: 1, inactive_receiver_count: 1, sender_count: 1, head_pos: 0, overflow: false, await_active: false, is_closed: false, send_ops: Event { listeners_notified: 18446744073709551615, listeners_total: 0 }, recv_ops: Event { listeners_notified: 0, listeners_total: 1 } }, poisoned: false, .. } }, Some(OwnedMatchRule(MatchRule { msg_type: Some(MethodReturn), sender: None, interface: None, member: None, path_spec: None, destination: None, args: [], arg_paths: [], arg0ns: None })): Sender { inner: RwLock { data: Inner { queue: [(Ok(Msg { type: MethodReturn, serial: 4294967295, sender: UniqueName("org.freedesktop.DBus"), reply-serial: 3, body: Signature("s"), fds: [] }), 1)], capacity: 8, receiver_count: 1, inactive_receiver_count: 1, sender_count: 2, head_pos: 1, overflow: false, await_active: false, is_closed: false, send_ops: Event { listeners_notified: 18446744073709551615, listeners_total: 0 }, recv_ops: Event { listeners_notified: 18446744073709551615, listeners_total: 1 } }, poisoned: false, .. } }, Some(OwnedMatchRule(MatchRule { msg_type: Some(Error), sender: None, interface: None, member: None, path_spec: None, destination: None, args: [], arg_paths: [], arg0ns: None })): Sender { inner: RwLock { data: Inner { queue: [(Ok(Msg { type: MethodReturn, serial: 4294967295, sender: UniqueName("org.freedesktop.DBus"), reply-serial: 3, body: Signature("s"), fds: [] }), 1)], capacity: 8, receiver_count: 1, inactive_receiver_count: 1, sender_count: 2, head_pos: 1, overflow: false, await_active: false, is_closed: false, send_ops: Event { listeners_notified: 18446744073709551615, listeners_total: 0 }, recv_ops: Event { listeners_notified: 18446744073709551615, listeners_total: 1 } }, poisoned: false, .. } }} }, already_received_bytes: [], already_received_fds: [], prev_seq: 3, activity_event: Event { listeners_notified: 18446744073709551615, listeners_total: 0 } }
+18:52:22 [INFO] read_socket; self=SocketReader { socket: Async { source: Source { registration: 32, key: 0, state: Mutex { data: [Direction { tick: 4, ticks: Some((4, 3)), waker: None, wakers: Slab { len: 0, cap: 0 } }, Direction { tick: 0, ticks: None, waker: None, wakers: Slab { len: 0, cap: 0 } }], poisoned: false, .. } }, io: Some(UnixStream { fd: FileDesc(OwnedFd { fd: 32 }), local: (unnamed), peer: "/run/user/1000/bus" (pathname) }) }, senders: Mutex { data: {None: Sender { inner: RwLock { data: Inner { queue: [], capacity: 64, receiver_count: 0, inactive_receiver_count: 1, sender_count: 1, head_pos: 0, overflow: false, await_active: false, is_closed: false, send_ops: Event(<uninitialized>), recv_ops: Event(<uninitialized>) }, poisoned: false, .. } }, Some(OwnedMatchRule(MatchRule { msg_type: Some(Signal), sender: Some(BusName::Unique("org.freedesktop.DBus")), interface: Some(InterfaceName("org.freedesktop.DBus")), member: Some(MemberName("NameOwnerChanged")), path_spec: Some(Path(ObjectPath("/org/freedesktop/DBus"))), destination: None, args: [(0, "org.a11y.Bus")], arg_paths: [], arg0ns: None })): Sender { inner: RwLock { data: Inner { queue: [], capacity: 8, receiver_count: 1, inactive_receiver_count: 1, sender_count: 1, head_pos: 0, overflow: false, await_active: false, is_closed: false, send_ops: Event { listeners_notified: 18446744073709551615, listeners_total: 0 }, recv_ops: Event { listeners_notified: 0, listeners_total: 1 } }, poisoned: false, .. } }, Some(OwnedMatchRule(MatchRule { msg_type: Some(MethodReturn), sender: None, interface: None, member: None, path_spec: None, destination: None, args: [], arg_paths: [], arg0ns: None })): Sender { inner: RwLock { data: Inner { queue: [(Ok(Msg { type: MethodReturn, serial: 4294967295, sender: UniqueName("org.freedesktop.DBus"), reply-serial: 4, body: Signature(""), fds: [] }), 1)], capacity: 8, receiver_count: 1, inactive_receiver_count: 1, sender_count: 2, head_pos: 2, overflow: false, await_active: false, is_closed: false, send_ops: Event { listeners_notified: 18446744073709551615, listeners_total: 0 }, recv_ops: Event { listeners_notified: 18446744073709551615, listeners_total: 1 } }, poisoned: false, .. } }, Some(OwnedMatchRule(MatchRule { msg_type: Some(Error), sender: None, interface: None, member: None, path_spec: None, destination: None, args: [], arg_paths: [], arg0ns: None })): Sender { inner: RwLock { data: Inner { queue: [(Ok(Msg { type: MethodReturn, serial: 4294967295, sender: UniqueName("org.freedesktop.DBus"), reply-serial: 4, body: Signature(""), fds: [] }), 1)], capacity: 8, receiver_count: 1, inactive_receiver_count: 1, sender_count: 2, head_pos: 2, overflow: false, await_active: false, is_closed: false, send_ops: Event { listeners_notified: 18446744073709551615, listeners_total: 0 }, recv_ops: Event { listeners_notified: 18446744073709551615, listeners_total: 1 } }, poisoned: false, .. } }} }, already_received_bytes: [], already_received_fds: [], prev_seq: 4, activity_event: Event { listeners_notified: 18446744073709551615, listeners_total: 0 } }
+18:52:22 [INFO] filebrowser::new() /home/bread/Desktop
+18:52:22 [INFO] read_socket; self=SocketReader { socket: Async { source: Source { registration: 32, key: 0, state: Mutex { data: [Direction { tick: 5, ticks: Some((5, 4)), waker: None, wakers: Slab { len: 0, cap: 0 } }, Direction { tick: 0, ticks: None, waker: None, wakers: Slab { len: 0, cap: 0 } }], poisoned: false, .. } }, io: Some(UnixStream { fd: FileDesc(OwnedFd { fd: 32 }), local: (unnamed), peer: "/run/user/1000/bus" (pathname) }) }, senders: Mutex { data: {None: Sender { inner: RwLock { data: Inner { queue: [], capacity: 64, receiver_count: 0, inactive_receiver_count: 1, sender_count: 1, head_pos: 0, overflow: false, await_active: false, is_closed: false, send_ops: Event(<uninitialized>), recv_ops: Event(<uninitialized>) }, poisoned: false, .. } }, Some(OwnedMatchRule(MatchRule { msg_type: Some(Signal), sender: Some(BusName::Unique("org.freedesktop.DBus")), interface: Some(InterfaceName("org.freedesktop.DBus")), member: Some(MemberName("NameOwnerChanged")), path_spec: Some(Path(ObjectPath("/org/freedesktop/DBus"))), destination: None, args: [(0, "org.a11y.Bus")], arg_paths: [], arg0ns: None })): Sender { inner: RwLock { data: Inner { queue: [], capacity: 8, receiver_count: 1, inactive_receiver_count: 1, sender_count: 1, head_pos: 0, overflow: false, await_active: false, is_closed: false, send_ops: Event { listeners_notified: 18446744073709551615, listeners_total: 0 }, recv_ops: Event { listeners_notified: 0, listeners_total: 1 } }, poisoned: false, .. } }, Some(OwnedMatchRule(MatchRule { msg_type: Some(MethodReturn), sender: None, interface: None, member: None, path_spec: None, destination: None, args: [], arg_paths: [], arg0ns: None })): Sender { inner: RwLock { data: Inner { queue: [(Ok(Msg { type: MethodReturn, serial: 2289, sender: UniqueName(":1.54"), reply-serial: 5, body: Signature("a{sv}"), fds: [] }), 1)], capacity: 8, receiver_count: 1, inactive_receiver_count: 1, sender_count: 2, head_pos: 3, overflow: false, await_active: false, is_closed: false, send_ops: Event { listeners_notified: 18446744073709551615, listeners_total: 0 }, recv_ops: Event { listeners_notified: 18446744073709551615, listeners_total: 1 } }, poisoned: false, .. } }, Some(OwnedMatchRule(MatchRule { msg_type: Some(Signal), sender: Some(BusName::WellKnown("org.a11y.Bus")), interface: Some(InterfaceName("org.freedesktop.DBus.Properties")), member: Some(MemberName("PropertiesChanged")), path_spec: Some(Path(ObjectPath("/org/a11y/bus"))), destination: None, args: [], arg_paths: [], arg0ns: None })): Sender { inner: RwLock { data: Inner { queue: [], capacity: 64, receiver_count: 1, inactive_receiver_count: 1, sender_count: 1, head_pos: 0, overflow: false, await_active: false, is_closed: false, send_ops: Event(<uninitialized>), recv_ops: Event { listeners_notified: 0, listeners_total: 1 } }, poisoned: false, .. } }, Some(OwnedMatchRule(MatchRule { msg_type: Some(Error), sender: None, interface: None, member: None, path_spec: None, destination: None, args: [], arg_paths: [], arg0ns: None })): Sender { inner: RwLock { data: Inner { queue: [(Ok(Msg { type: MethodReturn, serial: 2289, sender: UniqueName(":1.54"), reply-serial: 5, body: Signature("a{sv}"), fds: [] }), 1)], capacity: 8, receiver_count: 1, inactive_receiver_count: 1, sender_count: 2, head_pos: 3, overflow: false, await_active: false, is_closed: false, send_ops: Event { listeners_notified: 18446744073709551615, listeners_total: 0 }, recv_ops: Event { listeners_notified: 18446744073709551615, listeners_total: 1 } }, poisoned: false, .. } }} }, already_received_bytes: [], already_received_fds: [], prev_seq: 5, activity_event: Event { listeners_notified: 18446744073709551615, listeners_total: 0 } }
+18:52:22 [INFO] keep_updated;
+18:52:22 [INFO] Getting sysinfo
+18:52:22 [INFO] Pulling Drive information
+18:52:22 [INFO] DriveData: "devpts"
+18:52:22 [INFO] DriveData: "/dev/sda2"
+18:52:22 [INFO] DriveData: "mqueue"
+18:52:22 [INFO] DriveData: "hugetlbfs"
+18:52:22 [INFO] DriveData: "/dev/sda1"
+18:52:22 [ERROR] Error Pulling SEB info: "No such file or directory (os error 2)"
+18:52:22 [INFO] Pulling linux gpu
+18:52:22 [INFO] Pulling CPU
+18:52:22 [INFO] Pulling RAM
+18:52:22 [INFO] Pulling OS
+18:52:22 [INFO] Pulling Hostname
+18:52:22 [INFO] combined: bread-work-Intel(R) Core(TM) i5-8600K CPU @ 3.60GHz-unknown-cpu
+18:52:22 [INFO] hex_string: eb1751488d92c5adf4871bf1cfe5fd4361466eb352effc3928c1d0cec47a28bb
+18:52:22 [INFO] Computer Data: ComputerData { id: Thing { tb: "computer", id: String("bread-work:eb1751488") }, customer: None, seb_info: None, hostname: "bread-work", operating_system: "Linux 24.2.1 Manjaro Linux", cpu: "Intel(R) Core(TM) i5-8600K CPU @ 3.60GHz", gpu: "GeForce RTX 2080", ram: "24", drives: [DriveData { drive_letter: "/dev/pts", drive_type: "Unknown(-1)", total_size: "0", space_left: "0" }, DriveData { drive_letter: "/", drive_type: "SSD", total_size: "915", space_left: "671" }, DriveData { drive_letter: "/dev/mqueue", drive_type: "Unknown(-1)", total_size: "0", space_left: "0" }, DriveData { drive_letter: "/dev/hugepages", drive_type: "Unknown(-1)", total_size: "0", space_left: "0" }, DriveData { drive_letter: "/boot/efi", drive_type: "SSD", total_size: "0", space_left: "0" }] }
+18:52:22 [INFO] Got a new state: Login
+18:52:23 [INFO] Connected to "surrealdb.master-tech.app"
+18:52:23 [INFO] No JWT, sigining in: "brett.knowlton@pclaptops.com"
+18:52:23 [INFO] DB: Ok(Database { jwt: Some(Jwt(REDACTED)), user: Some(User { id: Thing { tb: "user", id: String("bey6vc4rhhrvuzpqfg5p") }, name: "Brett Knowlton", everest_initials: "BLK", email: "brett.knowlton@pclaptops.com", store: RIV, minio_access_key: Some("Eq2wAf0ZdCEe8NLth1ve"), minio_secret_key: Some("B9UAfgjB0PuZkAg8QkeveA3CKiyRwctx5bd8uQxo"), user_settings: UserSettings { color_scheme: Object {"active_bg_fill": Array [Number(26), Number(25), Number(25), Number(255)], "active_bg_stroke_color": Array [Number(91), Number(91), Number(100), Number(255)], "active_fg_stroke_color": Array [Number(115), Number(115), Number(130), Number(255)], "active_weak_bg_fill": Array [Number(33), Number(32), Number(32), Number(255)], "background_color": Array [Number(21), Number(40), Number(54), Number(255)], "border_color": Array [Number(35), Number(35), Number(55), Number(255)], "code_bg_color": Array [Number(20), Number(20), Number(27), Number(255)], "error_color": Array [Number(255), Number(255), Number(255), Number(255)], "extreme_bg_color": Array [Number(15), Number(15), Number(20), Number(255)], "faint_bg_color": Array [Number(20), Number(20), Number(25), Number(255)], "foreground_color": Array [Number(99), Number(106), Number(141), Number(255)], "hovered_bg_fill": Array [Number(35), Number(35), Number(40), Number(255)], "hovered_bg_stroke_color": Array [Number(129), Number(99), Number(129), Number(100)], "hovered_fg_stroke_color": Array [Number(255), Number(255), Number(255), Number(255)], "hovered_weak_bg_fill": Array [Number(40), Number(40), Number(45), Number(255)], "link_color": Array [Number(144), Number(99), Number(210), Number(255)], "open_bg_fill": Array [Number(30), Number(30), Number(35), Number(255)], "open_bg_stroke_color": Array [Number(100), Number(100), Number(110), Number(255)], "open_fg_stroke_color": Array [Number(193), Number(197), Number(220), Number(255)], "open_weak_bg_fill": Array [Number(35), Number(35), Number(40), Number(255)], "rounding": Object {"ne": Number(4.0), "nw": Number(0.0), "se": Number(0.0), "sw": Number(4.0)}, "selection_bg_fill": Array [Number(129), Number(86), Number(34), Number(90)], "selection_stroke_color": Array [Number(16), Number(8), Number(2), Number(50)], "text_color": Array [Number(77), Number(73), Number(63), Number(128)], "warn_color": Array [Number(255), Number(255), Number(255), Number(255)], "widget_bg_fill": Array [Number(24), Number(23), Number(23), Number(255)], "widget_bg_stroke_color": Array [Number(50), Number(50), Number(60), Number(255)], "widget_fg_stroke_color": Array [Number(134), Number(138), Number(162), Number(255)], "widget_weak_bg_fill": Array [Number(21), Number(21), Number(22), Number(255)], "window_stroke_color": Array [Number(45), Number(103), Number(114), Number(255)]}, ui_layout: UiLayout { mtechserver: Object {}, mastertech: Object {"focused_surface": Number(0), "surfaces": Array [Object {"Main": Object {"focused_node": Number(4), "nodes": Array [Object {"Vertical": Object {"fraction": Number(0.6499999761581421), "rect": Object {"max": Object {"x": Number(941.875), "y": Number(746.875)}, "min": Object {"x": Number(3.125), "y": Number(27.125)}}}}, Object {"Horizontal": Object {"fraction": Number(0.30000001192092896), "rect": Object {"max": Object {"x": Number(941.875), "y": Number(494.0)}, "min": Object {"x": Number(3.125), "y": Number(27.125)}}}}, Object {"Horizontal": Object {"fraction": Number(0.20000000298023224), "rect": Object {"max": Object {"x": Number(941.875), "y": Number(746.875)}, "min": Object {"x": Number(3.125), "y": Number(495.0)}}}}, Object {"Leaf": Object {"active": Number(0), "rect": Object {"max": Object {"x": Number(284.0), "y": Number(494.0)}, "min": Object {"x": Number(3.125), "y": Number(27.125)}}, "scroll": Number(0.0), "tabs": Array [String("File Browser 📂"), String("Logs")], "viewport": Object {"max": Object {"x": Number(284.0), "y": Number(494.0)}, "min": Object {"x": Number(3.125), "y": Number(47.125)}}}}, Object {"Leaf": Object {"active": Number(0), "rect": Object {"max": Object {"x": Number(941.875), "y": Number(494.0)}, "min": Object {"x": Number(285.0), "y": Number(27.125)}}, "scroll": Number(0.0), "tabs": Array [String("TUR Sheet"), String("My Tasks"), String("Store Tasks"), String("Completed Tasks"), String("SEB Lookup"), String("Downloads"), String("Stock"), String("Stock Quantity"), String("Ai")], "viewport": Object {"max": Object {"x": Number(941.875), "y": Number(494.0)}, "min": Object {"x": Number(285.0), "y": Number(54.625)}}}}, Object {"Leaf": Object {"active": Number(0), "rect": Object {"max": Object {"x": Number(190.0), "y": Number(746.875)}, "min": Object {"x": Number(3.125), "y": Number(495.0)}}, "scroll": Number(0.0), "tabs": Array [String("Scripts"), String("ToolBox")], "viewport": Object {"max": Object {"x": Number(190.0), "y": Number(746.875)}, "min": Object {"x": Number(3.125), "y": Number(522.5)}}}}, Object {"Horizontal": Object {"fraction": Number(0.44999998807907104), "rect": Object {"max": Object {"x": Number(941.875), "y": Number(746.875)}, "min": Object {"x": Number(191.0), "y": Number(495.0)}}}}, String("Empty"), String("Empty"), String("Empty"), String("Empty"), String("Empty"), String("Empty"), Object {"Leaf": Object {"active": Number(0), "rect": Object {"max": Object {"x": Number(528.0), "y": Number(746.875)}, "min": Object {"x": Number(191.0), "y": Number(495.0)}}, "scroll": Number(0.0), "tabs": Array [String("SysInfo"), String("Bug Tracker")], "viewport": Object {"max": Object {"x": Number(528.0), "y": Number(746.875)}, "min": Object {"x": Number(191.0), "y": Number(515.0)}}}}, Object {"Leaf": Object {"active": Number(0), "rect": Object {"max": Object {"x": Number(941.875), "y": Number(746.875)}, "min": Object {"x": Number(529.0), "y": Number(495.0)}}, "scroll": Number(0.0), "tabs": Array [String("Console"), String("Websockets")], "viewport": Object {"max": Object {"x": Number(941.875), "y": Number(746.875)}, "min": Object {"x": Number(529.0), "y": Number(515.0)}}}}]}}], "translations": Object {"tab_context_menu": Object {"close_button": String("Close"), "eject_button": String("Undock")}, "window": Object {"close_button_tooltip": String("This window contains non-closable tabs.")}}} } }, id_prestashop: Some(146), id_store: Some("7"), chat_threads: None }) })
+18:52:23 [INFO] Sent DB connection
+18:52:23 [INFO] 3
+18:52:23 [INFO] 10
+18:52:23 [INFO] Getting Initial data: 76
+18:52:23 [INFO] Got a new state: Authenticated(Tasks)
+18:52:23 [INFO] get_store_users: Ok(())
+18:52:23 [INFO] Reruning filtering for store/completed tasks, got new users
+18:52:27 [INFO] Data changed: 2
+18:52:27 [INFO] Data changed: 21
+18:52:28 [INFO] Data changed: 210
+18:52:28 [INFO] Data changed: 2105
+18:52:28 [INFO] Data changed: 21059
+18:52:28 [INFO] Data changed: 210590
+18:52:28 [INFO] Data changed: 2105904
+18:52:30 [INFO] resource_name: "customer_threads", {
+    "filter[id_order]": "2105904",
+    "output_format": "JSON",
+}
+URL: "https://pclaptops.mojo11.com/api/customer_threads?display=full&filter[id_order]=2105904&output_format=JSON"
+18:52:30 [INFO] response: Object {
+    "customer_threads": Array [
+        Object {
+            "id": Number(82675),
+            "id_lang": String("1"),
+            "id_shop": String("4"),
+            "id_customer": String("29166"),
+            "id_order": String("2105904"),
+            "id_product": String("0"),
+            "id_contact": String("0"),
+            "email": String("mcrawson444@gmail.com"),
+            "token": String("IJSegjeqiaAD"),
+            "status": String("open"),
+            "date_add": String("2025-03-26 13:29:34"),
+            "date_upd": String("2025-03-26 13:29:34"),
+            "associations": Object {
+                "customer_messages": Array [
+                    Object {
+                        "id": String("467271"),
+                    },
+                ],
+            },
+        },
+    ],
+}
+18:52:30 [INFO] x: [
+    CustomerThread {
+        id: "82675",
+        id_customer: "29166",
+        id_order: "2105904",
+        date_add: "2025-03-26 13:29:34",
+        date_upd: "2025-03-26 13:29:34",
+        associations: CustMessageAssociation {
+            customer_messages: [
+                CustMessage {
+                    id: "467271",
+                },
+            ],
+        },
+    },
+]
+18:52:31 [INFO] query:https://pclaptops.mojo11.com/api/customer_messages/467271?output_format=JSON
+response: Object {
+    "customer_message": Object {
+        "id": Number(467271),
+        "id_employee": String("48"),
+        "id_customer_thread": String("82675"),
+        "ip_address": String(""),
+        "message": String("started"),
+        "file_name": String(""),
+        "user_agent": String(""),
+        "private": String("1"),
+        "date_add": String("2025-03-26 13:29:34"),
+        "date_upd": String("2025-03-26 13:29:34"),
+        "read": String("0"),
+        "id_order_message_type": String("4"),
+        "id_legacy_comment": String("0"),
+        "id_order_config": String("0"),
+    },
+}
+18:52:31 [INFO] x: CustomerMessage {
+    id: "467271",
+    id_employee: "48",
+    id_customer_thread: "82675",
+    message: "started",
+    file_name: "",
+    private: "1",
+    date_add: "2025-03-26 13:29:34",
+}
+18:52:31 [INFO] query:https://pclaptops.mojo11.com/api/orders/2105904?output_format=JSON
+response: Object {
+    "order": Object {
+        "id": Number(2105904),
+        "id_address_delivery": String("175741"),
+        "id_address_invoice": String("215477"),
+        "id_cart": String("4940304"),
+        "id_currency": String("1"),
+        "id_lang": String("1"),
+        "id_customer": String("29166"),
+        "id_carrier": String("10"),
+        "current_state": String("30"),
+        "module": String("ps_creditcard"),
+        "invoice_number": String("0"),
+        "invoice_date": String("0000-00-00 00:00:00"),
+        "delivery_number": String("0"),
+        "delivery_date": String("0000-00-00 00:00:00"),
+        "valid": String("1"),
+        "date_add": String("2025-03-22 11:03:10"),
+        "date_upd": String("2025-03-25 12:30:43"),
+        "shipping_number": String(""),
+        "tax_exempt": String("0"),
+        "id_shop_group": String("1"),
+        "id_shop": String("4"),
+        "secure_key": String("ee72b7c3e20476d94c39be24ed91c3c2"),
+        "payment": String("Credit Card (manual)"),
+        "recyclable": String("0"),
+        "gift": String("0"),
+        "gift_message": String(""),
+        "mobile_theme": String("0"),
+        "total_discounts": String("0.000000"),
+        "total_discounts_tax_incl": String("0.000000"),
+        "total_discounts_tax_excl": String("0.000000"),
+        "total_paid": String("53.710000"),
+        "total_paid_tax_incl": String("53.710000"),
+        "total_paid_tax_excl": String("49.990000"),
+        "total_paid_real": String("0.000000"),
+        "total_products": String("49.990000"),
+        "total_products_wt": String("53.710000"),
+        "total_shipping": String("0.000000"),
+        "total_shipping_tax_incl": String("0.000000"),
+        "total_shipping_tax_excl": String("0.000000"),
+        "carrier_tax_rate": String("0.000"),
+        "total_wrapping": String("0.000000"),
+        "total_wrapping_tax_incl": String("0.000000"),
+        "total_wrapping_tax_excl": String("0.000000"),
+        "round_mode": String("2"),
+        "round_type": String("2"),
+        "conversion_rate": String("1.000000"),
+        "reference": String("SE002105904"),
+        "id_order_parent": String("0"),
+        "id_order_type": String("2"),
+        "id_order_rma_type": String("0"),
+        "id_order_claim_status": String("0"),
+        "id_order_reason_code": String("13"),
+        "order_type": String("configurator"),
+        "id_employee_sales_rep": String("146"),
+        "id_employee_split_rep": String("0"),
+        "id_store": String("7"),
+        "id_employee_editing": String("0"),
+        "edit_started": String("2025-03-25 12:22:52"),
+        "id_order_odoo": String(""),
+        "id_order_everest": String("0"),
+        "id_invoice_everest": String("0"),
+        "terms_approved_time": String("0000-00-00 00:00:00"),
+        "terms_approved_ip_address": String(""),
+        "estimated_ship_date": String("0000-00-00"),
+        "shipping_damage_reported": String("0"),
+        "debuild": String("0"),
+        "order_placed_ip_address": String(""),
+        "customer_reference": String("none"),
+        "allow_odoo_import": String("0"),
+        "ready_for_odoo": String("0"),
+        "associations": Object {
+            "order_rows": Array [
+                Object {
+                    "id": String("1599652"),
+                    "id_order_config": String("0"),
+                    "product_id": String("5126"),
+                    "product_attribute_id": String("0"),
+                    "product_quantity": String("1"),
+                    "product_name": String("Diagnosis of Computer"),
+                    "product_reference": String("SRVC/DIAG"),
+                    "product_ean13": String(""),
+                    "product_isbn": String(""),
+                    "product_upc": String(""),
+                    "product_price": String("49.990000"),
+                    "id_customization": String("0"),
+                    "unit_price_tax_incl": String("53.710000"),
+                    "unit_price_tax_excl": String("49.990000"),
+                },
+            ],
+            "order_service": Array [
+                Object {
+                    "id_order_service": String("15683"),
+                    "device_name": String("Laptop"),
+                    "device_mfg": String("HP"),
+                    "device_model": String("15-dy2073dx"),
+                    "device_serial": String("5cd2284tcg"),
+                    "device_password": String(""),
+                    "id_status_service": String(""),
+                    "device_power_supply": String(""),
+                    "other_hardware_software": String(""),
+                    "physical_damage": String(""),
+                    "check_in_notes": String("transfer all the data from his external to his new computer."),
+                    "intake_notes": String(""),
+                    "id_employee_qc_tech": String(""),
+                    "id_employee_qc_signoff": String(""),
+                },
+            ],
+        },
+    },
+}
+18:52:31 [INFO] x: Order {
+    id: "2105904",
+    order_type_name: None,
+    id_address_delivery: "175741",
+    id_address_invoice: "215477",
+    id_customer: "29166",
+    invoice_number: "0",
+    invoice_date: "0000-00-00 00:00:00",
+    payment: "Credit Card (manual)",
+    date_add: "2025-03-22 11:03:10",
+    date_upd: "2025-03-25 12:30:43",
+    id_employee_sales_rep: "146",
+    id_employee_split_rep: "0",
+    id_employee_editing: "0",
+    id_order_everest: "0",
+    id_store: "7",
+    total_paid: "53.710000",
+    total_products_wt: "53.710000",
+    reference: "SE002105904",
+    id_order_parent: "0",
+    shipping_number: "",
+    order_type: "configurator",
+    associations: Associations {
+        order_rows: [
+            OrderRow {
+                id: "1599652",
+                id_order_config: "0",
+                product_id: "5126",
+                product_quantity: "1",
+                product_name: "Diagnosis of Computer",
+                product_price: "49.990000",
+            },
+        ],
+        order_service: [
+            ServiceOrder {
+                id_order_service: "15683",
+                device_name: "Laptop",
+                device_mfg: "HP",
+                device_model: "15-dy2073dx",
+                device_serial: "5cd2284tcg",
+                device_password: "",
+                device_power_supply: "",
+                other_hardware_software: "",
+                physical_damage: "",
+                check_in_notes: "transfer all the data from his external to his new computer.",
+                intake_notes: "",
+            },
+        ],
+    },
+}
+18:52:31 [INFO] order: Order {
+    id: "2105904",
+    order_type_name: None,
+    id_address_delivery: "175741",
+    id_address_invoice: "215477",
+    id_customer: "29166",
+    invoice_number: "0",
+    invoice_date: "0000-00-00 00:00:00",
+    payment: "Credit Card (manual)",
+    date_add: "2025-03-22 11:03:10",
+    date_upd: "2025-03-25 12:30:43",
+    id_employee_sales_rep: "146",
+    id_employee_split_rep: "0",
+    id_employee_editing: "0",
+    id_order_everest: "0",
+    id_store: "7",
+    total_paid: "53.710000",
+    total_products_wt: "53.710000",
+    reference: "SE002105904",
+    id_order_parent: "0",
+    shipping_number: "",
+    order_type: "configurator",
+    associations: Associations {
+        order_rows: [
+            OrderRow {
+                id: "1599652",
+                id_order_config: "0",
+                product_id: "5126",
+                product_quantity: "1",
+                product_name: "Diagnosis of Computer",
+                product_price: "49.990000",
+            },
+        ],
+        order_service: [
+            ServiceOrder {
+                id_order_service: "15683",
+                device_name: "Laptop",
+                device_mfg: "HP",
+                device_model: "15-dy2073dx",
+                device_serial: "5cd2284tcg",
+                device_password: "",
+                device_power_supply: "",
+                other_hardware_software: "",
+                physical_damage: "",
+                check_in_notes: "transfer all the data from his external to his new computer.",
+                intake_notes: "",
+            },
+        ],
+    },
+}
+18:52:31 [INFO] query:https://pclaptops.mojo11.com/api/employees/146?output_format=JSON
+response: Object {
+    "employee": Object {
+        "id": Number(146),
+        "id_lang": String("1"),
+        "last_passwd_gen": String("2021-09-01 13:17:42"),
+        "stats_date_from": String("2021-06-06"),
+        "stats_date_to": String("2021-07-06"),
+        "stats_compare_from": String("0000-00-00"),
+        "stats_compare_to": String("0000-00-00"),
+        "passwd": String("$2y$10$N/Al7Z.8ZneWUs82RfSOyuRpJngmehYjfnveY5jpe70yjuApZmJ9."),
+        "lastname": String("Knowlton"),
+        "firstname": String("Brett"),
+        "email": String("brett.knowlton@pclaptops.com"),
+        "active": String("1"),
+        "optin": String("1"),
+        "id_profile": String("18"),
+        "bo_color": String(""),
+        "default_tab": String("4"),
+        "bo_theme": String(""),
+        "bo_css": String("theme.css"),
+        "bo_width": String("0"),
+        "bo_menu": String("1"),
+        "stats_compare_option": String("1"),
+        "preselect_date_range": String(""),
+        "id_last_order": String("2067849"),
+        "id_last_customer_message": String("420452"),
+        "id_last_customer": String("136077"),
+        "reset_password_token": String(""),
+        "reset_password_validity": String("0000-00-00 00:00:00"),
+        "id_store": String("7"),
+        "xidax_admin_name": String("Brett Knowlton"),
+        "sales_eligible": String("1"),
+        "show_order_ids": String("0"),
+        "dark_mode": String("1"),
+        "verbose_tax": String("0"),
+        "initials": String("BLK"),
+        "id_user_odoo": String(""),
+        "id_partner_odoo": String(""),
+        "id_order_state": String("58"),
+    },
+}
+18:52:31 [INFO] x: Employee {
+    id: "146",
+    id_store: "7",
+    lastname: "Knowlton",
+    firstname: "Brett",
+    email: "brett.knowlton@pclaptops.com",
+    active: "1",
+    id_profile: "18",
+    id_last_order: "2067849",
+    id_last_customer_message: "420452",
+    id_last_customer: "136077",
+    initials: "BLK",
+}
+18:52:31 [INFO] employee: Employee {
+    id: "146",
+    id_store: "7",
+    lastname: "Knowlton",
+    firstname: "Brett",
+    email: "brett.knowlton@pclaptops.com",
+    active: "1",
+    id_profile: "18",
+    id_last_order: "2067849",
+    id_last_customer_message: "420452",
+    id_last_customer: "136077",
+    initials: "BLK",
+}
+18:52:31 [INFO] query:https://pclaptops.mojo11.com/api/customers/29166?output_format=JSON
+response: Object {
+    "customer": Object {
+        "id": Number(29166),
+        "id_default_group": String("3"),
+        "id_lang": String("1"),
+        "newsletter_date_add": String("0000-00-00 00:00:00"),
+        "ip_registration_newsletter": String(""),
+        "last_passwd_gen": String("2021-09-01 20:44:46"),
+        "secure_key": String("ee72b7c3e20476d94c39be24ed91c3c2"),
+        "deleted": String("0"),
+        "passwd": String("$2y$10$6405Vj0ZAAUrsF/JX38v9.x7aHRh/BJjgjAbxDh6dNFzwo5KWy8/q"),
+        "lastname": String("Rawson"),
+        "firstname": String("Marty"),
+        "email": String("mcrawson444@gmail.com"),
+        "id_gender": String("0"),
+        "birthday": String("0000-00-00"),
+        "newsletter": String("0"),
+        "optin": String("0"),
+        "website": String(""),
+        "company": String(""),
+        "siret": String(""),
+        "ape": String(""),
+        "outstanding_allow_amount": String("0.000000"),
+        "show_public_prices": String("0"),
+        "id_risk": String("0"),
+        "max_payment_days": String("0"),
+        "active": String("1"),
+        "note": String(""),
+        "is_guest": String("0"),
+        "id_shop": String("4"),
+        "id_shop_group": String("1"),
+        "date_add": String("2021-09-02 02:44:46"),
+        "date_upd": String("2021-09-02 02:44:46"),
+        "reset_password_token": String(""),
+        "reset_password_validity": String("0000-00-00 00:00:00"),
+        "everest_customer_code": String("32164887"),
+        "recurly_account_code": String(""),
+        "receive_status_messages": String("0"),
+        "id_customer_odoo": String(""),
+        "is_whitebox": String("0"),
+        "whitebox_logo": Null,
+        "id_address_whitebox": String(""),
+    },
+}
+18:52:31 [INFO] x: Customer {
+    lastname: "Rawson",
+    firstname: "Marty",
+    email: "mcrawson444@gmail.com",
+}
+18:52:31 [INFO] query:https://pclaptops.mojo11.com/api/addresses/215477?output_format=JSON
+response: Object {
+    "address": Object {
+        "id": Number(215477),
+        "id_customer": String("29166"),
+        "id_manufacturer": String("0"),
+        "id_supplier": String("0"),
+        "id_warehouse": String("0"),
+        "id_country": String("21"),
+        "id_state": String("47"),
+        "alias": String("home"),
+        "company": String(""),
+        "lastname": String("Rawson"),
+        "firstname": String("Marty"),
+        "vat_number": String(""),
+        "address1": String("457 Hiland RD"),
+        "address2": String(""),
+        "postcode": String("84404"),
+        "city": String("Ogden"),
+        "other": String(""),
+        "phone": String("801-388-3895"),
+        "phone_mobile": String(""),
+        "dni": String(""),
+        "everest_address_code": String(""),
+        "address_hash": String("db297d35434f5b2671ba29a7950d8b54"),
+        "id_address_odoo": String(""),
+        "address_email": String("NULL"),
+        "deleted": String("0"),
+        "date_add": String("2025-03-22 11:01:09"),
+        "date_upd": String("2025-03-22 11:01:09"),
+    },
+}
+18:52:31 [INFO] x: Address {
+    id: "215477",
+    id_customer: "29166",
+    lastname: "Rawson",
+    firstname: "Marty",
+    address1: "457 Hiland RD",
+    address2: "",
+    postcode: "84404",
+    city: "Ogden",
+    phone: "801-388-3895",
+    phone_mobile: "",
+}
+18:52:31 [INFO] address: Address {
+    id: "215477",
+    id_customer: "29166",
+    lastname: "Rawson",
+    firstname: "Marty",
+    address1: "457 Hiland RD",
+    address2: "",
+    postcode: "84404",
+    city: "Ogden",
+    phone: "801-388-3895",
+    phone_mobile: "",
+}
+18:53:13 [INFO] Submitting TUR sheet
+18:53:13 [INFO] Send_Payload
+18:53:15 [INFO] After tokio spawn in send_ticket_request
+18:54:15 [INFO] Email: jacob.hardy
+18:54:16 [INFO] user: Some(User { id: Thing { tb: "user", id: String("aam998y60shwah3gr9hv") }, name: "Jake Hardy", everest_initials: "JDH2", email: "jacob.hardy@pclaptops.com", store: RIV, minio_access_key: Some(""), minio_secret_key: Some(""), user_settings: UserSettings { color_scheme: Object {}, ui_layout: UiLayout { mtechserver: Object {}, mastertech: Object {} } }, id_prestashop: Some(35), id_store: Some("7"), chat_threads: None })
+18:54:16 [INFO] get_tasks: Ok(())
+18:54:16 [INFO] Reruning filtering for store/completed/my_tasks. Got new tasks: 861
+18:54:16 [INFO] Email: brett.knowlton
+18:54:16 [INFO] user: Some(User { id: Thing { tb: "user", id: String("bey6vc4rhhrvuzpqfg5p") }, name: "Brett Knowlton", everest_initials: "BLK", email: "brett.knowlton@pclaptops.com", store: RIV, minio_access_key: Some("Eq2wAf0ZdCEe8NLth1ve"), minio_secret_key: Some("B9UAfgjB0PuZkAg8QkeveA3CKiyRwctx5bd8uQxo"), user_settings: UserSettings { color_scheme: Object {"active_bg_fill": Array [Number(26), Number(25), Number(25), Number(255)], "active_bg_stroke_color": Array [Number(91), Number(91), Number(100), Number(255)], "active_fg_stroke_color": Array [Number(115), Number(115), Number(130), Number(255)], "active_weak_bg_fill": Array [Number(33), Number(32), Number(32), Number(255)], "background_color": Array [Number(21), Number(40), Number(54), Number(255)], "border_color": Array [Number(35), Number(35), Number(55), Number(255)], "code_bg_color": Array [Number(20), Number(20), Number(27), Number(255)], "error_color": Array [Number(255), Number(255), Number(255), Number(255)], "extreme_bg_color": Array [Number(15), Number(15), Number(20), Number(255)], "faint_bg_color": Array [Number(20), Number(20), Number(25), Number(255)], "foreground_color": Array [Number(99), Number(106), Number(141), Number(255)], "hovered_bg_fill": Array [Number(35), Number(35), Number(40), Number(255)], "hovered_bg_stroke_color": Array [Number(129), Number(99), Number(129), Number(100)], "hovered_fg_stroke_color": Array [Number(255), Number(255), Number(255), Number(255)], "hovered_weak_bg_fill": Array [Number(40), Number(40), Number(45), Number(255)], "link_color": Array [Number(144), Number(99), Number(210), Number(255)], "open_bg_fill": Array [Number(30), Number(30), Number(35), Number(255)], "open_bg_stroke_color": Array [Number(100), Number(100), Number(110), Number(255)], "open_fg_stroke_color": Array [Number(193), Number(197), Number(220), Number(255)], "open_weak_bg_fill": Array [Number(35), Number(35), Number(40), Number(255)], "rounding": Object {"ne": Number(4.0), "nw": Number(0.0), "se": Number(0.0), "sw": Number(4.0)}, "selection_bg_fill": Array [Number(129), Number(86), Number(34), Number(90)], "selection_stroke_color": Array [Number(16), Number(8), Number(2), Number(50)], "text_color": Array [Number(77), Number(73), Number(63), Number(128)], "warn_color": Array [Number(255), Number(255), Number(255), Number(255)], "widget_bg_fill": Array [Number(24), Number(23), Number(23), Number(255)], "widget_bg_stroke_color": Array [Number(50), Number(50), Number(60), Number(255)], "widget_fg_stroke_color": Array [Number(134), Number(138), Number(162), Number(255)], "widget_weak_bg_fill": Array [Number(21), Number(21), Number(22), Number(255)], "window_stroke_color": Array [Number(45), Number(103), Number(114), Number(255)]}, ui_layout: UiLayout { mtechserver: Object {}, mastertech: Object {"focused_surface": Number(0), "surfaces": Array [Object {"Main": Object {"focused_node": Number(4), "nodes": Array [Object {"Vertical": Object {"fraction": Number(0.6499999761581421), "rect": Object {"max": Object {"x": Number(941.875), "y": Number(746.875)}, "min": Object {"x": Number(3.125), "y": Number(27.125)}}}}, Object {"Horizontal": Object {"fraction": Number(0.30000001192092896), "rect": Object {"max": Object {"x": Number(941.875), "y": Number(494.0)}, "min": Object {"x": Number(3.125), "y": Number(27.125)}}}}, Object {"Horizontal": Object {"fraction": Number(0.20000000298023224), "rect": Object {"max": Object {"x": Number(941.875), "y": Number(746.875)}, "min": Object {"x": Number(3.125), "y": Number(495.0)}}}}, Object {"Leaf": Object {"active": Number(0), "rect": Object {"max": Object {"x": Number(284.0), "y": Number(494.0)}, "min": Object {"x": Number(3.125), "y": Number(27.125)}}, "scroll": Number(0.0), "tabs": Array [String("File Browser 📂"), String("Logs")], "viewport": Object {"max": Object {"x": Number(284.0), "y": Number(494.0)}, "min": Object {"x": Number(3.125), "y": Number(47.125)}}}}, Object {"Leaf": Object {"active": Number(0), "rect": Object {"max": Object {"x": Number(941.875), "y": Number(494.0)}, "min": Object {"x": Number(285.0), "y": Number(27.125)}}, "scroll": Number(0.0), "tabs": Array [String("TUR Sheet"), String("My Tasks"), String("Store Tasks"), String("Completed Tasks"), String("SEB Lookup"), String("Downloads"), String("Stock"), String("Stock Quantity"), String("Ai")], "viewport": Object {"max": Object {"x": Number(941.875), "y": Number(494.0)}, "min": Object {"x": Number(285.0), "y": Number(54.625)}}}}, Object {"Leaf": Object {"active": Number(0), "rect": Object {"max": Object {"x": Number(190.0), "y": Number(746.875)}, "min": Object {"x": Number(3.125), "y": Number(495.0)}}, "scroll": Number(0.0), "tabs": Array [String("Scripts"), String("ToolBox")], "viewport": Object {"max": Object {"x": Number(190.0), "y": Number(746.875)}, "min": Object {"x": Number(3.125), "y": Number(522.5)}}}}, Object {"Horizontal": Object {"fraction": Number(0.44999998807907104), "rect": Object {"max": Object {"x": Number(941.875), "y": Number(746.875)}, "min": Object {"x": Number(191.0), "y": Number(495.0)}}}}, String("Empty"), String("Empty"), String("Empty"), String("Empty"), String("Empty"), String("Empty"), Object {"Leaf": Object {"active": Number(0), "rect": Object {"max": Object {"x": Number(528.0), "y": Number(746.875)}, "min": Object {"x": Number(191.0), "y": Number(495.0)}}, "scroll": Number(0.0), "tabs": Array [String("SysInfo"), String("Bug Tracker")], "viewport": Object {"max": Object {"x": Number(528.0), "y": Number(746.875)}, "min": Object {"x": Number(191.0), "y": Number(515.0)}}}}, Object {"Leaf": Object {"active": Number(0), "rect": Object {"max": Object {"x": Number(941.875), "y": Number(746.875)}, "min": Object {"x": Number(529.0), "y": Number(495.0)}}, "scroll": Number(0.0), "tabs": Array [String("Console"), String("Websockets")], "viewport": Object {"max": Object {"x": Number(941.875), "y": Number(746.875)}, "min": Object {"x": Number(529.0), "y": Number(515.0)}}}}]}}], "translations": Object {"tab_context_menu": Object {"close_button": String("Close"), "eject_button": String("Undock")}, "window": Object {"close_button_tooltip": String("This window contains non-closable tabs.")}}} } }, id_prestashop: Some(146), id_store: Some("7"), chat_threads: None })
+18:54:16 [INFO] Record: None
+18:54:16 [INFO] Created Record: Some(Record { id: Thing { tb: "customer", id: String("29166") } })
+18:54:16 [INFO] Created Record: Some(Record { id: Thing { tb: "service_order", id: String("2105904") } })
+18:54:16 [INFO] Task Data: LiveTaskPayload { id: Thing { tb: "task", id: String("a85edd8440b44ee48d802b41fb093abd") }, task_name: "Marty Rawson - 2105904", service_ticket: Some(Thing { tb: "service_order", id: String("2105904") }), everest_initials: "JDH2", task_description: "so idk why but I left this transfering overnight- came back to it being stuck on a bitlocker screen and cant get past....\nidk if the data finshed transfering or not.", assignee: Thing { tb: "user", id: String("aam998y60shwah3gr9hv") }, service_number: Some("2105904"), due_date: "2025-03-27T18:52:23Z", priority: Normal, completed: false, status: Todo }
+18:54:16 [INFO] Data: Create
+18:54:16 [INFO] Sent notification
+18:54:16 [INFO] Data: Update
+18:54:16 [INFO] Sent notification
+18:54:16 [INFO] Data: Create
+18:54:16 [INFO] Sent notification
+18:54:16 [INFO] Data: Update
+18:54:16 [INFO] Sent notification
+18:54:16 [INFO] create_task_record: Some(Record { id: Thing { tb: "task", id: String("a85edd8440b44ee48d802b41fb093abd") } })
+18:54:16 [INFO] New Task Update: Create
+18:54:16 [INFO] Action: Create - Notification: Notification { id: Thing { tb: "notification", id: String("s65ol3gaal6xwzxrm07j") }, user: Thing { tb: "user", id: String("aam998y60shwah3gr9hv") }, notification_description: "New Task for Jake Hardy", notification_type: "Task Created", status: "Unread" }
+18:54:16 [INFO] Username not found
+18:54:16 [INFO] Task name not found
+18:54:16 [INFO] New Task Update: Update
+18:54:16 [INFO] Action: Update - Notification: Notification { id: Thing { tb: "notification", id: String("s65ol3gaal6xwzxrm07j") }, user: Thing { tb: "user", id: String("aam998y60shwah3gr9hv") }, notification_description: "New Task for Jake Hardy", notification_type: "Task Created", status: "Unread" }
+18:54:16 [INFO] existing_data match's new_data: Notification { id: Thing { tb: "notification", id: String("s65ol3gaal6xwzxrm07j") }, user: Thing { tb: "user", id: String("aam998y60shwah3gr9hv") }, notification_description: "New Task for Jake Hardy", notification_type: "Task Created", status: "Unread" } // Notification { id: Thing { tb: "notification", id: String("s65ol3gaal6xwzxrm07j") }, user: Thing { tb: "user", id: String("aam998y60shwah3gr9hv") }, notification_description: "New Task for Jake Hardy", notification_type: "Task Created", status: "Unread" }
+18:54:16 [INFO] Order number pulled from task_id: Some("2105904") using task id: Thing { tb: "task", id: String("a85edd8440b44ee48d802b41fb093abd") }
+18:54:16 [INFO] Calling API for thread ID
+18:54:16 [INFO] resource_name: "customer_threads", {
+    "filter[id_order]": "2105904",
+    "output_format": "JSON",
+}
+URL: "https://pcl.master-tech.app/api/customer_threads?display=full&filter[id_order]=2105904&output_format=JSON"
+18:54:16 [INFO] New Ticket Update
+18:54:16 [INFO] data was NOT updated
+18:54:16 [INFO] Inserted new task
+18:54:17 [INFO] New Ticket Update
+18:54:17 [INFO] response: Object {
+    "customer_threads": Array [
+        Object {
+            "id": Number(82675),
+            "id_lang": String("1"),
+            "id_shop": String("4"),
+            "id_customer": String("29166"),
+            "id_order": String("2105904"),
+            "id_product": String("0"),
+            "id_contact": String("0"),
+            "email": String("mcrawson444@gmail.com"),
+            "token": String("IJSegjeqiaAD"),
+            "status": String("open"),
+            "date_add": String("2025-03-26 13:29:34"),
+            "date_upd": String("2025-03-26 13:29:34"),
+            "associations": Object {
+                "customer_messages": Array [
+                    Object {
+                        "id": String("467271"),
+                    },
+                ],
+            },
+        },
+    ],
+}
+18:54:17 [INFO] x: [
+    CustomerThread {
+        id: "82675",
+        id_customer: "29166",
+        id_order: "2105904",
+        date_add: "2025-03-26 13:29:34",
+        date_upd: "2025-03-26 13:29:34",
+        associations: CustMessageAssociation {
+            customer_messages: [
+                CustMessage {
+                    id: "467271",
+                },
+            ],
+        },
+    },
+]
+18:54:17 [INFO] Got customer threads: [CustomerThread { id: "82675", id_customer: "29166", id_order: "2105904", date_add: "2025-03-26 13:29:34", date_upd: "2025-03-26 13:29:34", associations: CustMessageAssociation { customer_messages: [CustMessage { id: "467271" }] } }]
+18:54:17 [INFO] Checking if msg ID exists in database: CustMessage { id: "467271" }
+18:54:17 [INFO] Message existence query results: []
+18:54:17 [INFO] WE NEED TO CREATE THIS MESSAGE IN OUR DATABASE: CustMessage { id: "467271" }
+18:54:17 [INFO] query:https://pcl.master-tech.app/api/customer_messages/467271?output_format=JSON
+response: Object {
+    "customer_message": Object {
+        "id": Number(467271),
+        "id_employee": String("48"),
+        "id_customer_thread": String("82675"),
+        "ip_address": String(""),
+        "message": String("started"),
+        "file_name": String(""),
+        "user_agent": String(""),
+        "private": String("1"),
+        "date_add": String("2025-03-26 13:29:34"),
+        "date_upd": String("2025-03-26 13:29:34"),
+        "read": String("0"),
+        "id_order_message_type": String("4"),
+        "id_legacy_comment": String("0"),
+        "id_order_config": String("0"),
+    },
+}
+18:54:17 [INFO] x: CustomerMessage {
+    id: "467271",
+    id_employee: "48",
+    id_customer_thread: "82675",
+    message: "started",
+    file_name: "",
+    private: "1",
+    date_add: "2025-03-26 13:29:34",
+}
+18:54:17 [INFO] query:https://pcl.master-tech.app/api/employees/48?output_format=JSON
+response: Object {
+    "employee": Object {
+        "id": Number(48),
+        "id_lang": String("1"),
+        "last_passwd_gen": String("2024-01-29 14:31:01"),
+        "stats_date_from": String("2021-02-19"),
+        "stats_date_to": String("2021-03-19"),
+        "stats_compare_from": String("0000-00-00"),
+        "stats_compare_to": String("0000-00-00"),
+        "passwd": String("$2y$10$RI5cR33gSLbwWGzdYez7nO0gVvszoiRsWwST4qmxrprYqgFqJiBfK"),
+        "lastname": String("Lees"),
+        "firstname": String("Logan"),
+        "email": String("logan.lees@pclaptops.com"),
+        "active": String("1"),
+        "optin": String("0"),
+        "id_profile": String("20"),
+        "bo_color": String(""),
+        "default_tab": String("4"),
+        "bo_theme": String(""),
+        "bo_css": String("theme.css"),
+        "bo_width": String("0"),
+        "bo_menu": String("1"),
+        "stats_compare_option": String("1"),
+        "preselect_date_range": String(""),
+        "id_last_order": String("2076719"),
+        "id_last_customer_message": String("432526"),
+        "id_last_customer": String("143014"),
+        "reset_password_token": String(""),
+        "reset_password_validity": String("0000-00-00 00:00:00"),
+        "id_store": String("7"),
+        "xidax_admin_name": String("Logan Lees"),
+        "sales_eligible": String("1"),
+        "show_order_ids": String("1"),
+        "dark_mode": String("1"),
+        "verbose_tax": String("0"),
+        "initials": String("LL"),
+        "id_user_odoo": String(""),
+        "id_partner_odoo": String(""),
+        "id_order_state": String("58"),
+    },
+}
+18:54:17 [INFO] x: Employee {
+    id: "48",
+    id_store: "7",
+    lastname: "Lees",
+    firstname: "Logan",
+    email: "logan.lees@pclaptops.com",
+    active: "1",
+    id_profile: "20",
+    id_last_order: "2076719",
+    id_last_customer_message: "432526",
+    id_last_customer: "143014",
+    initials: "LL",
+}
+18:54:17 [INFO] Creating a new task_note: TaskNotePayload { id: Thing { tb: "task_note", id: String("467271") }, task_id: Some(Thing { tb: "task", id: String("a85edd8440b44ee48d802b41fb093abd") }), everest_initials: "LL", created_at: "2025-03-26T13:29:34+00:00", note: "started", username: "logan.lees", id_customer_thread: Some("82675"), id_customer_message: Some("467271"), id_employee: Some("48"), user: Some(Thing { tb: "user", id: String("jm9a7l3v32gsiccr7pgw") }) }
+18:54:18 [INFO] Data: Create
+18:54:18 [INFO] Created note: Some(Record { id: Thing { tb: "task_note", id: String("467271") } })
+18:54:18 [INFO] Message existence in database: None
+18:54:18 [INFO] Sent notification
+18:54:18 [INFO] Customer thread id from order: "82675"
+18:54:18 [INFO] Sent from Mastertech, updating other task note fields
+18:54:18 [INFO] Task Note Creation from Mastertech: Ok(())
+18:54:18 [INFO] send_payload_result: Ok(())
+18:54:18 [INFO] New note: (Create, TaskNotePayload { id: Thing { tb: "task_note", id: String("467271") }, task_id: Some(Thing { tb: "task", id: String("a85edd8440b44ee48d802b41fb093abd") }), everest_initials: "LL", created_at: "2025-03-26T13:29:34+00:00", note: "started", username: "logan.lees", id_customer_thread: Some("82675"), id_customer_message: Some("467271"), id_employee: Some("48"), user: Some(Thing { tb: "user", id: String("jm9a7l3v32gsiccr7pgw") }) })

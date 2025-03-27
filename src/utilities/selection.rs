@@ -10,6 +10,7 @@ pub struct SelectionRect {
     pub start: Coordinate,
     pub end: Option<Coordinate>,
 }
+
 impl SelectionRect {
     pub fn new(start: Coordinate) -> Self {
         Self { start, end: Some(start) }
@@ -57,10 +58,6 @@ impl SignificantComponent for SelectionRect {
         todo!();
     }
 }
-
-
-
-
 
 
 

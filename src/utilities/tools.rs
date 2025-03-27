@@ -50,7 +50,10 @@ pub trait SignificantComponent {
         //insert specific rapier components based on the item type here
         match item_type {
             'c' => {
-                ec.insert((RigidBody::Fixed, Collider::cuboid(1., 1.)));
+                ec.insert((
+                    Collider::cuboid((TILE_SIZE /2)as f32, (TILE_SIZE/2) as f32),
+                    Restitution::coefficient(0.05),
+                ));
             },
             't' => {
                 println!("Adding tile, no rigidbody");
