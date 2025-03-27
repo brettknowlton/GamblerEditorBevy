@@ -1,16 +1,18 @@
+use bevy_rapier2d::prelude::RigidBody;
+
 use super::*;
 
 
 pub fn player_controls(
     keyboard_input: Res<ButtonInput<KeyCode>>,
-    mut query: Query<(&mut Player, &mut Transform)>,
+    mut query: Query<(&mut Player, &mut Transform, &mut RigidBody)>,
 ) {
-    for (mut player, _) in query.iter_mut() {
+    for (mut player, _, rb) in query.iter_mut() {
         if keyboard_input.just_pressed(KeyCode::KeyW) {
             
             if player.on_ground == true {
                 player.velocity.y += PLAYER_JUMP_FORCE as f32;
-                player.facing = Direction::Up;
+                // player.facing = Direction::Up;
                 player.on_ground = false;
             }
             
@@ -20,11 +22,11 @@ pub fn player_controls(
         }
         if keyboard_input.pressed(KeyCode::KeyA) {
             player.velocity.x -= PLAYER_WALK_SPEED as f32;
-            player.facing = Direction::Left;
+            // player.facing = Direction::Left;
         }
         if keyboard_input.pressed(KeyCode::KeyD) {
             player.velocity.x += PLAYER_WALK_SPEED as f32;
-            player.facing = Direction::Right;
+            // player.facing = Direction::Right;
         }
     }
 }
@@ -62,15 +64,37 @@ pub fn move_player_to_cursor(cursor_transform: Transform, player_transform: &mut
     player_transform.translation.z = 1.0;
 }
 
-#[derive(Component, Debug)]
+
+#[derive(Component, Debug, Reflect)]
+pub enum PlayerState {
+    Idle,
+    Walking,
+    Running,
+    Attacking,
+    Hurt,
+    Dead,
+}
+
+#[derive(Component, Debug, Reflect)]
+pub struct AnimationDef {
+    pub frame_size: Vec2,
+    pub layout: Vec2,
+    pub frame_count: u32,
+    pub frame_duration: f32,
+    pub current_frame: u32,
+    pub frame_timer: f32,
+}
+
+
+
+#[derive(Component, Debug, Reflect)]
 pub struct Player {
     pub state: PlayerState,
     pub current_animation: AnimationDef,
     pub facing: Direction,
+    pub on_ground: bool,
     pub velocity: Vec2,
     pub acceleration: Vec2,
-
-    pub on_ground: bool,
 
 }
 
@@ -92,8 +116,6 @@ impl Default for Player {
         Self {
             state: PlayerState::Idle,
             facing: Direction::Down,
-            velocity: Vec2::new(0.0, -1.0),
-            acceleration: Vec2::new(0.0, 0.0),
             current_animation: AnimationDef {
                 frame_size: Vec2::new(36.0, 45.0),
                 layout: Vec2::new(1., 1.),
@@ -103,6 +125,8 @@ impl Default for Player {
                 frame_timer: 0.0,
             },
             on_ground: false,
+            velocity: Vec2::new(0.0, 0.0),
+            acceleration: Vec2::new(0.0, 0.0),
         }
     }
 }
@@ -126,67 +150,4 @@ pub fn spawn_player(mut commands: Commands, asset_server: Res<AssetServer>) {
             ..Default::default()
         },
     ));
-}
-
-pub fn do_player_collision(mut players: Query<(Entity, &mut Player, &mut Transform)>, colliders: Query<(Entity, &Collider, &Transform), Without<Player>>) {
-    for (_, mut player, mut player_transform) in players.iter_mut() {
-
-
-        let player_rect = Rect::new(
-            player_transform.translation.x + PLAYER_HB_X_OFFSET as f32,
-            player_transform.translation.y,
-            player_transform.translation.x + SCALED_PLAYER_WIDTH as f32 - PLAYER_HB_X_OFFSET as f32,
-            player_transform.translation.y + (SCALED_PLAYER_HEIGHT - PLAYER_HB_Y_OFFSET) as f32,
-        );
-        let mut collisions = Vec::new();
-        for (_, _, collider_transform) in colliders.iter() {
-            let collider_rect = Rect::new(
-                collider_transform.translation.x,
-                collider_transform.translation.y,
-                collider_transform.translation.x + SCALED_TILE_WIDTH as f32,
-                collider_transform.translation.y + SCALED_TILE_HEIGHT as f32,
-            );
-            let intersect = collider_rect.intersect(player_rect);
-            if ! intersect.is_empty() {
-                //collision detected
-                collisions.push((intersect, collider_rect));
-            }
-        }
-
-        collisions.iter().for_each(|(intersection, collider_rect)| {
-            println!("Handling collision between player: {:?} and collider: {:?}", player_rect, collider_rect);
-            //handle collision
-            if intersection.width() > intersection.height() {
-                //player is colliding with the top or bottom of the collider
-                if player.velocity.y > 0.0 {
-                    //player is colliding with the bottom of the collider (jumping case)
-                    player_transform.translation.y = collider_rect.min.y - player_rect.height();
-                    player.velocity.y = 0.0;
-                    player.acceleration.y = 0.0;
-                }
-                if player.velocity.y < 0.0 {
-                    //player is colliding with the top of the collider (falling case)
-                    player_transform.translation.y = collider_rect.max.y;
-                    player.velocity.y = 0.0;
-                    player.on_ground = true;
-                }
-            }
-            
-            if intersection.width() < intersection.height() {
-                //player is colliding with the left or right of the collider 
-                if player.velocity.x > 0.0 {
-                    //player is colliding with the left of the collider (player moving right)
-                    player_transform.translation.x = collider_rect.min.x - SCALED_PLAYER_WIDTH as f32 + PLAYER_HB_X_OFFSET as f32;
-                    player.velocity.x = 0.0;
-                }
-                if player.velocity.x < 0.0 {
-                    //player is colliding with the right of the collider (player moving left)
-                    player_transform.translation.x = collider_rect.max.x - PLAYER_HB_X_OFFSET as f32;
-                    player.velocity.x = 0.0;
-                }
-            }
-        }
-
-        );
-    }
 }

@@ -5,14 +5,16 @@ use selection::SelectionRect;
 pub use ui::*;
 
 pub use tile::*;
-use tools::SignificantComponent;
+pub use tools::SignificantComponent;
 pub use crate::consts::*;
-use crate::game;
+pub use crate::game::*;
 pub use crate::utilities::*;
 pub use crate::resources::*;
 
 pub mod tile;
 pub mod collider;
+pub mod actor;
+
 mod scene;
 pub use std::{ fmt::Debug, path::PathBuf };
 
@@ -119,8 +121,8 @@ struct ResetScene;
 fn stateful_keybinds(
     editor_state: ResMut<State<EditorState>>,
     mut next_editor_state: ResMut<NextState<EditorState>>,
-    game_state: ResMut<State<game::GameState>>,
-    mut next_game_state: ResMut<NextState<game::GameState>>,
+    game_state: ResMut<State<GameState>>,
+    mut next_game_state: ResMut<NextState<GameState>>,
 
     
     mut next_showgrid_state: ResMut<NextState<ShowGrid>>,
@@ -171,13 +173,13 @@ fn stateful_keybinds(
         input.pressed(KeyCode::ControlLeft) && input.just_pressed(KeyCode::KeyT) &&
         editor_state.get() != &EditorState::Inactive
     {
-        if game_state.get() != &game::GameState::Inactive && editor_state.get() == &EditorState::Inactive {
+        if game_state.get() != &GameState::Inactive && editor_state.get() == &EditorState::Inactive {
             next_editor_state.set(EditorState::Normal);
-            next_game_state.set(game::GameState::Inactive);
+            next_game_state.set(GameState::Inactive);
             send_message!(Some('i'), messages, "Exiting Test Mode");
         } else {
             next_editor_state.set(EditorState::Inactive);
-            next_game_state.set(game::GameState::Running);
+            next_game_state.set(GameState::Running);
             send_message!(Some('i'), messages, "Entering Test Mode");
         }
     } else if 
@@ -238,6 +240,12 @@ fn stateful_keybinds(
     if input.just_pressed(KeyCode::Digit2) || input.just_pressed(KeyCode::Numpad2) {
         send_message!(Some('i'), messages, "Switching to Collider Mode");
         next_editor_state.set(EditorState::Editing(EditingComponent::Collider));
+    }
+
+    // 3 will switch to actor mode
+    if input.just_pressed(KeyCode::Digit3) || input.just_pressed(KeyCode::Numpad3) {
+        send_message!(Some('i'), messages, "Switching to Actor Mode");
+        next_editor_state.set(EditorState::Editing(EditingComponent::Actor));
     }
 
     //state specific keybinds
@@ -399,7 +407,7 @@ impl EditorObject {
 }
 
 fn reset_scene(
-    mut players: Query<(&mut game::player::Player, &mut Transform), (Without<Crosshair>, Without<Camera2d>)>,
+    mut players: Query<(&mut actor::player::Player, &mut Transform), (Without<Crosshair>, Without<Camera2d>)>,
     mut cameras: Query<(&mut Transform, &mut Camera2d), Without<Crosshair>>,
     crosshairs: Query<&Transform, (With<Crosshair>, Without<Camera2d>)>,
     // mut ui_items: Query<(&mut UIItem, &mut Transform), Without<Crosshair>>,
@@ -407,7 +415,7 @@ fn reset_scene(
     //reset the player to the crosshair position
     let cs = crosshairs.single().clone();
     for (mut player, mut t) in players.iter_mut() {
-        game::player::move_player_to_cursor(cs, &mut t);
+        actor::player::move_player_to_cursor(cs, &mut t);
         player.velocity = Vec2::new(0.0, 0.0);
     }
 
@@ -471,6 +479,7 @@ pub fn editor_plugin(app: &mut App) {
         .add_plugins(tile::tilemode_plugin)
         .add_plugins(collider::collidermode_plugin)
         .add_plugins(scene::scene_plugin)
+        .add_plugins(actor::actormode_plugin)
 
         //on entrance to this state, we give our placeholder object a handle to the default SignificantComponent of this mode- in normal mode this is a SelectionRect
         .add_systems(

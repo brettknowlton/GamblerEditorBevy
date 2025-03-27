@@ -56,6 +56,8 @@ pub const MAX_SPRITESHEET_ITEMS: u64 = 32;
 pub const UI_BORDER_PX: f32 = 2.0; //border around the UI elements
 pub const UI_BORDER_REAL: f32 = UI_BORDER_PX * UI_SCALE; //border around the UI elements as a fraction of the window height
 
+
+
 //PHYSICS CONSTS
 pub const GRAVITY: f32 = 15.6;
 pub const FRICTION: f32 = 0.25;

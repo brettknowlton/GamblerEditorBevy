@@ -3,8 +3,6 @@ use super::editor::*;
 
 use bevy::prelude::*;
 
-pub mod player;
-
 //EditorState is an enum that defines the different states the editor can be in, this is used to determine what the editor is currently doing
 #[derive(Clone, Copy, Default, Eq, PartialEq, Debug, Hash, States)]
 pub enum GameState {
@@ -23,15 +21,15 @@ pub fn game_plugin(app: &mut App) {
         //OnEnter systems
         .add_systems(
             OnEnter(GameState::Inactive),
-            (load_save_data, player::spawn_player).chain(),
+            (load_save_data, actor::player::spawn_player).chain(),
         )
         .add_systems(
             FixedUpdate,
             (
                 game_keybinds,
-                player::player_controls,
-                player::player_physics,
-                player::do_player_collision,
+                actor::player::player_controls,
+                actor::player::player_physics,
+                // player::do_player_collision,
             )
                 .chain()
                 .run_if(in_state(GameState::Running)),
@@ -59,7 +57,7 @@ fn game_keybinds(
 }
 
 fn player_camera(
-    players: Query<(&player::Player, &Transform), Without<Camera>>,
+    players: Query<(&actor::player::Player, &Transform), Without<Camera>>,
     mut camera_query: Query<(&mut Camera, &mut Transform)>,
 ) {
     for (_, player_t) in players.iter() {
@@ -84,7 +82,7 @@ pub enum PlayerState {
     Dead,
 }
 
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+#[derive(Clone, Reflect, Copy, Debug, PartialEq, Eq, Hash)]
 pub enum Direction {
     Up,
     Down,

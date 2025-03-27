@@ -19,7 +19,7 @@ fn collidermode_keybinds(
     input: Res<ButtonInput<KeyCode>>,
 
     crosshairs: Query<(&Transform, &Crosshair)>,
-    colliders: Query<(Entity, &EditorObject), With<Collider>>,
+    colliders: Query<(Entity, &EditorObject), With<ColliderObject>>,
     gridsnap: Res<State<GridSnap>>,
 
     mut message_queue: ResMut<EditorBottomBarQueuedMessages>
@@ -43,7 +43,7 @@ fn collidermode_keybinds(
         };
 
         //place the tile using our SignificantComponent trait
-        Collider::place(&mut commands, to_place, 'c',  coord, &colliders);
+        ColliderObject::place(&mut commands, to_place, 'c',  coord, &colliders);
         send_message!(Some('i'), message_queue, format!("Placed collider at: ({}, {})", coord.0, coord.1));
     }
 
@@ -68,23 +68,16 @@ fn exit_collidermode(mut message_queue: ResMut<EditorBottomBarQueuedMessages>) {
     // commands.insert_resource(PlaceholderObject(EditorObject::default()));
 }
 
-/// A component that marks an entity as part 
-/// 
-/// of the tile editing UI.
-#[derive(Component, Reflect)]
-#[reflect(Component)]
-#[require(UIItem)]
-struct ColliderModeUI;
 
 /// A component to track some basic info about a tile
 #[derive(Component, Reflect, Debug, Clone)]
 #[reflect(Component)]
-pub struct Collider {
+pub struct ColliderObject {
     pub internal_type: u64,
     pub coordinate: TCoordinate,
     pub rect: Rect,
 }
-impl Collider {
+impl ColliderObject {
     fn new() -> Self {
         Self {
             internal_type: 0,
@@ -95,13 +88,13 @@ impl Collider {
 
     
 }
-impl Default for Collider {
+impl Default for ColliderObject {
     fn default() -> Self {
         Self::new()
     }
 }
 
-impl SignificantComponent for Collider {
+impl SignificantComponent for ColliderObject {
 
     fn place_rectangle(_rect: Rect, _commands: Commands) {
         //make a tile like normal in this rect, but use sliced tiles over the sprite sheet selection
@@ -119,7 +112,7 @@ impl SignificantComponent for Collider {
 
 pub fn collidermode_plugin(app: &mut App) {
     app
-        .register_type::<Collider>()
+        .register_type::<ColliderObject>()
         .register_type::<Coordinate>()
         .register_type::<TCoordinate>()
         .register_type::<ColliderModeUI>()
@@ -128,12 +121,12 @@ pub fn collidermode_plugin(app: &mut App) {
         .add_systems(Startup, init)
 
         //OnEnter systems
-        .add_systems(OnEnter(EditorState::Editing(EditingComponent::Collider)), (crate::ui::update_placeholder::<Collider>, ui::create_collidermode_ui).chain())
+        .add_systems(OnEnter(EditorState::Editing(EditingComponent::Collider)), (crate::ui::update_placeholder::<ColliderObject>, ui::create_collidermode_ui).chain())
 
         //Update systems, that run only while TileEditor is active
         .add_systems(
             Update,
-            (collidermode_keybinds, super::ui::update_placeholder::<Collider>)
+            (collidermode_keybinds, super::ui::update_placeholder::<ColliderObject>)
                 .chain()
                 .run_if(in_state(EditorState::Editing(EditingComponent::Collider)))
         )
@@ -142,7 +135,7 @@ pub fn collidermode_plugin(app: &mut App) {
         .add_systems(
             OnExit(EditorState::Editing(EditingComponent::Collider)), 
             (
-                despawn_all::<ColliderModeUI>,
+                despawn_all::<ui::ColliderModeUI>,
                 exit_collidermode
             ).chain()
         );

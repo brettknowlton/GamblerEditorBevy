@@ -43,7 +43,7 @@ pub fn spawn_collider_placeholder(
 
     //display the placeholder tile
     commands.spawn((
-        ColliderObject {
+        Actor {
             ..default()
         },
 
@@ -65,7 +65,7 @@ pub fn spawn_collider_placeholder(
             ..default()
         },
         
-        ColliderModeUI,
+        ActorModeUI,
 
         PlaceholderObjectTag,
     ));
@@ -112,12 +112,12 @@ pub fn create_collidermode_ui(mut commands: Commands, asset_server: Res<AssetSer
         UIItem {
             ..default()
         },
-        ColliderModeUI,
+        ActorModeUI,
     ));
 
     //spawn the mode title at the top
     commands.spawn((
-        ColliderModeUI,
+        ActorModeUI,
         Text {
             0: "Collider Mode".to_string(),
 
@@ -135,8 +135,8 @@ pub fn create_collidermode_ui(mut commands: Commands, asset_server: Res<AssetSer
 
 /// A component that marks an entity as part 
 /// 
-/// of the collider editing UI.
+/// of the tile editing UI.
 #[derive(Component, Reflect)]
 #[reflect(Component)]
 #[require(UIItem)]
-pub struct ColliderModeUI;
+pub struct ActorModeUI;
