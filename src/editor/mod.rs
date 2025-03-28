@@ -15,8 +15,6 @@ pub mod tile;
 pub mod collider;
 pub mod actor;
 
-use bevy_rapier2d::prelude::*;
-
 mod scene;
 pub use std::{ fmt::Debug, path::PathBuf };
 

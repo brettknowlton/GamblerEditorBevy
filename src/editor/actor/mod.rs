@@ -9,7 +9,7 @@ pub use player::*;
 use bevy::prelude::*;
 use tools::SignificantComponent;
 use std::path::PathBuf;
-use crate::{ utilities::*, EditorObject, TILE_SIZE };
+pub use crate::{ utilities::*, EditorObject, TILE_SIZE };
 use crate::consts::*;
 use super::*;
 

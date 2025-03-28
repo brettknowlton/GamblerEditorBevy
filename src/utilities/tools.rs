@@ -2,8 +2,8 @@ use crate::EditorObject;
 
 use super::*;
 use bevy::math::Rect;
-use bevy_rapier2d::prelude::Sensor;
-use bevy_rapier2d::prelude::*;
+
+use avian2d::prelude::*;
 
 pub trait SignificantComponent {
     fn place_rectangle(rect: Rect, commands: Commands);
@@ -51,8 +51,7 @@ pub trait SignificantComponent {
         match item_type {
             'c' => {
                 ec.insert((
-                    Collider::cuboid((TILE_SIZE /2)as f32, (TILE_SIZE/2) as f32),
-                    Restitution::coefficient(0.05),
+                    Collider::rectangle(TILE_SIZE as f32, TILE_SIZE as f32),
                 ));
             },
             't' => {
@@ -60,7 +59,7 @@ pub trait SignificantComponent {
             },
             'a' => {
                 println!("Adding actor, dynamic rigidbody");
-                ec.insert((RigidBody::Dynamic, Collider::cuboid(1., 1.)));
+                ec.insert((Collider::rectangle(1., 1.)));
             },
             _ => panic!("Invalid item type"),
         }
