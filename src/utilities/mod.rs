@@ -6,12 +6,6 @@ use crate::{ TILE_SCALE, TILE_SIZE };
 pub mod resources;
 pub mod tools;
 pub mod selection;
-pub mod physics;
-
-pub use resources::*;
-pub use tools::*;
-pub use selection::*;
-pub use physics::*;
 
 //Helper Functions
 pub fn despawn_all<T: Component>(mut commands: Commands, to_despawn: Query<Entity, With<T>>) {

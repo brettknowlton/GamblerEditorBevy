@@ -30,6 +30,7 @@ pub fn game_plugin(app: &mut App) {
                 actor::player::player_controls,
                 // actor::player::player_physics,
                 // player::do_player_collision,
+                rapier_physics_systems
             )
                 .chain()
                 .run_if(in_state(GameState::Running)),

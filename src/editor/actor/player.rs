@@ -1,7 +1,7 @@
+use bevy_rapier2d::{parry::query::Contact, prelude::{Collider, LockedAxes, RapierContext, Restitution, RigidBody, Velocity}};
 use crate::collider::ColliderObject;
-use avian2d::prelude::*;
+
 use super::*;
-use crate::utilities::physics::*;
 
 pub fn player_controls(
     keyboard_input: Res<ButtonInput<KeyCode>>,
@@ -12,7 +12,7 @@ pub fn player_controls(
             // Jump
             if keyboard_input.pressed(KeyCode::KeyW) && player.on_ground {
                 if player.air_timer < PLAYER_JUMP_GRACE_PERIOD {
-                    velocity.y += PLAYER_JUMP_FORCE as f32;
+                    velocity.linvel.y += PLAYER_JUMP_FORCE as f32;
                     player.on_ground = false;
                 }
             }
@@ -24,12 +24,12 @@ pub fn player_controls(
 
             // Move Left
             if keyboard_input.pressed(KeyCode::KeyA) {
-                velocity.x -= PLAYER_WALK_SPEED as f32;
+                velocity.linvel.x -= PLAYER_WALK_SPEED as f32;
             }
 
             // Move Right
             if keyboard_input.pressed(KeyCode::KeyD) {
-                velocity.x += PLAYER_WALK_SPEED as f32;
+                velocity.linvel.x += PLAYER_WALK_SPEED as f32;
             }
         }
     }
@@ -40,6 +40,7 @@ pub fn player_physics(
     time: Res<Time>,
     mut players: Query<(Entity, &mut Player, &mut Transform, &mut Collider)>,
     mut colliders: Query<(Entity, &mut Collider), With<ColliderObject>>,
+    rapier_context: RapierContext,
 ) {
     for (pe, mut player, t, c) in players.iter_mut() {
         let mut is_on_ground = true;
@@ -137,11 +138,12 @@ pub fn spawn_player(
                 ..Default::default()
             },
             RigidBody::Dynamic,
-            Collider::rectangle(
-                ((PLAYER_SIZE_X) - (PLAYER_HB_X_OFFSET )) as f32,
-                ((PLAYER_SIZE_Y) - (PLAYER_HB_Y_OFFSET / 2)) as f32,
+            Collider::cuboid(
+                ((PLAYER_SIZE_X) / 2 - (PLAYER_HB_X_OFFSET / 2)) as f32,
+                ((PLAYER_SIZE_Y) / 2 - (PLAYER_HB_Y_OFFSET / 4)) as f32,
             ),
             LockedAxes::ROTATION_LOCKED,
+            Restitution::coefficient(0.0),
             Velocity::default(),
             Player {
                 ..Default::default()
