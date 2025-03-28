@@ -36,10 +36,11 @@ fn main() {
         //     query_pipeline_active: true,
         //     ..Default::default()
         // })
+
         .add_plugins(RapierPhysicsPlugin::<NoUserData>::pixels_per_meter(32.0))
         .add_plugins(RapierDebugRenderPlugin::default())
-        .add_systems(Startup, setup_physics)
 
+        
         .insert_resource(ClearColor(Color::from(WINDOW_DEFAULT_BACKGROUND_COLOR)))
         .insert_resource(Time::<Fixed>::from_hz(64.0))
         
@@ -49,17 +50,3 @@ fn main() {
         .run();
 }
 
-
-fn setup_physics(mut commands: Commands) {
-    /* Create the ground. */
-    commands
-        .spawn(Collider::cuboid(500.0, 50.0))
-        .insert(Transform::from_xyz(0.0, -100.0, 0.0));
-
-    /* Create the bouncing ball. */
-    commands
-        .spawn(RigidBody::Dynamic)
-        .insert(Collider::ball(50.0))
-        .insert(Restitution::coefficient(0.7))
-        .insert(Transform::from_xyz(0.0, 400.0, 0.0));
-}

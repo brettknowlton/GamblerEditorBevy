@@ -30,17 +30,18 @@ pub fn game_plugin(app: &mut App) {
                 actor::player::player_controls,
                 // actor::player::player_physics,
                 // player::do_player_collision,
+                rapier_physics_systems
             )
                 .chain()
                 .run_if(in_state(GameState::Running)),
         )
-        .add_systems(Update, player_camera.run_if(in_state(GameState::Running)));
-
+        .add_systems(Update, player_camera.run_if(in_state(GameState::Running)))
     // .add_systems(
     //     OnEnter(GameState::Loading),
     //     ().chain()
     // );
 }
+
 
 fn game_keybinds(
     editor_state: ResMut<State<EditorState>>,
