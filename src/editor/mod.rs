@@ -15,6 +15,8 @@ pub mod tile;
 pub mod collider;
 pub mod actor;
 
+use bevy_rapier2d::prelude::*;
+
 mod scene;
 pub use std::{ fmt::Debug, path::PathBuf };
 
@@ -465,7 +467,7 @@ impl EditorObject {
 
 fn reset_scene(
     mut players: Query<
-        (&mut actor::player::Player, &mut Transform),
+        (&mut actor::player::Player, &mut Transform, &mut Velocity),
         (Without<Crosshair>, Without<Camera2d>)
     >,
     mut cameras: Query<(&mut Transform, &mut Camera2d), Without<Crosshair>>,
@@ -474,9 +476,9 @@ fn reset_scene(
 ) {
     //reset the player to the crosshair position
     let cs = crosshairs.single().clone();
-    for (mut player, mut t) in players.iter_mut() {
+    for (mut player, mut t, mut vel) in players.iter_mut() {
         actor::player::move_player_to_cursor(cs, &mut t);
-        player.velocity = Vec2::new(0.0, 0.0);
+        vel.linvel = Vec2::new(0.0, 0.0);
     }
 
     //reset the camera to the crosshair position

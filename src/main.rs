@@ -30,10 +30,15 @@ fn main() {
         )
 
         //Rapier physics plugins
+        // .insert_resource(RapierConfiguration {
+        //     gravity: Vec2::new(0.0, -9.81), 
+        //     physics_pipeline_active: true,
+        //     query_pipeline_active: true,
+        //     ..Default::default()
+        // })
         .add_plugins(RapierPhysicsPlugin::<NoUserData>::pixels_per_meter(32.0))
         .add_plugins(RapierDebugRenderPlugin::default())
         .add_systems(Startup, setup_physics)
-
 
         .insert_resource(ClearColor(Color::from(WINDOW_DEFAULT_BACKGROUND_COLOR)))
         .insert_resource(Time::<Fixed>::from_hz(64.0))
