@@ -36,8 +36,10 @@ fn main() {
         //     query_pipeline_active: true,
         //     ..Default::default()
         // })
-
-        .add_plugins(RapierPhysicsPlugin::<NoUserData>::pixels_per_meter(32.0))
+        .add_plugins(
+            RapierPhysicsPlugin::<NoUserData>::pixels_per_meter(32.0)
+        )
+        
         .add_plugins(RapierDebugRenderPlugin::default())
 
         

@@ -13,6 +13,8 @@ use crate::{ utilities::*, EditorObject, TILE_SIZE };
 use crate::consts::*;
 use super::*;
 
+use bevy_rapier2d::prelude::*;
+
 #[derive(Component, Reflect, Debug, Clone, PartialEq,)]
 #[require(EditorObject)]
 pub struct Actor {
@@ -129,6 +131,7 @@ pub fn actormode_plugin(app: &mut App) {
             (super::ui::update_placeholder::<Actor>, actor_mode_keybinds).chain()
                 .run_if(in_state(EditorState::Editing(EditingComponent::Actor)))
         )
+
 
         //OnExit systems
         .add_systems(

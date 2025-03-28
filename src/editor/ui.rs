@@ -49,9 +49,6 @@ pub struct UIItem {
 pub fn spawn_general_editor_ui(mut commands: Commands, asset_server: Res<AssetServer>) {
     //spawn a bar on the bottom using our default UI menu sprite
 
-    let x_offset = -DEFAULT_WINDOW_WIDTH / 2.0;
-    let y_offset = -DEFAULT_WINDOW_HEIGHT / 2.0;
-
     let x_size = DEFAULT_WINDOW_WIDTH;
     let y_size = 30.0;
 
@@ -79,10 +76,6 @@ pub fn spawn_general_editor_ui(mut commands: Commands, asset_server: Res<AssetSe
             position_type: PositionType::Absolute,
             bottom: Val::Px(0.0),
             left: Val::Px(0.0),
-            ..default()
-        },
-        Transform {
-            translation: Vec3::new(x_offset, y_offset, UI_Z_LAYER),
             ..default()
         },
     ));

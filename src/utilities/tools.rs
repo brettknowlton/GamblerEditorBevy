@@ -2,8 +2,6 @@ use crate::EditorObject;
 
 use super::*;
 use bevy::math::Rect;
-use bevy_rapier2d::prelude::Sensor;
-use bevy_rapier2d::prelude::*;
 
 pub trait SignificantComponent {
     fn place_rectangle(rect: Rect, commands: Commands);
@@ -31,8 +29,15 @@ pub trait SignificantComponent {
             coord.1 as f32 + 1.0 * TILE_SCALE as f32,
         );
 
-        let pos = Vec3::new(coord.0 as f32, coord.1 as f32, -5.0);
-        let mut ec = commands.spawn((
+        let pos = Vec3::new((coord.0 + (TILE_SIZE*TILE_SCALE / 2) as i64) as f32, (coord.1 + (TILE_SIZE*TILE_SCALE / 2) as i64) as f32, -5.0);
+        let eo = EditorObject {
+            coordinate: TCoordinate::new(item_type, coord),
+            internal_type: item.internal_type,
+            zone_id: item.zone_id,
+        };
+
+
+        commands.spawn((
             T::from_rect(item_rect, coord),
             Visibility::default(),
             Transform {
@@ -40,30 +45,8 @@ pub trait SignificantComponent {
                 scale: Vec3::new(TILE_SCALE as f32, TILE_SCALE as f32, 1.0),
                 ..default()
             },
-            EditorObject {
-                coordinate: TCoordinate::new(item_type, coord),
-                internal_type: item.internal_type,
-                zone_id: item.zone_id,
-            },
+            eo.clone(),
         ));
-
-        //insert specific rapier components based on the item type here
-        match item_type {
-            'c' => {
-                ec.insert((
-                    Collider::cuboid((TILE_SIZE /2)as f32, (TILE_SIZE/2) as f32),
-                    Restitution::coefficient(0.05),
-                ));
-            },
-            't' => {
-                println!("Adding tile, no rigidbody");
-            },
-            'a' => {
-                println!("Adding actor, dynamic rigidbody");
-                ec.insert((RigidBody::Dynamic, Collider::cuboid(1., 1.)));
-            },
-            _ => panic!("Invalid item type"),
-        }
     }
 
     fn from_rect(rect: Rect, coord: Coordinate) -> Self;

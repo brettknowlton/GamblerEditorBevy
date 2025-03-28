@@ -1,41 +1,58 @@
+use crate::actor::Actor;
+
 use super::*;
 use bevy::log::*;
-use bevy::{prelude::*, tasks::IoTaskPool};
+use bevy::reflect::TypeRegistryArc;
+use bevy::{ prelude::*, tasks::IoTaskPool };
 use resources::*;
-use std::{fs::File, io::Write};
+use std::time::Duration;
+use std::{ fs::File, io::Write };
 
 pub fn scene_plugin(app: &mut App) {
-    app.add_systems(OnEnter(EditorState::LoadingEmpty), load_empty_scene)
-        .add_systems(
-            OnEnter(EditorState::Loading),
-            return_state.after(load_empty_scene),
-        )
-        .add_systems(
-            OnEnter(EditorState::Loading),
-            (load_scene, return_state.after(load_scene)),
-        )
-        .add_systems(
-            OnEnter(EditorState::Saving),
-            (save_items, return_state.after(save_items)),
-        )
+    app.register_type::<EditorObject>()
+        .register_type::<Actor>()
+        .register_type::<Tile>()
+        .register_type::<TCoordinate>()
+        .register_type::<Coordinate>()
+
+        .add_systems(OnEnter(EditorState::LoadingEmpty), load_empty_scene)
+        .add_systems(OnEnter(EditorState::Loading), return_state.after(load_empty_scene))
+        .add_systems(OnEnter(EditorState::Loading), (load_scene, return_state.after(load_scene)))
+        .add_systems(OnEnter(EditorState::Saving), (save_items, return_state.after(save_items)))
         .add_systems(
             Update,
-            spawn_sprites.run_if(not(in_state(EditorState::LoadAsk))),
+            (spawn_sprites, add_missing_colliders)
+                .chain()
+                .run_if(not(in_state(EditorState::LoadAsk)))
         );
 }
 
 // struct MyGenericType<T>(PhantomData<T>);
 fn load_scene(mut commands: Commands, asset_server: Res<AssetServer>) {
     //create scene manager component that will read/write our scene data between the enviornment and a json file
-    commands.spawn(DynamicSceneRoot(
-        asset_server.load(format!("{DEFAULT_SCENE_PATH}.ron")),
-    ));
+    commands.spawn(DynamicSceneRoot(asset_server.load(format!("{DEFAULT_SCENE_PATH}.ron"))));
+}
+
+fn add_missing_colliders(
+    mut commands: Commands,
+    editor_objects: Query<(Entity, &EditorObject), Without<Collider>>
+) {
+    for (entity, editor_object) in editor_objects.iter() {
+        if editor_object.get_major_type() == 'c' {
+            println!("Adding missing collider for EditorObject ID: {:?}", editor_object.coordinate);
+    
+            // Add a collider based on the EditorObject's properties
+            commands.entity(entity).insert((
+                Collider::cuboid(((TILE_SIZE / 2)) as f32, (TILE_SIZE / 2) as f32), Friction::coefficient(0.5)
+            ));
+        }
+    }
 }
 
 fn spawn_sprites(
     mut tiles: Query<(Entity, &mut EditorObject), Without<Sprite>>,
     mut commands: Commands,
-    spritesheets: Res<TextureHandles>,
+    spritesheets: Res<TextureHandles>
 ) {
     //spawn the sprites for each tile, use the editorObject's tcoords to determine the sprite's position
     //if the EditorObject has a tcoord beginning with 'T'
@@ -46,18 +63,18 @@ fn spawn_sprites(
                 //the UVs are the same for every tile, just change the offset by using the tiletype as a multiplier
                 rect: Some(Rect {
                     min: Vec2::new(
-                        (((eo.get_internal_type() as u64) % SPRITESHEET_WIDTH) as f32)
-                            * (TILE_SIZE as f32),
-                        (((eo.get_internal_type() as u64) / SPRITESHEET_WIDTH) as f32)
-                            * (TILE_SIZE as f32),
+                        (((eo.get_internal_type() as u64) % SPRITESHEET_WIDTH) as f32) *
+                            (TILE_SIZE as f32),
+                        (((eo.get_internal_type() as u64) / SPRITESHEET_WIDTH) as f32) *
+                            (TILE_SIZE as f32)
                     ),
                     max: Vec2::new(
-                        (((eo.get_internal_type() as u64) % SPRITESHEET_WIDTH) as f32)
-                            * (TILE_SIZE as f32)
-                            + (TILE_SIZE as f32),
-                        (((eo.get_internal_type() as u64) / SPRITESHEET_WIDTH) as f32)
-                            * (TILE_SIZE as f32)
-                            + (TILE_SIZE as f32),
+                        (((eo.get_internal_type() as u64) % SPRITESHEET_WIDTH) as f32) *
+                            (TILE_SIZE as f32) +
+                            (TILE_SIZE as f32),
+                        (((eo.get_internal_type() as u64) / SPRITESHEET_WIDTH) as f32) *
+                            (TILE_SIZE as f32) +
+                            (TILE_SIZE as f32)
                     ),
                 }),
                 anchor: Anchor::BottomLeft,
@@ -71,7 +88,7 @@ fn spawn_sprites(
                 .insert((sprite, Visibility::default()))
                 .entry::<Transform>()
                 .and_modify(move |mut t| {
-                    t.translation = Vec3::new(coord.0 as f32, coord.1 as f32, 0.);
+                    t.translation = Vec3::new(coord.0 as f32, coord.1 as f32, 0.0);
                 });
         }
         if eo.get_major_type() == 'c' {
@@ -87,17 +104,17 @@ fn spawn_sprites(
 
             let coord = eo.get_coordinate().coord;
 
-            commands
-                .entity(entity)
-                .insert(sprite)
-                .entry::<Transform>()
-                .and_modify(move |mut t| {
-                    t.translation = Vec3::new(
-                        coord.0 as f32 + (SCALED_TILE_WIDTH / 2) as f32,
-                        coord.1 as f32 + (SCALED_TILE_HEIGHT / 2) as f32,
-                        0.5,
-                    );
-                });
+            // commands
+            //     .entity(entity)
+            //     .insert(sprite)
+            //     .entry::<Transform>()
+            //     .and_modify(move |mut t| {
+            //         t.translation = Vec3::new(
+            //             (coord.0 as f32) + ((SCALED_TILE_WIDTH / 2) as f32),
+            //             (coord.1 as f32) + ((SCALED_TILE_HEIGHT / 2) as f32),
+            //             0.5
+            //         );
+            //     });
         }
     }
 }
@@ -109,7 +126,7 @@ fn load_empty_scene(mut commands: Commands) {
 
 fn return_state(
     mut next_state: ResMut<NextState<EditorState>>,
-    mut message_queue: ResMut<EditorBottomBarQueuedMessages>,
+    mut message_queue: ResMut<EditorBottomBarQueuedMessages>
 ) {
     //change the state
     next_state.set(EditorState::Normal);

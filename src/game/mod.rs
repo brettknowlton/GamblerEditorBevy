@@ -24,18 +24,17 @@ pub fn game_plugin(app: &mut App) {
             (load_save_data, actor::player::spawn_player).chain(),
         )
         .add_systems(
-            FixedUpdate,
+            Update,
             (
                 game_keybinds,
                 actor::player::player_controls,
-                // actor::player::player_physics,
+                actor::player::player_physics,
                 // player::do_player_collision,
-                rapier_physics_systems
             )
                 .chain()
                 .run_if(in_state(GameState::Running)),
         )
-        .add_systems(Update, player_camera.run_if(in_state(GameState::Running)))
+        .add_systems(Update, player_camera.run_if(in_state(GameState::Running)));
     // .add_systems(
     //     OnEnter(GameState::Loading),
     //     ().chain()
@@ -65,8 +64,6 @@ fn player_camera(
         for (_, mut t) in camera_query.iter_mut() {
             let mut new_t = player_t.clone();
             new_t.translation.z = t.translation.z;
-            new_t.translation.x += SCALED_PLAYER_WIDTH as f32 / 2.;
-            new_t.translation.y += SCALED_PLAYER_HEIGHT as f32 / 2.;
 
             t.translation = new_t.translation;
         }

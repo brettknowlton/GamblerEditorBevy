@@ -22,8 +22,6 @@ pub use std::{ fmt::Debug, path::PathBuf };
 
 use bevy::{ prelude::*, sprite::Anchor };
 
-use std::process::Command;
-
 //EditorState is an enum that defines the different states the editor can be in, this is used to determine what the editor is currently doing
 #[derive(Clone, Copy, Default, Eq, PartialEq, Debug, Hash, States)]
 pub enum EditorState {
