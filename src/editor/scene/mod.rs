@@ -2,10 +2,8 @@ use crate::actor::Actor;
 
 use super::*;
 use bevy::log::*;
-use bevy::reflect::TypeRegistryArc;
 use bevy::{ prelude::*, tasks::IoTaskPool };
 use resources::*;
-use std::time::Duration;
 use std::{ fs::File, io::Write };
 
 pub fn scene_plugin(app: &mut App) {
