@@ -22,8 +22,10 @@ pub fn player_controls(
         if keyboard_input.pressed(KeyCode::KeyW){
             player.trying_jump = true;
             if player.air_timer < PLAYER_JUMP_GRACE_PERIOD {
-                println!("air timer: {}", player.air_timer);
-                player.velocity.y += PLAYER_JUMP_FORCE as f32 * (1.+ PLAYER_JUMP_GRACE_PERIOD / 1.+ player.air_timer);
+                if keyboard_input.just_pressed(KeyCode::KeyW) && kpco.grounded{
+                    player.velocity.y = PLAYER_JUMP_FORCE as f32;
+
+                };
             }
         }else{
             player.trying_jump = false;
@@ -70,17 +72,11 @@ pub fn player_physics(
             //apply a small amount of gravity to the player if on the ground
             //this is to prevent the player from getting stuck in the ground
             let g = Vec2::new(0.0, -(GRAVITY as f32) * 0.1);
-            player.velocity += g;
+            player.velocity += g * time.delta_secs();
 
             //fix y velocity so the player doesnt drop off edges
             if player.velocity.y < -1.0 {
                 player.velocity.y = -1.0;
-            }
-
-            //apply friction to the player not trying to move
-            if !(player.trying_walk_left || player.trying_walk_right) {
-                let f = 1.0 - (FRICTION / 2.);
-                player.velocity.x *= f;
             }
             //clamp velocity.x to max walk speed if on ground
             if player.velocity.x > MAX_PLAYER_WALK_SPEED as f32 {
@@ -92,17 +88,12 @@ pub fn player_physics(
             //apply gravity to the player if in the air
             let g;
             if player.trying_jump && player.air_timer < PLAYER_JUMP_GRACE_PERIOD {//while trying to jump higher we suspend the effect of gravity somewhat
-                player.velocity.y += PLAYER_JUMP_FORCE as f32 * (1. / player.air_timer);
                 g = Vec2::new(0.0, -(GRAVITY as f32) * 0.1);
             }else{
                 g = Vec2::new(0.0, -(GRAVITY as f32));
             }
 
-            //apply friction to the player not trying to move
-            if !(player.trying_walk_left || player.trying_walk_right) {
-                let f = 1.0 - (FRICTION / 4.) ;
-                player.velocity.x *= f;
-            }
+            
 
             //apply a small amount of friction to the player if in the air
             //clamp velocity.x to double max walk speed if on ground
@@ -113,6 +104,12 @@ pub fn player_physics(
             }
             
             player.velocity += g;
+        }
+
+        //apply friction to the player not trying to move
+        if !(player.trying_walk_left || player.trying_walk_right) {
+            let f = 1.0 - (FRICTION / 4.) ;
+            player.velocity.x *= f;
         }
 
         controller.translation = Some(player.velocity * time.delta_secs());

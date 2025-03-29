@@ -25,10 +25,10 @@ pub const PLAYER_HB_X_OFFSET: u32 = SCALED_PLAYER_WIDTH / 3;
 pub const PLAYER_HB_Y_OFFSET: u32 = SCALED_PLAYER_HEIGHT / 3;
 
 pub const PLAYER_WALK_FORCE: u32 = 100;
-pub const MAX_PLAYER_WALK_SPEED: u32 = 400;
+pub const MAX_PLAYER_WALK_SPEED: u32 = 200;
 
-pub const PLAYER_JUMP_FORCE: f32 = 5.;
-pub const PLAYER_JUMP_GRACE_PERIOD: f32 = 0.2;//how long a vertical jump force can be applied to a player
+pub const PLAYER_JUMP_FORCE: f32 = 550.;
+pub const PLAYER_JUMP_GRACE_PERIOD: f32 = 0.5;//how long a vertical jump force can be applied to a player
 
 
 
@@ -60,7 +60,7 @@ pub const UI_BORDER_REAL: f32 = UI_BORDER_PX * UI_SCALE; //border around the UI 
 
 
 //PHYSICS CONSTS
-pub const GRAVITY: f32 = 20.;
+pub const GRAVITY: f32 = 30.;
 pub const FRICTION: f32 = 0.1; //Friction of the ground, this is a value between 0 and 1, 0 is no friction, 1 is full friction
 
 //Epsilon
