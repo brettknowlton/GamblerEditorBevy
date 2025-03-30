@@ -11,14 +11,17 @@
             "id": "5164161d9a27d8a0",
             "type": "leaf",
             "state": {
-              "type": "markdown",
+              "type": "canvas",
               "state": {
-                "file": "planning/Credits.md",
-                "mode": "source",
-                "source": false
+                "file": "planning/Dungeons and Dragons/Untitled.canvas",
+                "viewState": {
+                  "x": 179.18415172591392,
+                  "y": 369.81937059521783,
+                  "zoom": -1.8825930116040475
+                }
               },
-              "icon": "lucide-file",
-              "title": "Credits"
+              "icon": "lucide-layout-dashboard",
+              "title": "Untitled"
             }
           }
         ]
@@ -78,7 +81,7 @@
       }
     ],
     "direction": "horizontal",
-    "width": 300
+    "width": 200
   },
   "right": {
     "id": "bbec0168ba624e88",
@@ -162,8 +165,9 @@
   },
   "active": "5164161d9a27d8a0",
   "lastOpenFiles": [
-    "planning/Descriptions -thx gpt.md",
+    "planning/Planning Canvas.canvas",
     "planning/Credits.md",
+    "planning/Descriptions -thx gpt.md",
     "target/debug/deps/gambler_bevy-611733eab0f9239a",
     "target/debug/incremental/gambler_bevy-21uphrpt9fkq9/s-h5thujczdy-17ec8ob-4b15wo3snzr1luekwr4qt8wcg/work-products.bin",
     "target/debug/incremental/gambler_bevy-21uphrpt9fkq9/s-h5thujczdy-17ec8ob-4b15wo3snzr1luekwr4qt8wcg/query-cache.bin",
@@ -174,7 +178,6 @@
     "target/debug/incremental/gambler_bevy-21uphrpt9fkq9/s-h5thujczdy-17ec8ob-4b15wo3snzr1luekwr4qt8wcg/eykwr24ccekf1w19s340016d6.o",
     "target/debug/incremental/gambler_bevy-21uphrpt9fkq9/s-h5thujczdy-17ec8ob-4b15wo3snzr1luekwr4qt8wcg/eufxi3th0lqtzjxm909j2sq5p.o",
     "target/debug/incremental/gambler_bevy-21uphrpt9fkq9/s-h5thujczdy-17ec8ob-4b15wo3snzr1luekwr4qt8wcg/etns89vljjk7sb36ns9ijihru.o",
-    "planning/Planning Canvas.canvas",
     "assets/textures/player/PlayerHD.png",
     "assets/textures/player/PlayerLD.png",
     "planning/To-Do's.md",
