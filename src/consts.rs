@@ -24,8 +24,8 @@ pub const SCALED_PLAYER_HEIGHT: u32 = PLAYER_SIZE_Y * PLAYER_SCALE;//total pixel
 pub const PLAYER_HB_X_OFFSET: u32 = SCALED_PLAYER_WIDTH / 3;
 pub const PLAYER_HB_Y_OFFSET: u32 = SCALED_PLAYER_HEIGHT / 3;
 
-pub const PLAYER_WALK_FORCE: u32 = 100;
-pub const MAX_PLAYER_WALK_SPEED: u32 = 200;
+pub const PLAYER_WALK_FORCE: u32 = 200;
+pub const MAX_PLAYER_WALK_SPEED: u32 = 300;
 
 pub const PLAYER_JUMP_FORCE: f32 = 550.;
 pub const PLAYER_JUMP_GRACE_PERIOD: f32 = 0.5;//how long a vertical jump force can be applied to a player
