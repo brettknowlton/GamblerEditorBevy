@@ -1,4 +1,4 @@
-<H3>Laradia "Pearl" Shinstar - Aasimar /Cleric-Domain of Knowledge </H3>
+<H3>Helena "Pearl" Shinstar - Aasimar /Cleric-Domain of Knowledge </H3>
 Matriarch of camp in the mountains
 Mountain camp is largely quiet on a politcal scale as she exists in hermitude, attempts to gain power through knowledge
 

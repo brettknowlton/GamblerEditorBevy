@@ -1,0 +1,2 @@
+
+Feys are the living echoes of nature’s whimsy and chaos, beings woven from magic itself. Whether mischievous tricksters or eerie guardians, they exist in the liminal spaces between reality and dream, shaping the world in ways mortals can barely comprehend. Their motives are alien, their emotions fleeting, but to those who earn their favor—or their ire—feys are forces of nature itself, untamed and eternal.

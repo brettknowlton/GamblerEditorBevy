@@ -1,0 +1,2 @@
+
+Elves are beings of grace and longevity, their lifespans stretching far beyond mortal reckoning. Masters of art, magic, and war, they see the world in centuries rather than years, their patience and wisdom shaping civilizations. Yet, their detachment can make them aloof, watching the struggles of shorter-lived races with quiet amusement or cold indifference. To an elf, existence is a canvas of endless potential, *but stagnation is the enemy*—those who fail to adapt risk becoming relics of their own past.

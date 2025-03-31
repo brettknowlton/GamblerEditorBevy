@@ -13,15 +13,15 @@
             "state": {
               "type": "canvas",
               "state": {
-                "file": "planning/Dungeons and Dragons/Untitled.canvas",
+                "file": "planning/Planning Canvas.canvas",
                 "viewState": {
-                  "x": 179.18415172591392,
-                  "y": 369.81937059521783,
-                  "zoom": -1.8825930116040475
+                  "x": 3313.876083454871,
+                  "y": 2577.9761735823417,
+                  "zoom": -0.16619077634927082
                 }
               },
               "icon": "lucide-layout-dashboard",
-              "title": "Untitled"
+              "title": "Planning Canvas"
             }
           }
         ]
@@ -163,8 +163,9 @@
       "system3-relay:Relay": false
     }
   },
-  "active": "5164161d9a27d8a0",
+  "active": "2e616ea53fb13ed6",
   "lastOpenFiles": [
+    "planning/Dungeons and Dragons/Untitled.canvas",
     "planning/Planning Canvas.canvas",
     "planning/Credits.md",
     "planning/Descriptions -thx gpt.md",
