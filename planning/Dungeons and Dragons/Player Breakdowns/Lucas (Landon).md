@@ -3,6 +3,5 @@
 <H4>Background</H4>
 -Abandoned by parents
 -troublemaker
--eventually banished from homeland *(due to over-militarization?)*
--Eventually meets [[Rolen Ociphus (Kale)]] in the Wilderness
-
+-banished from homeland *(due to over-militarization?)*
+-Eventually meets [[Rolen Ociphus (Kale)]] in the Wilderness and follows him to camp

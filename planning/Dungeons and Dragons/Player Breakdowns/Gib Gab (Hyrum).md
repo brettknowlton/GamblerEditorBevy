@@ -1,7 +1,10 @@
 <H2>Goblin - Wizard? </H2>
-***"I have discovered I am a prodigy of Wizardry"***
+***"Are you  a wizard?"***
 <H4>Background</H4>
 -foolish and seemingly lost goblin who wandered into Camp Ernest
 -lost memory of his past and path to get here
 -fascination will all things "magic-ish"
 -innate love for shiny things
+
+
+-Has made contact with a rune, has deeply nested powers but in practice is actually an artificer but is delusional to the point of believing he is a wizard anyway

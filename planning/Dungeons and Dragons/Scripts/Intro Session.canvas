@@ -1,0 +1,39 @@
+{
+	"nodes":[
+		{"id":"02d512a87f3024bd","type":"text","text":"Intro #1\nRolen and Lucas","x":-730,"y":-235,"width":210,"height":75,"color":"1"},
+		{"id":"083fc59efcde12c5","type":"text","text":"See a line forming up the street","x":-460,"y":-225,"width":320,"height":65,"color":"1"},
+		{"id":"985c24ffcd571cdc","type":"text","text":"Join line immediately","x":-40,"y":-100,"width":250,"height":60,"color":"1"},
+		{"id":"deba01fd3ec7ca6b","type":"text","text":"No interest in line","x":-40,"y":-285,"width":250,"height":60,"color":"1"},
+		{"id":"a130140a14c1b6a9","type":"text","text":"Soldier forces them to join line","x":765,"y":-291,"width":250,"height":60,"color":"1"},
+		{"id":"fc6b649ba3a8bac7","type":"text","text":"Small interaction With [[1- Michael Scandopa - The Magician]]","x":780,"y":-100,"width":235,"height":160,"color":"1"},
+		{"id":"b32511272d3dc91e","type":"text","text":"Young boys fighting","x":320,"y":-253,"width":250,"height":60,"color":"1"},
+		{"id":"fbec1071a9a9357c","type":"text","text":"\"thats not fair\"","x":320,"y":-193,"width":250,"height":60,"color":"1"},
+		{"id":"cc2657c677616dc1","type":"text","text":"\"run along jeremiah, now jason, what would your father think? Get outta here\"","x":320,"y":-133,"width":409,"height":63,"color":"1"},
+		{"id":"f8b2c88b164faf4c","type":"text","text":"Vendor Interaction","x":195,"y":360,"width":250,"height":60},
+		{"id":"6b0e1ab06f633885","type":"text","text":"One of girls interact with vendor to which GibGab notices someone say MAGIC!","x":445,"y":340,"width":379,"height":120},
+		{"id":"7552803b2925e7ad","type":"text","text":"GibGab inserts himself into the situation asking too many questions to Vesta (who is clearly a wizard) and probably annoyed","x":824,"y":300,"width":508,"height":104},
+		{"id":"5ab7fcc20517c8fc","type":"text","text":"Other girl notices this commotion and involves herself- OR the merchant doesn't like how the sale is going and interacts with the other girl","x":824,"y":404,"width":508,"height":116},
+		{"id":"cf141597b367e77e","type":"text","text":"Intro #2\nVesta, Bronte, and GibGab","x":-764,"y":200,"width":278,"height":66,"color":"2"},
+		{"id":"4c004624518e2050","type":"text","text":"Vesta ","x":-460,"y":200,"width":250,"height":60},
+		{"id":"80614a2b3ad261d6","type":"text","text":"GibGab","x":-460,"y":360,"width":250,"height":60},
+		{"id":"4c4c78a85968703c","type":"text","text":"Bronte","x":-460,"y":520,"width":250,"height":60},
+		{"id":"c935fc1c252fb30b","type":"text","text":"Walking down street","x":-165,"y":200,"width":250,"height":60},
+		{"id":"799a82ec0f9d4ec9","type":"text","text":"Notice a merchant dealing magical items and try to insert self","x":-165,"y":340,"width":285,"height":100},
+		{"id":"124d1d29304ff83e","type":"text","text":"Players settle into line it may be a while","x":1301,"y":-215,"width":361,"height":82},
+		{"id":"ecd3d112caf311cc","x":1383,"y":375,"width":250,"height":60,"type":"text","text":""},
+		{"id":"b9a354427d6bd87f","x":1860,"y":357,"width":355,"height":97,"type":"text","text":"Players enter line behind Rolen and Lucan"}
+	],
+	"edges":[
+		{"id":"8b80896ef96456da","fromNode":"083fc59efcde12c5","fromSide":"right","toNode":"985c24ffcd571cdc","toSide":"left"},
+		{"id":"21e678d6008e056c","fromNode":"083fc59efcde12c5","fromSide":"right","toNode":"deba01fd3ec7ca6b","toSide":"left"},
+		{"id":"19ed40defcace093","fromNode":"deba01fd3ec7ca6b","fromSide":"top","toNode":"a130140a14c1b6a9","toSide":"top"},
+		{"id":"fb33957dce5dd4f3","fromNode":"985c24ffcd571cdc","fromSide":"bottom","toNode":"fc6b649ba3a8bac7","toSide":"left"},
+		{"id":"ecd4c13ca469a28e","fromNode":"fc6b649ba3a8bac7","fromSide":"right","toNode":"124d1d29304ff83e","toSide":"left"},
+		{"id":"d2ffd9150f4bbe87","fromNode":"a130140a14c1b6a9","fromSide":"right","toNode":"124d1d29304ff83e","toSide":"left"},
+		{"id":"84682394d4aa8a49","fromNode":"4c004624518e2050","fromSide":"right","toNode":"c935fc1c252fb30b","toSide":"left"},
+		{"id":"0c42bec22ce73383","fromNode":"80614a2b3ad261d6","fromSide":"right","toNode":"799a82ec0f9d4ec9","toSide":"left"},
+		{"id":"177f62355565d21f","fromNode":"4c4c78a85968703c","fromSide":"right","toNode":"f8b2c88b164faf4c","toSide":"bottom"},
+		{"id":"5851f8e41e9a9a1a","fromNode":"c935fc1c252fb30b","fromSide":"right","toNode":"f8b2c88b164faf4c","toSide":"top"},
+		{"id":"3fe163d66b4d1539","fromNode":"799a82ec0f9d4ec9","fromSide":"right","toNode":"f8b2c88b164faf4c","toSide":"left"}
+	]
+}
