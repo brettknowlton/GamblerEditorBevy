@@ -11,17 +11,12 @@
             "id": "5164161d9a27d8a0",
             "type": "leaf",
             "state": {
-              "type": "canvas",
+              "type": "image",
               "state": {
-                "file": "planning/Planning Canvas.canvas",
-                "viewState": {
-                  "x": 3313.876083454871,
-                  "y": 2577.9761735823417,
-                  "zoom": -0.16619077634927082
-                }
+                "file": "planning/Dungeons and Dragons/Maps/Camp Ernest.png"
               },
-              "icon": "lucide-layout-dashboard",
-              "title": "Planning Canvas"
+              "icon": "lucide-image",
+              "title": "Camp Ernest"
             }
           }
         ]
@@ -163,10 +158,14 @@
       "system3-relay:Relay": false
     }
   },
-  "active": "2e616ea53fb13ed6",
+  "active": "5164161d9a27d8a0",
   "lastOpenFiles": [
-    "planning/Dungeons and Dragons/Untitled.canvas",
+    "planning/Dungeons and Dragons/Player Breakdowns/Lucas (Landon).md",
+    "planning/Dungeons and Dragons/Maps/Camp Ernest.png",
+    "planning/Dungeons and Dragons/Maps",
+    "planning/Dungeons and Dragons/New folder",
     "planning/Planning Canvas.canvas",
+    "planning/Dungeons and Dragons/Untitled.canvas",
     "planning/Credits.md",
     "planning/Descriptions -thx gpt.md",
     "target/debug/deps/gambler_bevy-611733eab0f9239a",
@@ -177,8 +176,6 @@
     "target/debug/incremental/gambler_bevy-21uphrpt9fkq9/s-h5thujczdy-17ec8ob-4b15wo3snzr1luekwr4qt8wcg/f0zzz1inyfbdd5arjhrpm3ngn.o",
     "target/debug/incremental/gambler_bevy-21uphrpt9fkq9/s-h5thujczdy-17ec8ob-4b15wo3snzr1luekwr4qt8wcg/eztej6w3xfssckyyapy5f1iti.o",
     "target/debug/incremental/gambler_bevy-21uphrpt9fkq9/s-h5thujczdy-17ec8ob-4b15wo3snzr1luekwr4qt8wcg/eykwr24ccekf1w19s340016d6.o",
-    "target/debug/incremental/gambler_bevy-21uphrpt9fkq9/s-h5thujczdy-17ec8ob-4b15wo3snzr1luekwr4qt8wcg/eufxi3th0lqtzjxm909j2sq5p.o",
-    "target/debug/incremental/gambler_bevy-21uphrpt9fkq9/s-h5thujczdy-17ec8ob-4b15wo3snzr1luekwr4qt8wcg/etns89vljjk7sb36ns9ijihru.o",
     "assets/textures/player/PlayerHD.png",
     "assets/textures/player/PlayerLD.png",
     "planning/To-Do's.md",
@@ -202,7 +199,6 @@
     "planning/Art/Cards/H2.png",
     "planning/Mechanics.md",
     "planning/art concepts/zughy32.png",
-    "planning/art concepts/rosy-42-palette-example-by-s-203792.png",
     "planning/Root.md"
   ]
 }
