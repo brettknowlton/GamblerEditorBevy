@@ -14,4 +14,4 @@ from [[Rolen Ociphus (Kale)]]
 
 -Truly the first to interact with a rune in the Grand West - leading to him interacting with both the Diamond and Club runes
 
--He is the hermit now, completley alone, paranoid, still strong and incredibly dangerous, but letting anyone get close means they may take away his individuality
+-He is [[10- The Hermit]] now, completley alone, paranoid, still strong and incredibly dangerous, but letting anyone get close means they may take away his individuality
