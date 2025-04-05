@@ -5,7 +5,7 @@
 2 + 2 + 3?
 [[Rolen Ociphus (Kale)]] with [[Lucas (Landon)]]
 [[Vesta (Emma)]], [[Unknown (Bronte)]] and [[Gib Gab (Hyrum)]] walks up to ask about Vesta's magic prowess
-[[Unknown (Riley)]] and [[Unknown(Cole)]] are together somehow
+[[Endrin _____(Riley)]] and [[Unknown(Cole)]] are together somehow
 
 Mid Morning...
 
@@ -15,7 +15,7 @@ Rolen and Landon see a big line
 Do they get in line to see what's going on?
 
 If not 
-	they can explore a bit, see some kids fighting, one will shout "Thats not fair" as he tackles another young boy. [[9- Justice]] "JASON! your father is looking for you."
+	they can explore a bit, see some kids fighting, one ([[11- Justice]])will shout "Thats not fair" as he tackles another young boy. [[11- Justice]] "JASON! your father is looking for you."
 	 a soldier will roll up and force them into line, nobody gets to skip out on the job board anymore, General Ernest is tightening things up around camp
 	
 If so
