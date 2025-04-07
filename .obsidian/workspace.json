@@ -4,19 +4,17 @@
     "type": "split",
     "children": [
       {
-        "id": "462ab7a153a02dfc",
+        "id": "a42c74b50bab8ea8",
         "type": "tabs",
         "children": [
           {
-            "id": "5164161d9a27d8a0",
+            "id": "0e00f3194aae49b3",
             "type": "leaf",
             "state": {
-              "type": "image",
-              "state": {
-                "file": "planning/Dungeons and Dragons/Maps/Camp Ernest.png"
-              },
-              "icon": "lucide-image",
-              "title": "Camp Ernest"
+              "type": "empty",
+              "state": {},
+              "icon": "lucide-file",
+              "title": "New tab"
             }
           }
         ]
@@ -76,7 +74,7 @@
       }
     ],
     "direction": "horizontal",
-    "width": 200
+    "width": 265.5
   },
   "right": {
     "id": "bbec0168ba624e88",
@@ -158,15 +156,25 @@
       "system3-relay:Relay": false
     }
   },
-  "active": "5164161d9a27d8a0",
+  "active": "0e00f3194aae49b3",
   "lastOpenFiles": [
-    "planning/Dungeons and Dragons/Player Breakdowns/Lucas (Landon).md",
+    "planning/Dungeons and Dragons/Scripts/Player Creation Session Script.md",
+    "planning/Dungeons and Dragons/Gambler Story/00- Core.md",
+    "planning/Credits.md",
+    "planning/Planning Canvas.canvas",
+    "Untitled 1.md",
+    "Untitled.md",
+    "planning/Dungeons and Dragons/Tarot Breakdowns/00- Table of Tarot Contents.md",
+    "planning/Art/Player/Player Concept Art.md",
+    "planning/Art/Player/original player design.png",
+    "planning/Art/Player/le black man le jumping le jacks.aseprite",
+    "planning/Art/Player/player_concept_mk2.aseprite",
+    "assets/textures/player/PlayerHD.png",
     "planning/Dungeons and Dragons/Maps/Camp Ernest.png",
+    "planning/Dungeons and Dragons/Player Breakdowns/Lucas (Landon).md",
     "planning/Dungeons and Dragons/Maps",
     "planning/Dungeons and Dragons/New folder",
-    "planning/Planning Canvas.canvas",
     "planning/Dungeons and Dragons/Untitled.canvas",
-    "planning/Credits.md",
     "planning/Descriptions -thx gpt.md",
     "target/debug/deps/gambler_bevy-611733eab0f9239a",
     "target/debug/incremental/gambler_bevy-21uphrpt9fkq9/s-h5thujczdy-17ec8ob-4b15wo3snzr1luekwr4qt8wcg/work-products.bin",
@@ -174,13 +182,9 @@
     "target/debug/incremental/gambler_bevy-21uphrpt9fkq9/s-h5thujczdy-17ec8ob-4b15wo3snzr1luekwr4qt8wcg/f56lgli2h7x614a5sb7m3v6g6.o",
     "target/debug/incremental/gambler_bevy-21uphrpt9fkq9/s-h5thujczdy-17ec8ob-4b15wo3snzr1luekwr4qt8wcg/f1bo7cvlzbkor8wzfmlh7ebtt.o",
     "target/debug/incremental/gambler_bevy-21uphrpt9fkq9/s-h5thujczdy-17ec8ob-4b15wo3snzr1luekwr4qt8wcg/f0zzz1inyfbdd5arjhrpm3ngn.o",
-    "target/debug/incremental/gambler_bevy-21uphrpt9fkq9/s-h5thujczdy-17ec8ob-4b15wo3snzr1luekwr4qt8wcg/eztej6w3xfssckyyapy5f1iti.o",
-    "target/debug/incremental/gambler_bevy-21uphrpt9fkq9/s-h5thujczdy-17ec8ob-4b15wo3snzr1luekwr4qt8wcg/eykwr24ccekf1w19s340016d6.o",
-    "assets/textures/player/PlayerHD.png",
     "assets/textures/player/PlayerLD.png",
     "planning/To-Do's.md",
     "planning/Art/Art.md",
-    "planning/Art/Player/Player Concept Art.md",
     "planning/Art/Cards/Card Concept Art.md",
     "planning/Gambler Editor.md",
     "planning/Mechanic Breakdowns/Controls.md",
@@ -191,7 +195,6 @@
     "planning/Mechanic Breakdowns/SignificantComponent Trait.md",
     "planning/Mechanic Breakdowns/Context Menu.md",
     "planning/Mechanic Breakdowns/Yenter-Noscape.md",
-    "planning/Art/Player/original player design.png",
     "planning/Art/Interiors/zughy32.png",
     "planning/Art/Interiors/rosy-42-palette-example-by-s-203792.png",
     "planning/Art/Cards/H4.png",
