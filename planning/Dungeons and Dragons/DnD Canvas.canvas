@@ -66,7 +66,7 @@
 		{"id":"999a45921e6efa5f","type":"text","text":" **7**","x":-4954,"y":1151,"width":234,"height":517,"color":"2"},
 		{"id":"7716494507781fd6","type":"text","text":" **8**","x":-4720,"y":1151,"width":234,"height":517,"color":"2"},
 		{"id":"62fd7d26dc2bb7f5","type":"text","text":"Character Creation Day","x":-465,"y":-340,"width":250,"height":60},
-		{"id":"e91f096de9fa7054","type":"file","file":"Intro.md","x":-1360,"y":40,"width":455,"height":116},
+		{"id":"e91f096de9fa7054","type":"file","file":"GamblerEditorBevy/planning/Dungeons and Dragons/Lore Readings/Intro.md","x":-1360,"y":40,"width":455,"height":116},
 		{"id":"034b9563a457c6df","type":"text","text":"Talking to Michael Turnvoutz","x":-787,"y":40,"width":389,"height":116},
 		{"id":"48de4ec30d76f0d9","type":"file","file":"GamblerEditorBevy/planning/Dungeons and Dragons/Lore Readings/Quarterly reviews with Jason the Soldier.md","x":-314,"y":0,"width":421,"height":1040},
 		{"id":"e41b7ff9f566ee47","type":"text","text":"","x":-1692,"y":2901,"width":250,"height":60},

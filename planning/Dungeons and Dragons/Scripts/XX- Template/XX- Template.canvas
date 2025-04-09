@@ -1,0 +1,14 @@
+{
+	"nodes":[
+		{"id":"10a62a61a5e6316b","type":"text","text":"<H1>Act 1 (Introductions)</H1>\n","x":-3440,"y":-200,"width":477,"height":160},
+		{"id":"fe182c3bd7298d84","type":"text","text":"**Session Goals:**\n- Every character is introduced with **personality and mystery.**\n    \n- The **Bloodwheat attack** raises stakes and tension.\n    \n- General Ernest gives weight to the group's purpose.\n    \n- GibGab wins hearts with a **real emotional payoff.**","x":-3440,"y":-800,"width":477,"height":505},
+		{"id":"ebb18d137e5dd772","type":"text","text":"<H1>Act 2 (Conflict & Selection)\n</H1>","x":-2920,"y":-200,"width":520,"height":160},
+		{"id":"1b6fe8c8cd56239b","type":"text","text":"<H1>Act 3 – Roleplay\n</H1>","x":-2360,"y":-200,"width":400,"height":160},
+		{"id":"a756329167cb5c27","type":"text","text":"<H1>Act 4 – Call to Continue the quest\n</H1>","x":-1920,"y":-200,"width":600,"height":160}
+	],
+	"edges":[
+		{"id":"0a8d239ef371e6bb","fromNode":"10a62a61a5e6316b","fromSide":"right","toNode":"ebb18d137e5dd772","toSide":"left"},
+		{"id":"426a4634d83fe866","fromNode":"ebb18d137e5dd772","fromSide":"right","toNode":"1b6fe8c8cd56239b","toSide":"left"},
+		{"id":"6d95b082e77ceeb0","fromNode":"1b6fe8c8cd56239b","fromSide":"right","toNode":"a756329167cb5c27","toSide":"left"}
+	]
+}
