@@ -1,0 +1,36 @@
+{
+	"nodes":[
+		{"id":"d578ed66243d78dc","type":"file","file":"GamblerEditorBevy/planning/Dungeons and Dragons/Scripts/02- Day One/02.01.01 Vesta + the Census Clerk.md","x":-720,"y":-280,"width":460,"height":1340},
+		{"id":"41c94c025c410711","type":"file","file":"GamblerEditorBevy/planning/Dungeons and Dragons/Scripts/02- Day One/02.01.02 Vesta and the Old Lady Refugee.md","x":-180,"y":-280,"width":400,"height":1720},
+		{"id":"e031cf01be72f424","type":"text","text":"<H1>Act 1 – Who Are They? (Introductions)</H1>\n","x":-760,"y":-720,"width":2360,"height":160},
+		{"id":"322dc793f4223217","type":"file","file":"GamblerEditorBevy/planning/Dungeons and Dragons/Scripts/02- Day One/02.01.03 Enter Rolen.md","x":300,"y":-480,"width":780,"height":1060},
+		{"id":"ee1a9fb22674af54","type":"file","file":"GamblerEditorBevy/planning/Dungeons and Dragons/Scripts/02- Day One/02.01.04 The Little Goblin that could.md","x":300,"y":680,"width":780,"height":880},
+		{"id":"c6f660e1b45331b7","type":"file","file":"GamblerEditorBevy/planning/Dungeons and Dragons/Scripts/02- Day One/02.01.05 Human in Plain Sight.md","x":1200,"y":-240,"width":400,"height":880},
+		{"id":"27d32fcf364b6b21","type":"text","text":"<H1>Act 2 – Why Are They Chosen? (Conflict & Selection)\n</H1>","x":2400,"y":-720,"width":1400,"height":160},
+		{"id":"f3e8e7277c00204c","type":"file","file":"GamblerEditorBevy/planning/Dungeons and Dragons/Scripts/02- Day One/02.02.01 Bloodwheat Golems Attack!.md","x":2400,"y":-460,"width":560,"height":560},
+		{"id":"72412e596b088661","type":"file","file":"GamblerEditorBevy/planning/Dungeons and Dragons/Scripts/02- Day One/02.02.01a Combat Notes.md","x":2400,"y":192,"width":560,"height":468},
+		{"id":"7f8c1eb4724d0fe8","type":"file","file":"GamblerEditorBevy/planning/Dungeons and Dragons/Scripts/02- Day One/02.02.02 General Ernest's Praise.md","x":3160,"y":-460,"width":640,"height":640},
+		{"id":"9a5fd5c8373e65fd","type":"file","file":"GamblerEditorBevy/planning/Dungeons and Dragons/Scripts/02- Day One/02.03.01 Nighttime Roleplay.md","x":4080,"y":-500,"width":400,"height":720},
+		{"id":"41f0839f095fcb37","type":"text","text":"<H1>Act 4 – The Morning After\n</H1>","x":4720,"y":-720,"width":1520,"height":160},
+		{"id":"43e1096d33718c23","type":"text","text":"<H1>Act 3 – Nighttime Roleplay\n</H1>","x":4080,"y":-720,"width":400,"height":160},
+		{"id":"e866a833600a415a","type":"file","file":"GamblerEditorBevy/planning/Dungeons and Dragons/Scripts/02- Day One/02.04.01 Departure.md","x":4720,"y":-440,"width":400,"height":660},
+		{"id":"2d3563af493276dc","type":"file","file":"02.04.02 GibGab’s Big Moment.md","x":5230,"y":-440,"width":410,"height":820},
+		{"id":"c973a31ffd8ca166","type":"file","file":"GamblerEditorBevy/planning/Dungeons and Dragons/Lore Readings/Camp Ernest – Census Interview Log.md","x":-690,"y":1240,"width":400,"height":400},
+		{"id":"fad2c260d2f44138","x":-760,"y":-1320,"width":477,"height":505,"type":"text","text":"**Session Goals:**\n- Every character is introduced with **personality and mystery.**\n    \n- The **Bloodwheat attack** raises stakes and tension.\n    \n- General Ernest gives weight to the group's purpose.\n    \n- GibGab wins hearts with a **real emotional payoff.**"},
+		{"id":"724c67537c08da3e","x":5940,"y":-60,"width":250,"height":60,"type":"text","text":"Let it ride..."}
+	],
+	"edges":[
+		{"id":"2886ea954a765026","fromNode":"d578ed66243d78dc","fromSide":"right","toNode":"41c94c025c410711","toSide":"left"},
+		{"id":"370aa2014ee36398","fromNode":"41c94c025c410711","fromSide":"right","toNode":"322dc793f4223217","toSide":"left","color":"5"},
+		{"id":"657fbf32540595bb","fromNode":"41c94c025c410711","fromSide":"right","toNode":"ee1a9fb22674af54","toSide":"left","color":"3"},
+		{"id":"b3998737a8802ac2","fromNode":"322dc793f4223217","fromSide":"bottom","toNode":"ee1a9fb22674af54","toSide":"top","color":"5"},
+		{"id":"91448f33845cef49","fromNode":"ee1a9fb22674af54","fromSide":"right","toNode":"c6f660e1b45331b7","toSide":"left"},
+		{"id":"dd281005be062747","fromNode":"322dc793f4223217","fromSide":"right","toNode":"c6f660e1b45331b7","toSide":"left"},
+		{"id":"0a754050c63d3b34","fromNode":"e031cf01be72f424","fromSide":"right","toNode":"27d32fcf364b6b21","toSide":"left"},
+		{"id":"a166858fed0896bf","fromNode":"f3e8e7277c00204c","fromSide":"right","toNode":"7f8c1eb4724d0fe8","toSide":"left","color":"5"},
+		{"id":"624f432fa9af4b85","fromNode":"f3e8e7277c00204c","fromSide":"bottom","toNode":"72412e596b088661","toSide":"top","toEnd":"none","color":"1"},
+		{"id":"5c4334f43cebc98f","fromNode":"27d32fcf364b6b21","fromSide":"right","toNode":"43e1096d33718c23","toSide":"left"},
+		{"id":"3f0d1baad038815d","fromNode":"43e1096d33718c23","fromSide":"right","toNode":"41f0839f095fcb37","toSide":"left"},
+		{"id":"7fdbfe923d152f17","fromNode":"d578ed66243d78dc","fromSide":"bottom","toNode":"c973a31ffd8ca166","toSide":"top","toEnd":"none","color":"1"}
+	]
+}
