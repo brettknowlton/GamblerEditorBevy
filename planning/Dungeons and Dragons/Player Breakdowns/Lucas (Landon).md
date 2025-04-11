@@ -1,4 +1,4 @@
-<H2>Ranger - Halfling</H2>
+<H2>Ranger - Halfling</H2>[[Halflings]]
 ***"Rolen found me out there, without him I would probably still be lost..."***
 <H4>Background</H4>
 -Abandoned by parents

@@ -1,5 +1,5 @@
 *ɡɪb ɡæb*
-<H2>Goblin - Wizard </H2>
+<H2>Goblin - Wizard </H2>see: [[Goblins]]
 ***"Are you  a wizard?"***
 <H4>Background</H4>
 -foolish and seemingly lost goblin who wandered into Camp Ernest

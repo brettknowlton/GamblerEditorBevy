@@ -1,4 +1,4 @@
-<H2>Bard - Eldrin (Fey Elf)</H2>
+<H2>Bard - Eldrin (Fey Elf)</H2>[[Fey-Elves]]
 ***"A body stained with great regret can never grow"***
 
 <H4>Description</H4>
@@ -8,8 +8,9 @@
 [[Lucas (Landon)]] - Met in wilderness
 [[Varus Ociphus]] - Brother, lost for a long period of time, found in a cult
 [[Morzan]] - Childhood friend became arch nemesis
+[[Callon 'Living Blade' Ociphus]] - Father, Rolen believes he is dead as he witnessed a faked death
 <H4>Background</H4>
-Rolen's father, Callon Living Blade, was one of the most renowned swordsmen in his time, a highly charismatic fighter. A legend, Callon later in his life settled down and started a family. Rolen grew up very wealthy and grew accustomed to that lifestyle. Both Rolen and his brother Varus, loved and idolized their father. They wanted to be just like him. Rolen would spend hours reading about his fathers deeds and talking to his father about them. Rolen loved learning the strategy involved. Callon taught that defeating your oppenent took two parts, *knowing and reading them and swinging a blade*. 
+Rolen's father, Callon Living Blade, was one of the most renowned swordsmen in his time, a highly charismatic fighter. A legend, Callon later in his life settled down and started a family. Rolen grew up very wealthy and grew accustomed to that lifestyle. Both Rolen and his brother Varus, loved and idolized their father. They wanted to be just like him. Rolen would spend hours reading about his fathers deeds and talking to his father about them. Rolen loved learning the strategy involved. Callon taught that defeating your opponent took two parts, *knowing and reading them and swinging a blade*. 
 
   
 
