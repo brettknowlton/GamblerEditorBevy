@@ -4,7 +4,7 @@
 [[3- The Empress]]
 [[4- The Emperor]]
 [[5- The Hierophant]]
-[[6- The Lover]]
+[[6- Anthony S. - The Lover]]
 [[7- The Chariot]]
 [[8- Strength]]
 [[9- The Hermit]]

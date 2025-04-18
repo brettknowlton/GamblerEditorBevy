@@ -4,3 +4,6 @@ Pact with a love god to give him and his lover strength and fortitude forever. H
 Both have interacted with the heart rune but it is Taboo to do so, as such they have not told anyone nor revealed its location to others. 
 
 They live in their own mansion far out in the grand west and are fairly capable of defending it with the aid of a few employed SpadeBots
+
+
+father to [[1- Michael Scandopa - The Magician]]
