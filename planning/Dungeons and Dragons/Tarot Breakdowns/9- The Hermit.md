@@ -1,2 +1,0 @@
-[[Callon 'Living Blade' Ociphus]]
-

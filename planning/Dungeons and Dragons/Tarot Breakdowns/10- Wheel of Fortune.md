@@ -1,1 +1,0 @@
-Born mid-time-skip
