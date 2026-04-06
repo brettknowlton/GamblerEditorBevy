@@ -8,6 +8,18 @@ use crate::{ utilities::*, EditorObject, TILE_SIZE };
 use crate::consts::*;
 use super::*;
 
+fn populate_collider_tooling_menu(mut tooling_menu: ResMut<ToolingMenuState>) {
+    tooling_menu.title = "Collider Parts".to_string();
+    tooling_menu.visible = true;
+    tooling_menu.selected_item_id = Some(0);
+    tooling_menu.items = vec![ToolingMenuItem {
+        id: 0,
+        label: "Solid".to_string(),
+        texture_key: Some('c'),
+        rect: Some(Rect::new(0.0, 0.0, TILE_SIZE as f32, TILE_SIZE as f32)),
+    }];
+}
+
 fn init(mut spritesheets: ResMut<TextureHandles>, asset_server: Res<AssetServer>){
     let texpath= PathBuf::from("textures/tiles/collider_debug.png");
     spritesheets.0.insert('c', asset_server.load(texpath));
@@ -27,7 +39,9 @@ fn collidermode_keybinds(
     //"P" handles placement of a collider and adding it to the scene
     if input.just_pressed(KeyCode::KeyP) {
         //clean up the bevy query overhead
-        let (t, _) = crosshairs.single();
+        let Ok((t, _)) = crosshairs.single() else {
+            return;
+        };
 
         //get the coordinate of the crosshair AND snap it to the grid if gridsnap is enabled
         let mut coord = Coordinate::from(t.translation);
@@ -50,11 +64,13 @@ fn collidermode_keybinds(
 
     // "L" handles removal of a collider from the scene, similar to placing one just doesnt need to worry about the tile creation part afterwards
     if input.just_pressed(KeyCode::KeyL) {
-        let (t, _) = crosshairs.single();
+        let Ok((t, _)) = crosshairs.single() else {
+            return;
+        };
         let mut coord = Coordinate::from(t.translation);
         coord = snap_coordinate_to_grid(coord);
 
-        Tile::remove(&mut commands, coord, &colliders);
+        ColliderObject::remove(&mut commands, coord, &colliders);
         send_message!(Some('i'), message_queue, format!("Removing colliders at: ({}, {})", coord.0, coord.1));
     }
 
@@ -121,7 +137,10 @@ pub fn collidermode_plugin(app: &mut App) {
         .add_systems(Startup, init)
 
         //OnEnter systems
-        .add_systems(OnEnter(EditorState::Editing(EditingComponent::Collider)), (crate::ui::update_placeholder::<ColliderObject>, ui::create_collidermode_ui).chain())
+        .add_systems(
+            OnEnter(EditorState::Editing(EditingComponent::Collider)),
+            (populate_collider_tooling_menu, crate::ui::update_placeholder::<ColliderObject>).chain(),
+        )
 
         //Update systems, that run only while TileEditor is active
         .add_systems(

@@ -10,7 +10,7 @@ pub mod selection;
 //Helper Functions
 pub fn despawn_all<T: Component>(mut commands: Commands, to_despawn: Query<Entity, With<T>>) {
     for e in to_despawn.iter() {
-        commands.entity(e).despawn_recursive();
+        commands.entity(e).despawn();
     }
 }
 

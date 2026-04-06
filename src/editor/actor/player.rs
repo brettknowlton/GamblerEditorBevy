@@ -1,6 +1,4 @@
-use bevy_rapier2d::{
-    control, parry::query::Contact, prelude::{ Collider, LockedAxes, RapierContext, Restitution, RigidBody, Velocity }
-};
+use bevy_rapier2d::prelude::{Collider, RigidBody};
 
 use super::*;
 
@@ -10,7 +8,6 @@ pub fn player_controls(
     time: Res<Time>,
 ) {
     for (mut player, kpco) in query.iter_mut() {
-
         // Reset or increment the air timer based on ground state
         if kpco.grounded {
             player.air_timer = 0.05;
@@ -19,15 +16,14 @@ pub fn player_controls(
         }
 
         // Jump
-        if keyboard_input.pressed(KeyCode::KeyW){
+        if keyboard_input.pressed(KeyCode::KeyW) {
             player.trying_jump = true;
             if player.air_timer < PLAYER_JUMP_GRACE_PERIOD {
-                if keyboard_input.just_pressed(KeyCode::KeyW) && kpco.grounded{
+                if keyboard_input.just_pressed(KeyCode::KeyW) && kpco.grounded {
                     player.velocity.y = PLAYER_JUMP_FORCE as f32;
-
                 };
             }
-        }else{
+        } else {
             player.trying_jump = false;
         }
 
@@ -40,7 +36,7 @@ pub fn player_controls(
         if keyboard_input.pressed(KeyCode::KeyA) {
             player.trying_walk_left = true;
             player.velocity.x -= PLAYER_WALK_FORCE as f32;
-        }else{
+        } else {
             player.trying_walk_left = false;
         }
 
@@ -48,27 +44,24 @@ pub fn player_controls(
         if keyboard_input.pressed(KeyCode::KeyD) {
             player.trying_walk_right = true;
             player.velocity.x += PLAYER_WALK_FORCE as f32;
-        }else {
+        } else {
             player.trying_walk_right = false;
         }
     }
 }
 
 pub fn player_physics(
-    mut players: Query<
-        (
-            Entity,
-            &mut Player,
-            &mut KinematicCharacterControllerOutput,
-            &mut KinematicCharacterController,
-        )
-    >,
-    time: Res<Time>
+    mut players: Query<(
+        Entity,
+        &mut Player,
+        &mut KinematicCharacterControllerOutput,
+        &mut KinematicCharacterController,
+    )>,
+    time: Res<Time>,
 ) {
     for (_, mut player, kpco, mut controller) in players.iter_mut() {
-        
-        
-        if kpco.grounded {//ON GROUND PHYSICS
+        if kpco.grounded {
+            //ON GROUND PHYSICS
             //apply a small amount of gravity to the player if on the ground
             //this is to prevent the player from getting stuck in the ground
             let g = Vec2::new(0.0, -(GRAVITY as f32) * 0.1);
@@ -84,31 +77,31 @@ pub fn player_physics(
             } else if player.velocity.x < -(MAX_PLAYER_WALK_SPEED as f32) {
                 player.velocity.x = -(MAX_PLAYER_WALK_SPEED as f32);
             }
-        }else {//IN AIR PHYSICS
+        } else {
+            //IN AIR PHYSICS
             //apply gravity to the player if in the air
             let g;
-            if player.trying_jump && player.air_timer < PLAYER_JUMP_GRACE_PERIOD {//while trying to jump higher we suspend the effect of gravity somewhat
+            if player.trying_jump && player.air_timer < PLAYER_JUMP_GRACE_PERIOD {
+                //while trying to jump higher we suspend the effect of gravity somewhat
                 g = Vec2::new(0.0, -(GRAVITY as f32) * 0.1);
-            }else{
+            } else {
                 g = Vec2::new(0.0, -(GRAVITY as f32));
             }
 
-            
-
             //apply a small amount of friction to the player if in the air
             //clamp velocity.x to double max walk speed if on ground
-            if player.velocity.x > 2.* MAX_PLAYER_WALK_SPEED as f32 {
-                player.velocity.x = 2.* MAX_PLAYER_WALK_SPEED as f32;
-            } else if player.velocity.x < -(2.* MAX_PLAYER_WALK_SPEED as f32) {
-                player.velocity.x = -(2.* MAX_PLAYER_WALK_SPEED as f32);
+            if player.velocity.x > 2. * MAX_PLAYER_WALK_SPEED as f32 {
+                player.velocity.x = 2. * MAX_PLAYER_WALK_SPEED as f32;
+            } else if player.velocity.x < -(2. * MAX_PLAYER_WALK_SPEED as f32) {
+                player.velocity.x = -(2. * MAX_PLAYER_WALK_SPEED as f32);
             }
-            
+
             player.velocity += g;
         }
 
         //apply friction to the player not trying to move
         if !(player.trying_walk_left || player.trying_walk_right) {
-            let f = 1.0 - (FRICTION / 4.) ;
+            let f = 1.0 - (FRICTION / 4.);
             player.velocity.x *= f;
         }
 
@@ -121,7 +114,6 @@ pub fn player_physics(
         if player.velocity.y.abs() < EPSILON {
             player.velocity.y = 0.0;
         }
-
     }
 }
 
@@ -194,16 +186,14 @@ impl Default for Player {
             trying_jump: false,
             trying_walk_left: false,
             trying_walk_right: false,
-
         }
     }
 }
 
-
 pub fn spawn_player(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
-    crosshairs: Query<&Transform, With<Crosshair>>
+    //crosshairs: Query<&Transform, With<Crosshair>>,
 ) {
     println!("spawning player...");
     let path = PathBuf::from("textures/player/PlayerHD.png");
@@ -219,7 +209,7 @@ pub fn spawn_player(
             (PLAYER_SIZE_X / 2 - PLAYER_HB_X_OFFSET / 2) as f32,
             (PLAYER_SIZE_Y / 2 - PLAYER_HB_Y_OFFSET / 4) as f32,
         ),
-        KinematicCharacterController{
+        KinematicCharacterController {
             up: Vec2::Y,
             translation: Some(Vec2::new(0.0, 0.0)),
             ..default()
@@ -231,13 +221,13 @@ pub fn spawn_player(
     ec.with_child((
         Sprite {
             image: player_sprite,
-            anchor: bevy::sprite::Anchor::Center,
             ..Default::default()
         },
         Transform {
             translation: Vec3::new(0.0, 0.0 + (PLAYER_HB_Y_OFFSET as f32) / 4.0, 1.0),
             ..Default::default()
         },
+        Anchor::CENTER,
     ));
 
     //update the kindematic character controller to use the collider

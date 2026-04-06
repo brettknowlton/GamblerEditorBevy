@@ -1,5 +1,7 @@
-use bevy::prelude::*;
+use bevy::{prelude::*, window::WindowResolution};
+use bevy_egui::EguiPlugin;
 use bevy_rapier2d::prelude::*;
+
 pub mod consts;
 pub mod utilities;
 pub mod editor;
@@ -8,7 +10,6 @@ pub mod game;
 pub use consts::*;
 pub use utilities::*;
 pub use editor::*;
-pub use game::*;
 
 fn main() {
     App::new()
@@ -18,7 +19,7 @@ fn main() {
                 .set(WindowPlugin {
                     primary_window: Some(Window {
                         title: WINDOW_TITLE2.to_string(),
-                        resolution: (DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT).into(),
+                        resolution: WindowResolution::new(DEFAULT_WINDOW_WIDTH as u32, DEFAULT_WINDOW_HEIGHT as u32),
                         resizable: false,
                         decorations: true,
                         visible: true,
@@ -39,8 +40,10 @@ fn main() {
         .add_plugins(
             RapierPhysicsPlugin::<NoUserData>::pixels_per_meter(32.0)
         )
-        
         .add_plugins(RapierDebugRenderPlugin::default())
+        
+        .add_plugins(EguiPlugin::default())
+        
 
         
         .insert_resource(ClearColor(Color::from(WINDOW_DEFAULT_BACKGROUND_COLOR)))

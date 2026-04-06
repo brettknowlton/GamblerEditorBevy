@@ -56,7 +56,7 @@ fn spawn_sprites(
     //if the EditorObject has a tcoord beginning with 'T'
     for (entity, eo) in tiles.iter_mut() {
         if eo.get_major_type() == 't' {
-            let sprite: Sprite = Sprite {
+            let sprite_bundle = Sprite {
                 image: spritesheets.0.get(&'t').unwrap().clone(),
                 //the UVs are the same for every tile, just change the offset by using the tiletype as a multiplier
                 rect: Some(Rect {
@@ -75,7 +75,7 @@ fn spawn_sprites(
                             (TILE_SIZE as f32)
                     ),
                 }),
-                anchor: Anchor::BottomLeft,
+            
                 ..default()
             };
 
@@ -83,37 +83,13 @@ fn spawn_sprites(
 
             commands
                 .entity(entity)
-                .insert((sprite, Visibility::default()))
+                .insert((sprite_bundle, Anchor::CENTER, Visibility::default()))
                 .entry::<Transform>()
                 .and_modify(move |mut t| {
                     t.translation = Vec3::new(coord.0 as f32, coord.1 as f32, 0.0);
                 });
         }
-        if eo.get_major_type() == 'c' {
-            let sprite: Sprite = Sprite {
-                image: spritesheets.0.get(&'c').unwrap().clone(),
-                rect: Some(Rect {
-                    min: Vec2::new(0.0, 0.0),
-                    max: Vec2::new(TILE_SIZE as f32, TILE_SIZE as f32),
-                }),
-                anchor: Anchor::Center,
-                ..default()
-            };
 
-            let coord = eo.get_coordinate().coord;
-
-            // commands
-            //     .entity(entity)
-            //     .insert(sprite)
-            //     .entry::<Transform>()
-            //     .and_modify(move |mut t| {
-            //         t.translation = Vec3::new(
-            //             (coord.0 as f32) + ((SCALED_TILE_WIDTH / 2) as f32),
-            //             (coord.1 as f32) + ((SCALED_TILE_HEIGHT / 2) as f32),
-            //             0.5
-            //         );
-            //     });
-        }
     }
 }
 
@@ -152,20 +128,29 @@ fn save_items(world: &mut World) {
         .filter(|e| world.get::<EditorObject>(**e).is_none())
         .collect::<Vec<&Entity>>();
 
-    //create a new world that will actually be saved
-    let new_world = world;
+    //create a new world (copy of orignial world) that will actually be saved
+    let mut new_world = world.query::<Entity>()
+        .iter(world)
+        .map(|e| e)
+        .fold(World::new(), |mut acc, e| {
+            if let Some(editor_object) = world.get::<EditorObject>(e) {
+                acc.spawn(editor_object.clone());
+            }
+            acc
+        });
 
+        
     // despawn the entities from the new world that are not EditorObjects
     for t in filtered_objects.iter() {
         debug!("despawning non-serializable entity: {t:?} from the simulated world-to-save");
         new_world.despawn(**t);
     }
-
+    
     //create a new scene from the new world that now only contains EditorObjects
-    let scene = DynamicSceneBuilder::from_world(&new_world)
+    let scene = DynamicSceneBuilder::from_world(world)
         .deny_all_resources()
         .deny_component::<Sprite>()
-        .extract_entities(new_world.iter_entities().map(|e| e.id()))
+        .extract_entities(&mut new_world.query::<Entity>().iter(&new_world).map(|e| e))
         .build();
 
     println!("Successfully converted world to DynamicScene");

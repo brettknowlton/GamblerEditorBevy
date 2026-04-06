@@ -44,8 +44,8 @@ pub const UI_Z_LAYER: f32 = 10.0; //z layer for UI elements, we can use this to 
 
 pub const DEFAULT_TEXT_HEIGHT: f32 = 20.0; //default height of text in pixels
 
-pub const DEFAULT_WINDOW_WIDTH: f32 = 1200.0;
-pub const DEFAULT_WINDOW_HEIGHT: f32 = 800.0;
+pub const DEFAULT_WINDOW_WIDTH: u32 = 1200;
+pub const DEFAULT_WINDOW_HEIGHT: u32 = 800;
 
 pub const ASSETS_PATH: &str = "assets/";
 pub const TEXTURES_PATH: &str = "assets/textures/";

@@ -4,21 +4,21 @@
     "type": "split",
     "children": [
       {
-        "id": "228925c8fdc0710a",
+        "id": "910eb2d2f3477b8e",
         "type": "tabs",
         "children": [
           {
-            "id": "75e836dd78ba2fe8",
+            "id": "6501e2465a8c915c",
             "type": "leaf",
             "state": {
               "type": "markdown",
               "state": {
-                "file": "planning/Descriptions -thx gpt.md",
+                "file": "planning/Mechanic Breakdowns/Context Menu.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "Descriptions -thx gpt"
+              "title": "Context Menu"
             }
           }
         ]
@@ -151,6 +151,7 @@
   },
   "left-ribbon": {
     "hiddenItems": {
+      "bases:Create new base": false,
       "switcher:Open quick switcher": false,
       "graph:Open graph view": false,
       "canvas:Create new canvas": false,
@@ -161,8 +162,22 @@
       "3d-graph-new:Global 3D Graph": false
     }
   },
-  "active": "75e836dd78ba2fe8",
+  "active": "6501e2465a8c915c",
   "lastOpenFiles": [
+    "target/debug/incremental/gambler_bevy-3qb4mtmt7n2fs/s-hha3495tkd-1hiltkn-9t2isdq2hr64866j244gikldd/f15767phk5mt7n35fiqutxvk7.o",
+    "target/debug/incremental/gambler_bevy-3qb4mtmt7n2fs/s-hha3495tkd-1hiltkn-9t2isdq2hr64866j244gikldd/work-products.bin",
+    "target/debug/incremental/gambler_bevy-3qb4mtmt7n2fs/s-hha3495tkd-1hiltkn-9t2isdq2hr64866j244gikldd/f3k1yaq6xcym7tattt9r437vg.o",
+    "target/debug/incremental/gambler_bevy-3qb4mtmt7n2fs/s-hha3495tkd-1hiltkn-9t2isdq2hr64866j244gikldd/query-cache.bin",
+    "target/debug/incremental/gambler_bevy-3qb4mtmt7n2fs/s-hha3495tkd-1hiltkn-9t2isdq2hr64866j244gikldd/euy7qeaqi7eg3xcb76z1nf79x.o",
+    "target/debug/incremental/gambler_bevy-3qb4mtmt7n2fs/s-hha3495tkd-1hiltkn-9t2isdq2hr64866j244gikldd/eui6d67stmwkd3ktjnb85bczr.o",
+    "target/debug/incremental/gambler_bevy-3qb4mtmt7n2fs/s-hha3495tkd-1hiltkn-9t2isdq2hr64866j244gikldd/et8335e1bjnkq7f0xh7kzk38i.o",
+    "target/debug/incremental/gambler_bevy-3qb4mtmt7n2fs/s-hha3495tkd-1hiltkn-9t2isdq2hr64866j244gikldd/esbemjp47w80764s6qd20luzl.o",
+    "target/debug/incremental/gambler_bevy-3qb4mtmt7n2fs/s-hha3495tkd-1hiltkn-9t2isdq2hr64866j244gikldd/erq0ty4b9u4777zm5hyuy8ke0.o",
+    "target/debug/incremental/gambler_bevy-3qb4mtmt7n2fs/s-hha3495tkd-1hiltkn-9t2isdq2hr64866j244gikldd/eprjpjq9gam82uudd6qmekl54.o",
+    "target/debug/incremental/gambler_bevy-3qb4mtmt7n2fs/s-hha3495tkd-1hiltkn-9t2isdq2hr64866j244gikldd/epibt0umupklo8hnhi3dgo6ny.o",
+    "planning/Mechanic Breakdowns/Controls.md",
+    "planning/Mechanic Breakdowns/Context Menu.md",
+    "planning/Descriptions -thx gpt.md",
     "assets/textures/player/PlayerHD.png",
     "assets/textures/player/PlayerLD.png",
     "planning/Art/Player/Player Concept Art.md",
@@ -188,26 +203,13 @@
     "Untitled 1.md",
     "Untitled.md",
     "Vesta.md",
-    "planning/Dungeons and Dragons/Scripts/02- Day One/02.01.02 Vesta and the Old Lady Refugee.md",
-    "planning/Dungeons and Dragons/Scripts/Camp Ernest Intro Reading.md",
     "Pasted image 20250329213157.png",
     "Pasted image 20250329213225.png",
-    "planning/Dungeons and Dragons/Player Breakdowns/Unknown (Bronte).md",
     "planning/Dungeons and Dragons/Scripts/02- Day One/02- Day One.canvas",
     "background00.png",
     "planning/Planning Canvas.canvas",
-    "planning/Art/Player/le black man le jumping le jacks.aseprite",
-    "planning/Art/Player/player_concept_mk2.aseprite",
     "planning/Dungeons and Dragons/Maps/Camp Ernest.png",
-    "planning/Dungeons and Dragons/Maps",
-    "planning/Dungeons and Dragons/New folder",
     "planning/Dungeons and Dragons/Untitled.canvas",
-    "target/debug/deps/gambler_bevy-611733eab0f9239a",
-    "target/debug/incremental/gambler_bevy-21uphrpt9fkq9/s-h5thujczdy-17ec8ob-4b15wo3snzr1luekwr4qt8wcg/work-products.bin",
-    "target/debug/incremental/gambler_bevy-21uphrpt9fkq9/s-h5thujczdy-17ec8ob-4b15wo3snzr1luekwr4qt8wcg/query-cache.bin",
-    "target/debug/incremental/gambler_bevy-21uphrpt9fkq9/s-h5thujczdy-17ec8ob-4b15wo3snzr1luekwr4qt8wcg/f56lgli2h7x614a5sb7m3v6g6.o",
-    "target/debug/incremental/gambler_bevy-21uphrpt9fkq9/s-h5thujczdy-17ec8ob-4b15wo3snzr1luekwr4qt8wcg/f1bo7cvlzbkor8wzfmlh7ebtt.o",
-    "target/debug/incremental/gambler_bevy-21uphrpt9fkq9/s-h5thujczdy-17ec8ob-4b15wo3snzr1luekwr4qt8wcg/f0zzz1inyfbdd5arjhrpm3ngn.o",
     "PCL Process.canvas",
     "planning/Art/Interiors/zughy32.png",
     "planning/Art/Interiors/rosy-42-palette-example-by-s-203792.png",

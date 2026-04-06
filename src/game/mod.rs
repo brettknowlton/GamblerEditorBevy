@@ -1,4 +1,3 @@
-use super::editor::collider::*;
 use super::editor::*;
 
 use bevy::prelude::*;

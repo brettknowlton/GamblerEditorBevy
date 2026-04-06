@@ -1,10 +1,9 @@
 #[macro_use]
 mod ui;
-use bevy::gizmos::grid;
 pub use ui::*;
 
 pub mod player;
-pub use player::*;
+use player::Player;
 
 use bevy::prelude::*;
 use tools::SignificantComponent;
@@ -14,6 +13,18 @@ use crate::consts::*;
 use super::*;
 
 use bevy_rapier2d::prelude::*;
+
+fn populate_actor_tooling_menu(mut tooling_menu: ResMut<ToolingMenuState>) {
+    tooling_menu.title = "Actor Parts".to_string();
+    tooling_menu.visible = true;
+    tooling_menu.selected_item_id = Some(0);
+    tooling_menu.items = vec![ToolingMenuItem {
+        id: 0,
+        label: "Default Actor".to_string(),
+        texture_key: None,
+        rect: None,
+    }];
+}
 
 #[derive(Component, Reflect, Debug, Clone, PartialEq,)]
 #[require(EditorObject)]
@@ -79,7 +90,9 @@ pub fn actor_mode_keybinds(
     //places the first actor in the selection rect
     if input.just_pressed(KeyCode::KeyP) {
         //clean up the bevy query overhead
-        let (t, _) = crosshairs.single();
+        let Ok((t, _)) = crosshairs.single() else {
+            return;
+        };
 
         //get the coordinate of the crosshair AND snap it to the grid if gridsnap is enabled
         let mut coord = Coordinate::from(t.translation);
@@ -102,7 +115,9 @@ pub fn actor_mode_keybinds(
 
     // "L" handles removal of a tile from the scene, similar to placing one just doesnt need to worry about the tile creation part afterwards
     if input.just_pressed(KeyCode::KeyL) {
-        let (t, _) = crosshairs.single();
+        let Ok((t, _)) = crosshairs.single() else {
+            return;
+        };
         let mut coord = Coordinate::from(t.translation);
         coord = snap_coordinate_to_grid(coord);
 
@@ -123,7 +138,10 @@ pub fn actormode_plugin(app: &mut App) {
         // .add_systems(Startup, init)
 
         //OnEnter systems
-        .add_systems(OnEnter(EditorState::Editing(EditingComponent::Collider)), (crate::ui::update_placeholder::<Actor>, ui::create_collidermode_ui).chain())
+        .add_systems(
+            OnEnter(EditorState::Editing(EditingComponent::Actor)),
+            (populate_actor_tooling_menu, crate::ui::update_placeholder::<Actor>).chain(),
+        )
 
         //Update systems, that run only while TileEditor is active
         .add_systems(
@@ -135,7 +153,7 @@ pub fn actormode_plugin(app: &mut App) {
 
         //OnExit systems
         .add_systems(
-            OnExit(EditorState::Editing(EditingComponent::Collider)), 
+            OnExit(EditorState::Editing(EditingComponent::Actor)), 
             (
                 despawn_all::<ui::ActorModeUI>,
             ).chain()
