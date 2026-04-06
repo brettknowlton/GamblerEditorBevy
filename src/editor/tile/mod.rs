@@ -1,183 +1,132 @@
 pub mod ui;
 
+use super::*;
+use crate::{EditorObject, TILE_SIZE};
 use bevy::prelude::*;
 use bevy::sprite::Anchor;
 use std::path::PathBuf;
-use crate::{ utilities::*, resources::*, EditorObject, TILE_SIZE };
-use crate::consts::*;
-use super::*;
+use tools::SignificantComponent;
 
-// #[derive(Clone, Copy, Default, Eq, PartialEq, Debug, Hash, States)]
-// pub enum TileEditorState {
-//     #[default]
-//     Inactive,
-//     Active,
-// }
-
-pub fn tilemode_plugin(app: &mut App) {
-    app
-        .register_type::<Tile>()
-        .register_type::<Coordinate>()
-        .register_type::<TCoordinate>()
-        .register_type::<TileModeUI>()
-        .insert_resource(PlaceholderTile(Tile::new()))
-        //startup systems (may need to be moved from here to maintain order)
-        .add_systems(Startup, load_spritesheet)
-
-        //OnEnter systems
-        .add_systems(OnEnter(EditorState::Editing(EditingMode::Tile)), (init_tilemode, ui::show_placeholder, ui::create_tilemode_ui).chain())
-
-        //Update systems, that run only while TileEditor is active
-        .add_systems(
-            Update,
-            (tilemode_keybinds, ui::update_placeholder)
-                .chain()
-                .run_if(in_state(EditorState::Editing(EditingMode::Tile)))
-        )
-
-        //OnExit systems
-        .add_systems(
-            OnExit(EditorState::Editing(EditingMode::Tile)), 
-            (
-                despawn_all::<TileModeUI>,
-                exit_tilemode
-            ).chain()
-        );
-
-    //we could also take care of some post-exit cleanup here, like despawning all the UI elements by using the schedule OnEnter(EditorState::Inactive) and then despawning all the UI elements
+fn tile_texture_rect(tile_id: u64) -> Rect {
+    Rect {
+        min: Vec2::new(
+            (tile_id % SPRITESHEET_WIDTH) as f32 * TILE_SIZE as f32,
+            (tile_id / SPRITESHEET_WIDTH) as f32 * TILE_SIZE as f32,
+        ),
+        max: Vec2::new(
+            (tile_id % SPRITESHEET_WIDTH + 1) as f32 * TILE_SIZE as f32,
+            (tile_id / SPRITESHEET_WIDTH + 1) as f32 * TILE_SIZE as f32,
+        ),
+    }
 }
 
-// fn ensure_unique_tiles(mut commands: Commands, tiles: Query<(Entity, &Tile)>) {
-//     let mut seen = std::collections::HashSet::new();
-
-//     for (e, t) in tiles.iter() {
-//         if seen.contains(&t.coordinate) {
-//             //remove the older of the two tiles
-//             commands.entity(e).despawn();
-//         } else {
-//             seen.insert(&t.coordinate);
-//         }
-//     }
-// }
-
-fn init_tilemode(
+fn populate_tile_tooling_menu(
+    mut tooling_menu: ResMut<ToolingMenuState>,
+    selected_tile_id: Res<SelectedTileID>,
 ) {
-    println!("Entering Tile Editing Mode");
+    tooling_menu.title = "Tile Parts".to_string();
+    tooling_menu.visible = true;
+    tooling_menu.selected_item_id = Some(selected_tile_id.id);
+    tooling_menu.items = (0..MAX_SPRITESHEET_ITEMS)
+        .map(|tile_id| ToolingMenuItem {
+            id: tile_id,
+            label: tile_id.to_string(),
+            texture_key: Some('t'),
+            rect: Some(tile_texture_rect(tile_id)),
+        })
+        .collect();
+}
 
+fn load_spritesheet(
+    asset_server: Res<AssetServer>,
+    mut message_queue: ResMut<EditorBottomBarQueuedMessages>,
+    mut textures: ResMut<TextureHandles>,
+) {
+    //load the tilesheet for this mode
+    let tex_path = PathBuf::from("textures/tiles/tilesheet.png");
+
+    send_message!(
+        Some('i'),
+        message_queue,
+        format!("Tilesheet Loaded: \"{}\"", &tex_path.clone().display())
+    );
+
+    //load happens here
+    textures.0.insert('t', asset_server.load(tex_path));
 }
 
 fn tilemode_keybinds(
     mut commands: Commands,
+
+    mut message_queue: ResMut<EditorBottomBarQueuedMessages>,
     input: Res<ButtonInput<KeyCode>>,
 
     crosshairs: Query<(&Transform, &Crosshair)>,
-    mut current_editor_object: ResMut<PlaceholderTile>,
-    tiles: Query<(Entity, &Tile)>
+    tiles: Query<(Entity, &EditorObject), With<Tile>>,
+    gridsnap: Res<State<GridSnap>>,
+    selected_tile_id: ResMut<SelectedTileID>,
 ) {
     //"P" handles placement of a tile and adding it to the scene
+    //places the first tile in the selection rect
     if input.just_pressed(KeyCode::KeyP) {
         //clean up the bevy query overhead
-        let (t, _) = crosshairs.single();
-        let focused_item = &current_editor_object.0;
-        let mut coord = Coordinate::from(t.translation);
-        let pushover = 1000 * ((TILE_SIZE * TILE_SCALE) as i64); //this effectively offsets all my tiles 1000 to the right and down, so that negative coordinates arent a problem and rounds to the nearest integer
-        coord = Coordinate(
-            ((coord.0 + pushover) / ((TILE_SIZE * TILE_SCALE) as i64)) *
-                ((TILE_SIZE * TILE_SCALE) as i64) -
-                pushover,
-            ((coord.1 + pushover) / ((TILE_SIZE * TILE_SCALE) as i64)) *
-                ((TILE_SIZE * TILE_SCALE) as i64) -
-                pushover
-        );
+        if let Ok((t, _)) = crosshairs.single() {
+            //get the coordinate of the crosshair AND snap it to the grid if gridsnap is enabled
+            let mut coord = Coordinate::from(t.translation);
+            if gridsnap.get() == &GridSnap::Enabled {
+                coord = snap_coordinate_to_grid(coord);
+            }
 
-        // println!("coords: {}{}", coord.0, coord.1);
+            let first_tile = selected_tile_id.id;
 
-        //check if a tile already exists at this location and remove it if it does
-        if let Some(item) = tiles.iter().find(|(_, t)| t.coordinate == coord) {
-            //remove the old tile
-            commands.entity(item.0).despawn();
+            let to_place = EditorObject {
+                coordinate: TCoordinate::new('t', coord),
+                internal_type: first_tile as u64,
+                zone_id: TCoordinate::new(
+                    'f',
+                    Coordinate {
+                        0: coord.0 / ZONE_SIZE as i64,
+                        1: coord.1 / ZONE_SIZE as i64,
+                    },
+                ),
+            };
+
+            //place the tile using our SignificantComponent trait
+            Tile::place(&mut commands, to_place, 't', coord, &tiles);
+            send_message!(
+                Some('i'),
+                message_queue,
+                format!("Placed tile at: ({}, {})", coord.0, coord.1)
+            );
         }
-        commands.spawn((
-            Tile {
-                tile_type: focused_item.tile_type,
-                coordinate: coord,
-            },
-            Transform {
-                translation: Vec3::new(coord.0 as f32, coord.1 as f32, -5.0),
-                scale: Vec3::new(TILE_SCALE as f32, TILE_SCALE as f32, 1.0),
-                ..default()
-            },
-            EditorObject {
-                coordinate: TCoordinate::new('T', coord),
-                internal_type: focused_item.tile_type,
-            },
-        ));
     }
+
     // "L" handles removal of a tile from the scene, similar to placing one just doesnt need to worry about the tile creation part afterwards
     if input.just_pressed(KeyCode::KeyL) {
-        let (t, _) = crosshairs.single();
-        let mut coord = Coordinate::from(t.translation);
-        //"floor" the coordinate to the nearest tile grid space in a way that (kind of) respects the negative coordinate space, just dont place anything more than 1000 tiles away from the origin until I can figure that out
-        let pushover = 1000 * ((TILE_SIZE * TILE_SCALE) as i64);
-        coord = Coordinate(
-            ((coord.0 + pushover) / ((TILE_SIZE * TILE_SCALE) as i64)) *
-                ((TILE_SIZE * TILE_SCALE) as i64) -
-                pushover,
-            ((coord.1 + pushover) / ((TILE_SIZE * TILE_SCALE) as i64)) *
-                ((TILE_SIZE * TILE_SCALE) as i64) -
-                pushover
-        );
+        if let Ok((t, _)) = crosshairs.single() {
+            let mut coord = Coordinate::from(t.translation);
+            coord = snap_coordinate_to_grid(coord);
 
-        // println!("coords: {}{}", coord.0, coord.1);
-
-        //check if a tile already exists at this location and remove it if it does
-        if let Some(item) = tiles.iter().find(|(_, t)| t.coordinate == coord) {
-            //remove the old tile
-            commands.entity(item.0).despawn();
+            Tile::remove(&mut commands, coord, &tiles);
+            send_message!(
+                Some('i'),
+                message_queue,
+                format!("Removing tiles at: ({}, {})", coord.0, coord.1)
+            );
         }
     }
 
-
-    if input.just_pressed(KeyCode::ArrowRight) {
-        //cycles through the spritesheet to the right
-        current_editor_object.0.tile_type =
-            (current_editor_object.0.tile_type + 1) % (MAX_SPRITESHEET_ITEMS as u64);
-    }
-    if input.just_pressed(KeyCode::ArrowLeft) {
-        //cycles through the spritesheet to the left
-        current_editor_object.0.tile_type =
-            (current_editor_object.0.tile_type + (MAX_SPRITESHEET_ITEMS as u64) - 1) %
-            (MAX_SPRITESHEET_ITEMS as u64);
-    }
-    if input.just_pressed(KeyCode::ArrowUp) {
-        //cycles through the spritesheet up
-        current_editor_object.0.tile_type = (MAX_SPRITESHEET_ITEMS - SPRITESHEET_WIDTH) as u64 + (current_editor_object.0.tile_type % SPRITESHEET_WIDTH as u64);
-    }
-    if input.just_pressed(KeyCode::ArrowDown) {
-        //cycles through the spritesheet down
-        current_editor_object.0.tile_type =
-            (current_editor_object.0.tile_type + (SPRITESHEET_WIDTH as u64)) %
-            (MAX_SPRITESHEET_ITEMS as u64);
-    }
+    // Selection changes are now handled by the egui tooling panel.
 }
 
-fn load_spritesheet(mut commands: Commands, asset_server: Res<AssetServer>) {
-    //load the tilesheet for this mode
-    let tex_path = PathBuf::from("textures/tiles/tilesheet.png");
-
-    //load happens here
-    let texture = asset_server.load(tex_path);
-
-    //insert the texture handle into the resources for easy access later
-    commands.insert_resource(TilesheetHandle(texture.clone()));
-}
-
-fn exit_tilemode(mut commands: Commands, mut tile_state: ResMut<NextState<EditorState>>) {
-    tile_state.set(EditorState::Editing(EditingMode::None));
-    println!("Exiting Tile Editing Mode");
-
+fn exit_tilemode(mut message_queue: ResMut<EditorBottomBarQueuedMessages>) {
     //remove the CurrentEditorObject resource
-    commands.insert_resource(PlaceholderTile(Tile::new()));
+    // commands.insert_resource(PlaceholderObject(EditorObject::default()));
+    send_message!(
+        Some('i'),
+        message_queue,
+        "Exiting Tile Editing Mode".to_string()
+    );
 }
 
 /// A component that marks an entity as part of the tile editing UI.
@@ -186,23 +135,82 @@ fn exit_tilemode(mut commands: Commands, mut tile_state: ResMut<NextState<Editor
 #[require(UIItem)]
 struct TileModeUI;
 
-/// A component to track some basic info about a tile
+/// A component to track some basic info about a tile (actually its just a tag right now but that might change)
 #[derive(Component, Reflect, Debug, Clone)]
 #[reflect(Component)]
-pub struct Tile {
-    pub tile_type: u64,
-    pub coordinate: Coordinate,
-}
+#[require(EditorObject)]
+
+pub struct Tile {}
 impl Tile {
     fn new() -> Self {
-        Self {
-            tile_type: 0,
-            coordinate: Coordinate(0, 0),
-        }
+        Self {}
     }
 }
+
 impl Default for Tile {
     fn default() -> Self {
         Self::new()
     }
 }
+impl SignificantComponent for Tile {
+    fn place_rectangle(_rect: Rect, _commands: Commands) {
+        //make a tile like normal in this rect, but use sliced tiles over the sprite sheet selection
+        todo!();
+    }
+
+    fn from_rect(_rect: Rect, _coord: Coordinate) -> Self {
+        Self {}
+    }
+}
+
+fn run_if_tile_update_needed(needs_update: Res<TileUpdateNeeded>) -> bool {
+    if needs_update.0 {
+        true
+    } else {
+        false
+    }
+}
+
+fn reset_update_needed(mut needs_update: ResMut<TileUpdateNeeded>) {
+    needs_update.0 = false;
+}
+
+pub fn tilemode_plugin(app: &mut App) {
+    app.register_type::<Tile>()
+        .register_type::<Coordinate>()
+        .register_type::<TCoordinate>()
+        .register_type::<TileModeUI>()
+        .init_resource::<SelectedTileID>()
+        .init_resource::<TileUpdateNeeded>()
+        // .init_resource::<SpritesheetCrop>()
+        // .insert_resource(PlaceholderObject(EditorObject::default()))
+        //startup systems (may need to be moved from here to maintain order)
+        .add_systems(Startup, load_spritesheet)
+        //OnEnter systems
+        .add_systems(
+            OnEnter(EditorState::Editing(EditingComponent::Tile)),
+            (
+                populate_tile_tooling_menu,
+                update_placeholder::<Tile>,
+                ui::spawn_tile_placeholder,
+            )
+                .chain(),
+        )
+        //Update systems, that run only while TileEditor is active
+        .add_systems(
+            Update,
+            (
+                tilemode_keybinds,
+                (update_placeholder::<Tile>, reset_update_needed).run_if(run_if_tile_update_needed),
+            )
+                .chain()
+                .run_if(in_state(EditorState::Editing(EditingComponent::Tile))),
+        )
+        //OnExit systems
+        .add_systems(
+            OnExit(EditorState::Editing(EditingComponent::Tile)),
+            (despawn_all::<TileModeUI>, exit_tilemode).chain(),
+        );
+    //we could also take care of some post-exit cleanup here, like despawning all the UI elements by using the schedule OnEnter(EditorState::Inactive) and then despawning all the UI elements
+}
+//NOTHING BELOW THE PLUGINS!
