@@ -10,7 +10,7 @@ pub use crate::game::*;
 pub use crate::resources::*;
 use crate::selection::ActiveSelection;
 use crate::selection::SelectionRect;
-use crate::ui::ToolingMenuState;
+use crate::ui::{ToolingMenuItem, ToolingMenuState};
 use crate::ui::UIItem;
 pub use crate::utilities::*;
 pub use tools::SignificantComponent;
@@ -89,6 +89,103 @@ pub struct UpdatePlaceholderMessage {
     pub rect: Rect,
 }
 
+pub fn configure_tooling_menu(
+    tooling_menu: &mut ToolingMenuState,
+    title: &str,
+    selected_item_id: Option<u64>,
+    items: Vec<ToolingMenuItem>,
+) {
+    tooling_menu.title = title.to_string();
+    tooling_menu.visible = true;
+    tooling_menu.selected_item_id = selected_item_id;
+    tooling_menu.items = items;
+}
+
+pub fn editing_component_kind(component: EditingComponent) -> EditorObjectKind {
+    match component {
+        EditingComponent::Actor => EditorObjectKind::Actor,
+        EditingComponent::Collider => EditorObjectKind::Collider,
+        EditingComponent::Tile => EditorObjectKind::Tile,
+        _ => EditorObjectKind::Other,
+    }
+}
+
+pub fn current_editing_kind(state: &State<EditorState>) -> EditorObjectKind {
+    match state.get() {
+        EditorState::Editing(component) => editing_component_kind(*component),
+        _ => EditorObjectKind::Other,
+    }
+}
+
+pub fn snapped_coordinate_from_translation(
+    translation: Vec3,
+    gridsnap: &State<GridSnap>,
+) -> Coordinate {
+    let coord = Coordinate::from(translation);
+
+    if gridsnap.get() == &GridSnap::Enabled {
+        snap_coordinate_to_grid(coord)
+    } else {
+        coord
+    }
+}
+
+pub fn zone_coordinate_for(coord: Coordinate) -> Coordinate {
+    Coordinate {
+        0: coord.0 / ZONE_SIZE as i64,
+        1: coord.1 / ZONE_SIZE as i64,
+    }
+}
+
+pub fn build_editor_object(
+    kind: EditorObjectKind,
+    internal_kind: u64,
+    coordinate: Coordinate,
+    zone_kind: EditorObjectKind,
+) -> EditorObject {
+    EditorObject {
+        kind,
+        internal_kind,
+        coordinate,
+        zone_id: TCoordinate::new(zone_kind, zone_coordinate_for(coordinate)),
+    }
+}
+
+pub fn send_placement_message(
+    message_queue: &mut EditorBottomBarQueuedMessages,
+    label: &str,
+    coord: Coordinate,
+) {
+    send_message!(
+        Some('i'),
+        message_queue,
+        format!("Placed {label} at: ({}, {})", coord.0, coord.1)
+    );
+}
+
+pub fn send_removal_message(
+    message_queue: &mut EditorBottomBarQueuedMessages,
+    label: &str,
+    coord: Coordinate,
+) {
+    send_message!(
+        Some('i'),
+        message_queue,
+        format!("Removing {label} at: ({}, {})", coord.0, coord.1)
+    );
+}
+
+pub fn send_mode_exit_message(
+    message_queue: &mut EditorBottomBarQueuedMessages,
+    label: &str,
+) {
+    send_message!(
+        Some('i'),
+        message_queue,
+        format!("Exiting {label} Editing Mode")
+    );
+}
+
 fn initialize(
     mut commands: Commands,
 
@@ -143,6 +240,280 @@ struct BottomBarUpdate;
 #[derive(Message)]
 struct ResetScene;
 
+fn handle_global_editor_shortcuts(
+    editor_state: &State<EditorState>,
+    next_editor_state: &mut NextState<EditorState>,
+    game_state: &State<GameState>,
+    next_game_state: &mut NextState<GameState>,
+    next_showgrid_state: &mut NextState<ShowGrid>,
+    showgrid_state: &State<ShowGrid>,
+    next_gridsnap_state: &mut NextState<GridSnap>,
+    gridsnap_state: &State<GridSnap>,
+    input: &ButtonInput<KeyCode>,
+    message_queue: &mut EditorBottomBarQueuedMessages,
+    crosshairs: &mut Query<(&mut Crosshair, &mut Transform, &mut Sprite), Without<Camera2d>>,
+    message_writer: &mut MessageWriter<ResetScene>,
+) {
+    if input.just_pressed(KeyCode::KeyQ) {
+        next_editor_state.set(EditorState::Normal);
+        send_message!(Some('i'), message_queue, "Returning to Normal Mode");
+    } else if input.pressed(KeyCode::ControlLeft)
+        && input.just_pressed(KeyCode::KeyS)
+        && !input.just_pressed(KeyCode::ShiftLeft)
+        && editor_state.get() != &EditorState::SaveAsk
+    {
+        next_editor_state.set(EditorState::SaveAsk);
+        send_message!(
+            Some('i'),
+            message_queue,
+            "Would you like to save the scene? Yenter/Noscape"
+        );
+    } else if input.pressed(KeyCode::ControlLeft)
+        && input.just_pressed(KeyCode::KeyL)
+        && editor_state.get() != &EditorState::LoadAsk
+    {
+        next_editor_state.set(EditorState::LoadAsk);
+        send_message!(
+            Some('i'),
+            message_queue,
+            "Would you like to load a scene? Yenter/Noscape"
+        );
+    } else if input.pressed(KeyCode::ControlLeft)
+        && input.just_pressed(KeyCode::KeyQ)
+        && editor_state.get() != &EditorState::QuitAsk
+    {
+        next_editor_state.set(EditorState::QuitAsk);
+        send_message!(
+            Some('i'),
+            message_queue,
+            "Would you like to exit the editor? Yenter/Noscape"
+        );
+    } else if input.pressed(KeyCode::ControlLeft)
+        && input.just_pressed(KeyCode::KeyT)
+        && editor_state.get() != &EditorState::Inactive
+    {
+        if game_state.get() != &GameState::Inactive && editor_state.get() == &EditorState::Inactive
+        {
+            next_editor_state.set(EditorState::Normal);
+            next_game_state.set(GameState::Inactive);
+            send_message!(Some('i'), message_queue, "Exiting Test Mode");
+        } else {
+            next_editor_state.set(EditorState::Inactive);
+            next_game_state.set(GameState::Running);
+            send_message!(Some('i'), message_queue, "Entering Test Mode");
+        }
+    } else if input.pressed(KeyCode::ControlLeft)
+        && input.just_pressed(KeyCode::KeyR)
+        && editor_state.get() != &EditorState::Inactive
+    {
+        send_message!(Some('i'), message_queue, "Resetting Scene");
+        next_editor_state.set(EditorState::Normal);
+        message_writer.write(ResetScene);
+    } else if input.pressed(KeyCode::ControlLeft)
+        && input.just_pressed(KeyCode::KeyG)
+        && !input.pressed(KeyCode::ShiftLeft)
+        && editor_state.get() != &EditorState::Inactive
+    {
+        if showgrid_state.get() == &ShowGrid::Yes {
+            next_showgrid_state.set(ShowGrid::No);
+            send_message!(Some('i'), message_queue, "Hiding Grid");
+        } else {
+            next_showgrid_state.set(ShowGrid::Yes);
+            send_message!(Some('i'), message_queue, "Showing Grid");
+        }
+    } else if input.pressed(KeyCode::ControlLeft)
+        && input.just_pressed(KeyCode::KeyG)
+        && input.pressed(KeyCode::ShiftLeft)
+        && editor_state.get() != &EditorState::Inactive
+    {
+        if gridsnap_state.get() == &GridSnap::Enabled {
+            next_gridsnap_state.set(GridSnap::Disabled);
+            send_message!(Some('i'), message_queue, "Disabling Grid Snap");
+        } else {
+            next_gridsnap_state.set(GridSnap::Enabled);
+            send_message!(Some('i'), message_queue, "Enabling Grid Snap");
+        }
+    } else if input.pressed(KeyCode::ControlLeft)
+        && input.just_pressed(KeyCode::KeyB)
+        && editor_state.get() != &EditorState::Inactive
+    {
+        let Ok((_, transform, _)) = crosshairs.single() else {
+            return;
+        };
+
+        let zone_id = Coordinate {
+            0: (transform.translation.x as i64) / ((ZONE_SIZE * SCALED_TILE_WIDTH) as i64),
+            1: (transform.translation.y as i64) / ((ZONE_SIZE * SCALED_TILE_WIDTH) as i64),
+        };
+
+        let path = PathBuf::from(format!("background{}{}.png", zone_id.0, zone_id.1));
+        let aseprite_path =
+            PathBuf::from("C:/Program Files (x86)/Steam/steamapps/common/Aseprite/Aseprite.exe");
+
+        if path.exists() {
+            send_message!(Some('i'), message_queue, "Opening background.png");
+            std::process::Command::new(aseprite_path)
+                .arg(path)
+                .spawn()
+                .expect("Failed to open aseprite");
+        } else {
+            send_message!(Some('i'), message_queue, "Creating background.png");
+            std::fs::File::create(&path).expect("Failed to create background.png");
+            std::process::Command::new("aseprite")
+                .arg(path)
+                .spawn()
+                .expect("Failed to open aseprite");
+        }
+    }
+}
+
+fn handle_rectangle_tool_shortcuts(
+    input: &ButtonInput<KeyCode>,
+    message_queue: &mut EditorBottomBarQueuedMessages,
+    crosshairs: &mut Query<(&mut Crosshair, &mut Transform, &mut Sprite), Without<Camera2d>>,
+) {
+    if input.just_pressed(KeyCode::KeyO) {
+        let Ok((_, _, _)) = crosshairs.single() else {
+            return;
+        };
+
+        send_message!(Some('i'), message_queue, "This feature is not yet implemented");
+    } else if input.just_released(KeyCode::KeyO) {
+        let Ok((_, t, _)) = crosshairs.single() else {
+            return;
+        };
+        let _ = Coordinate {
+            0: t.translation.x as i64,
+            1: t.translation.y as i64,
+        };
+    }
+}
+
+fn handle_mode_switch_shortcuts(
+    input: &ButtonInput<KeyCode>,
+    next_editor_state: &mut NextState<EditorState>,
+    message_queue: &mut EditorBottomBarQueuedMessages,
+) {
+    if input.just_pressed(KeyCode::Digit1) || input.just_pressed(KeyCode::Numpad1) {
+        send_message!(Some('i'), message_queue, "Switching to Tile Mode");
+        next_editor_state.set(EditorState::Editing(EditingComponent::Tile));
+    }
+
+    if input.just_pressed(KeyCode::Digit2) || input.just_pressed(KeyCode::Numpad2) {
+        send_message!(Some('i'), message_queue, "Switching to Collider Mode");
+        next_editor_state.set(EditorState::Editing(EditingComponent::Collider));
+    }
+
+    if input.just_pressed(KeyCode::Digit3) || input.just_pressed(KeyCode::Numpad3) {
+        send_message!(Some('i'), message_queue, "Switching to Actor Mode");
+        next_editor_state.set(EditorState::Editing(EditingComponent::Actor));
+    }
+}
+
+fn handle_state_specific_keybinds(
+    editor_state: &State<EditorState>,
+    next_editor_state: &mut NextState<EditorState>,
+    input: &ButtonInput<KeyCode>,
+    message_queue: &mut EditorBottomBarQueuedMessages,
+) {
+    match editor_state.get() {
+        EditorState::Normal | EditorState::Loading | EditorState::LoadingEmpty | EditorState::Saving => {}
+        EditorState::LoadAsk => {
+            if input.just_pressed(KeyCode::KeyY) || input.just_pressed(KeyCode::Enter) {
+                next_editor_state.set(EditorState::Loading);
+                send_message!(Some('i'), message_queue, "Attempting to load scene");
+            }
+            if input.just_pressed(KeyCode::KeyN) || input.just_pressed(KeyCode::Escape) {
+                next_editor_state.set(EditorState::LoadingEmpty);
+                send_message!(Some('w'), message_queue, "No scene loaded");
+            }
+        }
+        EditorState::Editing(_) => {
+            if input.just_pressed(KeyCode::KeyQ)
+                || input.all_pressed(vec![KeyCode::ControlLeft, KeyCode::KeyS])
+            {
+                next_editor_state.set(EditorState::Normal);
+                send_message!(Some('i'), message_queue, "Returning to Normal Mode");
+            }
+        }
+        EditorState::SaveAsk => {
+            if input.just_pressed(KeyCode::KeyY) || input.just_pressed(KeyCode::Enter) {
+                next_editor_state.set(EditorState::Saving);
+                send_message!(Some('i'), message_queue, "Saving scene.");
+            } else if input.just_pressed(KeyCode::KeyN) || input.just_pressed(KeyCode::Escape) {
+                next_editor_state.set(EditorState::Normal);
+                send_message!(Some('w'), message_queue, "Saving aborted.");
+            }
+        }
+        EditorState::QuitAsk => {
+            if input.just_pressed(KeyCode::KeyY) || input.just_pressed(KeyCode::Enter) {
+                next_editor_state.set(EditorState::Inactive);
+                send_message!(Some('i'), message_queue, "Exiting the editor...");
+            } else if input.just_pressed(KeyCode::KeyN) || input.just_pressed(KeyCode::Escape) {
+                next_editor_state.set(EditorState::Normal);
+                send_message!(Some('w'), message_queue, "Exiting aborted.");
+            }
+        }
+        _ => {}
+    }
+}
+
+fn should_apply_editor_movement(editor_state: &State<EditorState>) -> bool {
+    editor_state.get() != &EditorState::SaveAsk
+        && editor_state.get() != &EditorState::LoadAsk
+        && editor_state.get() != &EditorState::QuitAsk
+}
+
+fn movement_velocity(input: &ButtonInput<KeyCode>) -> Vec2 {
+    let mut velocity = Vec2::ZERO;
+
+    if input.pressed(KeyCode::KeyW) && !input.pressed(KeyCode::KeyS) {
+        velocity.y = 200.0;
+    }
+    if input.pressed(KeyCode::KeyS) && !input.pressed(KeyCode::KeyW) {
+        velocity.y = -200.0;
+    }
+    if input.pressed(KeyCode::KeyD) && !input.pressed(KeyCode::KeyA) {
+        velocity.x = 200.0;
+    }
+    if input.pressed(KeyCode::KeyA) && !input.pressed(KeyCode::KeyD) {
+        velocity.x = -200.0;
+    }
+
+    velocity
+}
+
+fn apply_editor_movement(
+    uiitems: &mut Query<(&mut UIItem, &mut Transform), (Without<Camera2d>, Without<Crosshair>)>,
+    cameras: &mut Query<(&mut UIItem, &mut Transform, &mut Camera2d)>,
+    crosshairs: &mut Query<(&mut Crosshair, &mut Transform, &mut Sprite), Without<Camera2d>>,
+    velocity: Vec2,
+    delta_secs: f32,
+) {
+    for (mut ui, mut t) in uiitems.iter_mut() {
+        ui.vel_x = velocity.x;
+        ui.vel_y = velocity.y;
+        t.translation.x += ui.vel_x * delta_secs;
+        t.translation.y += ui.vel_y * delta_secs;
+        ui.vel_x *= 0.99;
+        ui.vel_y *= 0.99;
+    }
+
+    for (mut ui, mut t, _) in cameras.iter_mut() {
+        ui.vel_x = velocity.x;
+        ui.vel_y = velocity.y;
+        t.translation.x += ui.vel_x * delta_secs;
+        t.translation.y += ui.vel_y * delta_secs;
+        ui.vel_x *= 0.99;
+        ui.vel_y *= 0.99;
+    }
+
+    for (_, mut t, _) in crosshairs.iter_mut() {
+        t.translation.x += velocity.x * delta_secs;
+        t.translation.y += velocity.y * delta_secs;
+    }
+}
+
 fn stateful_keybinds(
     editor_state: ResMut<State<EditorState>>,
     mut next_editor_state: ResMut<NextState<EditorState>>,
@@ -165,296 +536,38 @@ fn stateful_keybinds(
     mut cameras: Query<(&mut UIItem, &mut Transform, &mut Camera2d)>,
     mut message_writer: MessageWriter<ResetScene>,
 ) {
-    let messages = &mut message_queue;
-    //manage the editor state, you can switch between modes with their letter call or number keys except if you are attempting to save/load the document
+    handle_global_editor_shortcuts(
+        editor_state.as_ref(),
+        &mut next_editor_state,
+        game_state.as_ref(),
+        &mut next_game_state,
+        &mut next_showgrid_state,
+        showgrid_state.as_ref(),
+        &mut next_gridsnap_state,
+        gridsnap_state.as_ref(),
+        &input,
+        &mut message_queue,
+        &mut crosshairs,
+        &mut message_writer,
+    );
+    handle_rectangle_tool_shortcuts(&input, &mut message_queue, &mut crosshairs);
+    handle_mode_switch_shortcuts(&input, &mut next_editor_state, &mut message_queue);
+    handle_state_specific_keybinds(
+        editor_state.as_ref(),
+        &mut next_editor_state,
+        &input,
+        &mut message_queue,
+    );
 
-    //Universal keys, not dependant on state:
-
-    // Q brings us back to normal mode
-    if input.just_pressed(KeyCode::KeyQ) {
-        next_editor_state.set(EditorState::Normal);
-        send_message!(Some('i'), messages, "Returning to Normal Mode");
-    } else if
-    //CTRL + S will enter saveAsk mode
-    input.pressed(KeyCode::ControlLeft)
-        && input.just_pressed(KeyCode::KeyS)
-        && !input.just_pressed(KeyCode::ShiftLeft)
-        && editor_state.get() != &EditorState::SaveAsk
-    {
-        next_editor_state.set(EditorState::SaveAsk);
-        send_message!(
-            Some('i'),
-            messages,
-            "Would you like to save the scene? Yenter/Noscape"
+    if should_apply_editor_movement(editor_state.as_ref()) {
+        let velocity = movement_velocity(&input);
+        apply_editor_movement(
+            &mut uiitems,
+            &mut cameras,
+            &mut crosshairs,
+            velocity,
+            time.delta_secs(),
         );
-    } else if
-    //CTRL + L will enter loadAsk mode
-    input.pressed(KeyCode::ControlLeft)
-        && input.just_pressed(KeyCode::KeyL)
-        && editor_state.get() != &EditorState::LoadAsk
-    {
-        next_editor_state.set(EditorState::LoadAsk);
-        send_message!(
-            Some('i'),
-            messages,
-            "Would you like to load a scene? Yenter/Noscape"
-        );
-    } else if
-    //CTRL + Q will enter QuitAsk mode
-    input.pressed(KeyCode::ControlLeft)
-        && input.just_pressed(KeyCode::KeyQ)
-        && editor_state.get() != &EditorState::QuitAsk
-    {
-        next_editor_state.set(EditorState::QuitAsk);
-        send_message!(
-            Some('i'),
-            messages,
-            "Would you like to exit the editor? Yenter/Noscape"
-        );
-    } else if
-    //CTRL + T will toggle TEST mode, disabling the editor and enabling the game functionality.
-    input.pressed(KeyCode::ControlLeft)
-        && input.just_pressed(KeyCode::KeyT)
-        && editor_state.get() != &EditorState::Inactive
-    {
-        if game_state.get() != &GameState::Inactive && editor_state.get() == &EditorState::Inactive
-        {
-            next_editor_state.set(EditorState::Normal);
-            next_game_state.set(GameState::Inactive);
-            send_message!(Some('i'), messages, "Exiting Test Mode");
-        } else {
-            next_editor_state.set(EditorState::Inactive);
-            next_game_state.set(GameState::Running);
-            send_message!(Some('i'), messages, "Entering Test Mode");
-        }
-    } else if
-    //CTRL + R will "reset" the editor, for now that willjust move the player to the crosshair position
-    input.pressed(KeyCode::ControlLeft)
-        && input.just_pressed(KeyCode::KeyR)
-        && editor_state.get() != &EditorState::Inactive
-    {
-        // game::player::move_player_to_cursor(crosshairs.single_mut().unwrap().1, &mut cameras.single_mut().unwrap().1);
-        send_message!(Some('i'), messages, "Resetting Scene");
-        next_editor_state.set(EditorState::Normal);
-        //send a ResetScene event to the ResetScene system
-        message_writer.write(ResetScene);
-    } else if
-    //CTRL + G will toggle the grid
-    input.pressed(KeyCode::ControlLeft)
-        && input.just_pressed(KeyCode::KeyG)
-        && editor_state.get() != &EditorState::Inactive
-    {
-        if showgrid_state.get() == &ShowGrid::Yes {
-            next_showgrid_state.set(ShowGrid::No);
-            send_message!(Some('i'), messages, "Hiding Grid");
-        } else {
-            next_showgrid_state.set(ShowGrid::Yes);
-            send_message!(Some('i'), messages, "Showing Grid");
-        }
-    } else if
-    //CTRL + SHIFT + G will toggle the grid snap
-    input.pressed(KeyCode::ControlLeft)
-        && input.just_pressed(KeyCode::KeyG)
-        && input.pressed(KeyCode::ShiftLeft)
-        && editor_state.get() != &EditorState::Inactive
-    {
-        if gridsnap_state.get() == &GridSnap::Enabled {
-            next_gridsnap_state.set(GridSnap::Disabled);
-            send_message!(Some('i'), messages, "Disabling Grid Snap");
-        } else {
-            next_gridsnap_state.set(GridSnap::Enabled);
-            send_message!(Some('i'), messages, "Enabling Grid Snap");
-        } //
-    } else if
-    //CTRL + B will try to open the baground png, if it does not exist will create the file and then open it with aseprite program
-    input.pressed(KeyCode::ControlLeft)
-        && input.just_pressed(KeyCode::KeyB)
-        && editor_state.get() != &EditorState::Inactive
-    {
-        //open the background png in aseprite
-        //background will have the name backgroundXY where XY is the zone XY coordinates, we can find this by taking the crosshair position and dividing by the zone size
-        let zone_id = Coordinate {
-            0: (crosshairs.single().unwrap().1.translation.x as i64)
-                / ((ZONE_SIZE * SCALED_TILE_WIDTH) as i64),
-            1: (crosshairs.single().unwrap().1.translation.y as i64)
-                / ((ZONE_SIZE * SCALED_TILE_WIDTH) as i64),
-        };
-
-        let path = PathBuf::from(format!("background{}{}.png", zone_id.0, zone_id.1));
-
-        let aseprite_path =
-            PathBuf::from("C:/Program Files (x86)/Steam/steamapps/common/Aseprite/Aseprite.exe");
-        if path.exists() {
-            send_message!(Some('i'), messages, "Opening background.png");
-            std::process::Command::new(aseprite_path)
-                .arg(path)
-                .spawn()
-                .expect("Failed to open aseprite");
-        } else {
-            send_message!(Some('i'), messages, "Creating background.png");
-            std::fs::File::create(&path).expect("Failed to create background.png");
-            std::process::Command::new("aseprite")
-                .arg(path)
-                .spawn()
-                .expect("Failed to open aseprite");
-        }
-    }
-
-    //O is the main button to directly use the Rectangle Tool
-    if input.just_pressed(KeyCode::KeyO) {
-        //use crosshair's coordinate as start
-        let Ok((_, _, _)) = crosshairs.single() else {
-            return;
-        };
-
-        // active_selection.selection_rect = Some(selection::SelectionRect::start(coord));
-
-        send_message!(Some('i'), messages, "This feature is not yet implemented");
-    } else if input.just_released(KeyCode::KeyO) {
-        //use crosshair's coordinate as end
-        let Ok((_, t, _)) = crosshairs.single() else {
-            return;
-        };
-        let _ = Coordinate {
-            0: t.translation.x as i64,
-            1: t.translation.y as i64,
-        };
-
-        // active_selection.selection_rect = active_selection.selection_rect.clone().map(|mut r| {
-        //     r.end(coord);
-        //     r
-        // });
-
-        // send_message!(
-        //     Some('i'),
-        //     messages,
-        //     format!("Selection Rect: {:?}", active_selection.selection_rect)
-        // );
-    }
-
-    // 1 will switch to tile mode
-    if input.just_pressed(KeyCode::Digit1) || input.just_pressed(KeyCode::Numpad1) {
-        send_message!(Some('i'), messages, "Switching to Tile Mode");
-        next_editor_state.set(EditorState::Editing(EditingComponent::Tile));
-    }
-
-    // 2 will switch to collider mode
-    if input.just_pressed(KeyCode::Digit2) || input.just_pressed(KeyCode::Numpad2) {
-        send_message!(Some('i'), messages, "Switching to Collider Mode");
-        next_editor_state.set(EditorState::Editing(EditingComponent::Collider));
-    }
-
-    // 3 will switch to actor mode
-    if input.just_pressed(KeyCode::Digit3) || input.just_pressed(KeyCode::Numpad3) {
-        send_message!(Some('i'), messages, "Switching to Actor Mode");
-        next_editor_state.set(EditorState::Editing(EditingComponent::Actor));
-    }
-
-    //state specific keybinds
-    match editor_state.get() {
-        EditorState::Normal => {
-            //there is not a lot unique to normal mode
-        }
-        EditorState::LoadAsk => {
-            if input.just_pressed(KeyCode::KeyY) || input.just_pressed(KeyCode::Enter) {
-                next_editor_state.set(EditorState::Loading);
-                send_message!(Some('i'), messages, "Attempting to load scene");
-            }
-            if input.just_pressed(KeyCode::KeyN) || input.just_pressed(KeyCode::Escape) {
-                next_editor_state.set(EditorState::LoadingEmpty);
-                send_message!(Some('w'), messages, "No scene loaded");
-            }
-        }
-        EditorState::Loading => {
-            //do nothing, we are waiting for the scene to load
-        }
-        EditorState::LoadingEmpty => {
-            //do nothing, we are waiting for the scene to load
-        }
-        EditorState::Saving => {
-            //do nothing, we are waiting for the scene to save
-        }
-        EditorState::Editing(_) => {
-            //in any editing mode, Q will bring us back to normal mode
-            if input.just_pressed(KeyCode::KeyQ)
-                || input.all_pressed(vec![KeyCode::ControlLeft, KeyCode::KeyS])
-            {
-                next_editor_state.set(EditorState::Normal);
-                send_message!(Some('i'), messages, "Returning to Normal Mode");
-            }
-        }
-
-        EditorState::SaveAsk => {
-            if input.just_pressed(KeyCode::KeyY) || input.just_pressed(KeyCode::Enter) {
-                next_editor_state.set(EditorState::Saving);
-                send_message!(Some('i'), messages, "Saving scene.");
-            } else if input.just_pressed(KeyCode::KeyN) || input.just_pressed(KeyCode::Escape) {
-                next_editor_state.set(EditorState::Normal);
-                send_message!(Some('w'), messages, "Saving aborted.");
-            }
-        }
-
-        EditorState::QuitAsk => {
-            if input.just_pressed(KeyCode::KeyY) || input.just_pressed(KeyCode::Enter) {
-                next_editor_state.set(EditorState::Inactive);
-                send_message!(Some('i'), messages, "Exiting the editor...");
-            } else if input.just_pressed(KeyCode::KeyN) || input.just_pressed(KeyCode::Escape) {
-                next_editor_state.set(EditorState::Normal);
-                send_message!(Some('w'), messages, "Exiting aborted.");
-            }
-        }
-        _ => {}
-    }
-
-    //Anti-Stateful Keybinds
-    if editor_state.get() != &EditorState::SaveAsk
-        && editor_state.get() != &EditorState::LoadAsk
-        && editor_state.get() != &EditorState::QuitAsk
-    {
-        //Camera Controls, just dont work in the save/load/quit states
-        let mut vel_y = 0.0;
-        let mut vel_x = 0.0;
-
-        let list = &mut uiitems.iter_mut();
-        //WASD controls for crosshair movement
-        if input.pressed(KeyCode::KeyW) && !input.pressed(KeyCode::KeyS) {
-            vel_y = 200.0;
-        }
-        if input.pressed(KeyCode::KeyS) && !input.pressed(KeyCode::KeyW) {
-            vel_y = -200.0;
-        }
-        if input.pressed(KeyCode::KeyD) && !input.pressed(KeyCode::KeyA) {
-            vel_x = 200.0;
-        }
-        if input.pressed(KeyCode::KeyA) && !input.pressed(KeyCode::KeyD) {
-            vel_x = -200.0;
-        }
-
-        //update anything with a UIItem component
-        for (mut ui, mut t) in list {
-            ui.vel_x = vel_x;
-            ui.vel_y = vel_y;
-            t.translation.x += ui.vel_x * time.delta_secs();
-            t.translation.y += ui.vel_y * time.delta_secs();
-            //apply frictoin -1% of the velocity per frame
-            ui.vel_x *= 0.99;
-            ui.vel_y *= 0.99;
-        }
-        //update the camera in the same way
-        for (mut ui, mut t, _) in cameras.iter_mut() {
-            ui.vel_x = vel_x;
-            ui.vel_y = vel_y;
-            t.translation.x += ui.vel_x * time.delta_secs();
-            t.translation.y += ui.vel_y * time.delta_secs();
-            //apply frictoin -1% of the velocity per frame
-            ui.vel_x *= 0.99;
-            ui.vel_y *= 0.99;
-        }
-        //also update the crosshair in the same way
-        for (_, mut t, _) in crosshairs.iter_mut() {
-            t.translation.x += vel_x * time.delta_secs();
-            t.translation.y += vel_y * time.delta_secs();
-        }
     }
 }
 

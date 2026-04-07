@@ -56,6 +56,88 @@ pub struct ToolingMenuItemNode {
     pub id: u64,
 }
 
+fn editor_panel_frame() -> egui::Frame {
+    egui::Frame {
+        fill: egui::Color32::from_rgba_unmultiplied(18, 22, 30, 165),
+        stroke: egui::Stroke::new(
+            1.0,
+            egui::Color32::from_rgba_unmultiplied(220, 230, 245, 120),
+        ),
+        inner_margin: egui::Margin::same(8),
+        ..Default::default()
+    }
+}
+
+fn tooling_columns(is_tile_mode: bool) -> usize {
+    if is_tile_mode {
+        (SPRITESHEET_WIDTH as usize / 2).max(1)
+    } else {
+        1
+    }
+}
+
+fn move_selection_index(
+    input: &ButtonInput<KeyCode>,
+    item_count: usize,
+    current_index: usize,
+    columns: usize,
+) -> usize {
+    let mut next = current_index;
+
+    if input.just_pressed(KeyCode::ArrowRight) {
+        next = (next + 1) % item_count;
+    }
+    if input.just_pressed(KeyCode::ArrowLeft) {
+        next = if next == 0 { item_count - 1 } else { next - 1 };
+    }
+    if input.just_pressed(KeyCode::ArrowDown) {
+        next = (next + columns) % item_count;
+    }
+    if input.just_pressed(KeyCode::ArrowUp) {
+        next = if next >= columns {
+            next - columns
+        } else {
+            (item_count + next - columns % item_count) % item_count
+        };
+    }
+
+    next
+}
+
+fn tile_rect_for_item_id(id: u64) -> Rect {
+    Rect {
+        min: Vec2::new(
+            (id % SPRITESHEET_WIDTH) as f32 * TILE_SIZE as f32,
+            (id / SPRITESHEET_WIDTH) as f32 * TILE_SIZE as f32,
+        ),
+        max: Vec2::new(
+            (id % SPRITESHEET_WIDTH + 1) as f32 * TILE_SIZE as f32,
+            (id / SPRITESHEET_WIDTH + 1) as f32 * TILE_SIZE as f32,
+        ),
+    }
+}
+
+fn sync_tile_selection(
+    selected_tile_id: &mut ResMut<SelectedTileID>,
+    placeholder_update_writer: &mut MessageWriter<UpdatePlaceholderMessage>,
+    items: &[ToolingMenuItem],
+    next_selected_id: Option<u64>,
+) {
+    if let Some(id) = next_selected_id {
+        selected_tile_id.id = id;
+        let rect = items
+            .iter()
+            .find(|item| item.id == id)
+            .and_then(|item| item.rect)
+            .unwrap_or_else(|| tile_rect_for_item_id(id));
+
+        placeholder_update_writer.write(UpdatePlaceholderMessage {
+            tcoord: TCoordinate::new(EditorObjectKind::Tile, Coordinate(0, 0)),
+            rect,
+        });
+    }
+}
+
 pub fn left_panel(
     contexts: &mut EguiContexts,
     editor_state: &Res<State<EditorState>>,
@@ -91,43 +173,12 @@ pub fn left_panel(
 
     let ctx = contexts.ctx_mut()?;
 
-    let items = tooling_menu_state.items.clone();
-    if items.is_empty() {
-        return Ok(());
-    }
-
     let mut current_index = items
         .iter()
         .position(|item| Some(item.id) == tooling_menu_state.selected_item_id)
         .unwrap_or(0);
-
-    let columns = if is_tile_mode {
-        SPRITESHEET_WIDTH as usize / 2
-    } else {
-        1
-    }
-    .max(1);
-
-    if input.just_pressed(KeyCode::ArrowRight) {
-        current_index = (current_index + 1) % items.len();
-    }
-    if input.just_pressed(KeyCode::ArrowLeft) {
-        current_index = if current_index == 0 {
-            items.len() - 1
-        } else {
-            current_index - 1
-        };
-    }
-    if input.just_pressed(KeyCode::ArrowDown) {
-        current_index = (current_index + columns) % items.len();
-    }
-    if input.just_pressed(KeyCode::ArrowUp) {
-        current_index = if current_index >= columns {
-            current_index - columns
-        } else {
-            (items.len() + current_index - columns % items.len()) % items.len()
-        };
-    }
+    let columns = tooling_columns(is_tile_mode);
+    current_index = move_selection_index(input.as_ref(), items.len(), current_index, columns);
 
     let mut next_selected_id = Some(items[current_index].id);
     let tile_button_px = TILE_SIZE as f32;
@@ -142,15 +193,7 @@ pub fn left_panel(
     };
 
     egui::SidePanel::left("tooling_menu_panel")
-        .frame(egui::Frame {
-            fill: egui::Color32::from_rgba_unmultiplied(18, 22, 30, 165),
-            stroke: egui::Stroke::new(
-                1.0,
-                egui::Color32::from_rgba_unmultiplied(220, 230, 245, 120),
-            ),
-            inner_margin: egui::Margin::same(8),
-            ..Default::default()
-        })
+        .frame(editor_panel_frame())
         .resizable(false)
         .default_width(panel_width)
         .show(ctx, |ui| {
@@ -250,28 +293,7 @@ pub fn left_panel(
         tooling_menu_state.selected_item_id = next_selected_id;
 
         if is_tile_mode {
-            if let Some(id) = next_selected_id {
-                selected_tile_id.id = id;
-                let rect = items
-                    .iter()
-                    .find(|item| item.id == id)
-                    .and_then(|item| item.rect)
-                    .unwrap_or(Rect {
-                        min: Vec2::new(
-                            (id % SPRITESHEET_WIDTH) as f32 * TILE_SIZE as f32,
-                            (id / SPRITESHEET_WIDTH) as f32 * TILE_SIZE as f32,
-                        ),
-                        max: Vec2::new(
-                            (id % SPRITESHEET_WIDTH + 1) as f32 * TILE_SIZE as f32,
-                            (id / SPRITESHEET_WIDTH + 1) as f32 * TILE_SIZE as f32,
-                        ),
-                    });
-
-                placeholder_update_writer.write(UpdatePlaceholderMessage {
-                    tcoord: TCoordinate::new(EditorObjectKind::Tile, Coordinate(0, 0)),
-                    rect,
-                });
-            }
+            sync_tile_selection(selected_tile_id, placeholder_update_writer, &items, next_selected_id);
         }
     }
 
@@ -344,15 +366,7 @@ pub fn general_editor_ui(
     let message_string = &display_message.text;
 
     egui::TopBottomPanel::bottom("bottom_panel")
-        .frame(egui::Frame {
-            fill: egui::Color32::from_rgba_unmultiplied(18, 22, 30, 165),
-            stroke: egui::Stroke::new(
-                1.0,
-                egui::Color32::from_rgba_unmultiplied(220, 230, 245, 120),
-            ),
-            inner_margin: egui::Margin::same(8),
-            ..Default::default()
-        })
+        .frame(editor_panel_frame())
         .resizable(false)
         .default_height(panel_height)
         .show(ctx, |ui| {
@@ -481,15 +495,12 @@ pub fn update_placeholder<T: SignificantComponent + Component + Default>(
         commands.entity(e).despawn();
     }
 
-    let m = match state.get() {
-        EditorState::Editing(EditingComponent::Tile) => EditorObjectKind::Tile,
-        EditorState::Editing(EditingComponent::Collider) => EditorObjectKind::Collider,
-        _ => {
-            EditorObjectKind::Other //use formatting
-        }
-    };
+    let m = current_editing_kind(state.as_ref());
     //update the placeholder object to be the major type of the current editing mode
-    placeholder.0 = textures.0.get(&m).unwrap().clone();
+    let Some(texture) = textures.0.get(&m) else {
+        return;
+    };
+    placeholder.0 = texture.clone();
 
     let Ok((_, t)) = crosshairs.single() else {
         return;
@@ -519,7 +530,6 @@ pub fn trigger_placeholder_update(
     mut ev: MessageReader<UpdatePlaceholderMessage>,
     mut commands: Commands,
 
-    state: ResMut<State<EditorState>>,
     placeholder: ResMut<PlaceholderHandle>,
 
     // crosshairs: Query<(&Crosshair, &Transform)>,
@@ -527,14 +537,6 @@ pub fn trigger_placeholder_update(
 ) {
     for e in ev.read() {
         println!("Placeholder Update Event Triggered");
-        match state.get() {
-            EditorState::Editing(EditingComponent::Tile) => 't',
-            EditorState::Editing(EditingComponent::Collider) => 'c',
-            _ => {
-                '_' //blank here as a fallback to cause a panic
-            }
-        };
-
         //update the placeholder object's texture rect to align with the rect given by the event
         for ent in placeholders.iter() {
             commands.entity(ent.0).insert(Sprite {

@@ -1,7 +1,6 @@
 use crate::actor::Actor;
 
 use super::*;
-use bevy::log::*;
 use bevy::{prelude::*, tasks::IoTaskPool};
 use resources::*;
 use std::{fs::File, io::Write};
@@ -26,7 +25,13 @@ pub fn scene_plugin(app: &mut App) {
         )
         .add_systems(
             Update,
-            (spawn_sprites, add_missing_colliders)
+            (spawn_sprites)
+                .chain()
+                .run_if(not(in_state(EditorState::LoadAsk))),
+        )
+        .add_systems(
+            Update,
+            (add_missing_colliders)
                 .chain()
                 .run_if(not(in_state(EditorState::LoadAsk))),
         );
@@ -53,58 +58,63 @@ fn add_missing_colliders(
 
             // Add a collider based on the EditorObject's properties
             commands.entity(entity).insert((
-                Collider::cuboid((TILE_SIZE / 2) as f32, (TILE_SIZE / 2) as f32),
+                Collider::cuboid(
+                    ((TILE_SIZE / 2) * TILE_SCALE) as f32,
+                    ((TILE_SIZE / 2) * TILE_SCALE) as f32,
+                ),
                 Friction::coefficient(0.5),
+                Transform {
+                    translation: Vec3::new(
+                        (editor_object.coordinate.0 + (SCALED_TILE_WIDTH / 2) as i64) as f32,
+                        (editor_object.coordinate.1 + (SCALED_TILE_HEIGHT / 2) as i64) as f32,
+                        -5.0,
+                    ),
+                    ..default()
+                },
             ));
         }
     }
 }
 
 fn spawn_sprites(
-    mut tiles: Query<(Entity, &mut EditorObject), Without<Sprite>>,
+    mut tiles: Query<(Entity, &mut EditorObject), (With<Tile>, Without<Sprite>)>,
     mut commands: Commands,
     spritesheets: Res<TextureHandles>,
 ) {
-    //spawn the sprites for each tile, use the editorObject's tcoords to determine the sprite's position
-    //if the EditorObject has a tcoord beginning with 'T'
+    //spawn the sprites for each tile, use the editorObject's kind and coordinate to determine the sprite's position
+    //if the EditorObject has a kind of Tile
     for (entity, eo) in tiles.iter_mut() {
-        if eo.get_major_type() == EditorObjectKind::Tile {
-            let sprite_bundle = Sprite {
+        if eo.kind == EditorObjectKind::Tile {
+            let rect = Some(Tile::get_tex_rect(eo.get_internal_type() as u64));
+
+            let sprite = Sprite {
                 image: spritesheets.0.get(&EditorObjectKind::Tile).unwrap().clone(),
                 //the UVs are the same for every tile, just change the offset by using the tiletype as a multiplier
-                rect: Some(Rect {
-                    min: Vec2::new(
-                        (((eo.get_internal_type() as u64) % SPRITESHEET_WIDTH) as f32)
-                            * (TILE_SIZE as f32),
-                        (((eo.get_internal_type() as u64) / SPRITESHEET_WIDTH) as f32)
-                            * (TILE_SIZE as f32),
-                    ),
-                    max: Vec2::new(
-                        (((eo.get_internal_type() as u64) % SPRITESHEET_WIDTH) as f32)
-                            * (TILE_SIZE as f32)
-                            + (TILE_SIZE as f32),
-                        (((eo.get_internal_type() as u64) / SPRITESHEET_WIDTH) as f32)
-                            * (TILE_SIZE as f32)
-                            + (TILE_SIZE as f32),
-                    ),
-                }),
+                rect,
+                custom_size: Some(Vec2::splat(TILE_SIZE as f32 * TILE_SCALE as f32)),
 
                 ..default()
             };
 
-            let coord = eo.get_coordinate();
+            // calculate the position for the Transform component, this will be in the center of the item's hitbox locked to the grid
+            let pos = Vec3::new(
+                (eo.coordinate.0 + (SCALED_TILE_WIDTH / 2) as i64) as f32,
+                (eo.coordinate.1 + (SCALED_TILE_HEIGHT / 2) as i64) as f32,
+                -5.0,
+            );
+            println!("item's position offset calculated: {:?}", pos);
 
-            commands
-                .entity(entity)
-                .insert((sprite_bundle, Anchor::CENTER, Visibility::default()))
-                .entry::<Transform>()
-                .and_modify(move |mut t| {
-                    t.translation = Vec3::new(
-                        (coord.0 + (SCALED_TILE_WIDTH / 2) as i64) as f32,
-                        (coord.1 + (SCALED_TILE_HEIGHT / 2) as i64) as f32,
-                        t.translation.z,
-                    );
-                });
+            commands.entity(entity).insert((
+                sprite,
+                Tile::from_rect(rect.unwrap(), eo.coordinate),
+                Visibility::default(),
+                Transform {
+                    translation: pos,
+                    scale: Vec3::new((TILE_SCALE / 2) as f32, (TILE_SCALE / 2) as f32, 1.0),
+                    ..default()
+                },
+                eo.clone(),
+            ));
         }
     }
 }
@@ -127,47 +137,16 @@ fn goto_normal_state(
     );
 }
 
-fn save_items(world: &mut World) {
-    // copy_entities_with_component::<EditorObject>(world, &mut new_world, eos);
-    let type_registry = world.resource::<AppTypeRegistry>().clone();
+fn serialize_editor_scene(world: &mut World, type_registry: &AppTypeRegistry) -> String {
+    let mut query = world.query_filtered::<Entity, With<EditorObject>>();
 
-    // sim_world.insert_resource(type_registry.clone());
-    let objects = world
-        .query::<Entity>()
-        .iter(world)
-        .map(|e| e)
-        .collect::<Vec<Entity>>();
-
-    //filter out the entities that are not EditorObjects
-    let filtered_objects = objects
-        .iter()
-        .filter(|e| world.get::<EditorObject>(**e).is_none())
-        .collect::<Vec<&Entity>>();
-
-    //create a new world (copy of orignial world) that will actually be saved
-    let mut new_world =
-        world
-            .query::<Entity>()
-            .iter(world)
-            .map(|e| e)
-            .fold(World::new(), |mut acc, e| {
-                if let Some(editor_object) = world.get::<EditorObject>(e) {
-                    acc.spawn(editor_object.clone());
-                }
-                acc
-            });
-
-    // despawn the entities from the new world that are not EditorObjects
-    for t in filtered_objects.iter() {
-        debug!("despawning non-serializable entity: {t:?} from the simulated world-to-save");
-        new_world.despawn(**t);
-    }
-
-    //create a new scene from the new world that now only contains EditorObjects
     let scene = DynamicSceneBuilder::from_world(world)
-        .deny_all_resources()
-        .deny_component::<Sprite>()
-        .extract_entities(&mut new_world.query::<Entity>().iter(&new_world).map(|e| e))
+        .deny_all()
+        .allow_component::<EditorObject>()
+        .allow_component::<Tile>()
+        .allow_component::<Collider>()
+        .allow_component::<Actor>()
+        .extract_entities(query.iter(world))
         .build();
 
     println!("Successfully converted world to DynamicScene");
@@ -178,19 +157,23 @@ fn save_items(world: &mut World) {
     let serialized_scene = scene.serialize(&type_registry).unwrap();
     println!("Scene serialized");
 
-    // Showing the scene in the console
-    // info!("{}", serialized_scene);
+    serialized_scene
+}
 
-    // Writing the scene to a new file. Using a task to avoid calling the filesystem APIs in a system
-    // as they are blocking
-    // This can't work in Wasm as there is no filesystem access
+fn write_serialized_scene(serialized_scene: String) {
     #[cfg(not(target_arch = "wasm32"))]
     IoTaskPool::get()
         .spawn(async move {
-            // Write the scene RON data to file
             File::create(format!("assets/{DEFAULT_SCENE_PATH}.ron"))
                 .and_then(|mut file| file.write(serialized_scene.as_bytes()))
                 .expect("Error while writing scene to file");
         })
         .detach();
+}
+
+fn save_items(world: &mut World) {
+    let type_registry = world.resource::<AppTypeRegistry>().clone();
+
+    let serialized_scene = serialize_editor_scene(world, &type_registry);
+    write_serialized_scene(serialized_scene);
 }

@@ -1,4 +1,5 @@
 use bevy_rapier2d::prelude::{Collider, RigidBody};
+use crate::tools::Direction;
 
 use super::*;
 

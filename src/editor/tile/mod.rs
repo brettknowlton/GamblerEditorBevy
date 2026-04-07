@@ -7,34 +7,25 @@ use bevy::prelude::*;
 use std::path::PathBuf;
 use tools::SignificantComponent;
 
-fn get_tex_rect(tile_id: u64) -> Rect {
-    Rect {
-        min: Vec2::new(
-            (tile_id % SPRITESHEET_WIDTH) as f32 * TILE_SIZE as f32,
-            (tile_id / SPRITESHEET_WIDTH) as f32 * TILE_SIZE as f32,
-        ),
-        max: Vec2::new(
-            (tile_id % SPRITESHEET_WIDTH + 1) as f32 * TILE_SIZE as f32,
-            (tile_id / SPRITESHEET_WIDTH + 1) as f32 * TILE_SIZE as f32,
-        ),
-    }
-}
+
 
 fn populate_tile_tooling_menu(
     mut tooling_menu: ResMut<ToolingMenuState>,
     selected_tile_id: Res<SelectedTileID>,
 ) {
-    tooling_menu.title = "Tile Parts".to_string();
-    tooling_menu.visible = true;
-    tooling_menu.selected_item_id = Some(selected_tile_id.id);
-    tooling_menu.items = (0..MAX_SPRITESHEET_ITEMS)
-        .map(|tile_id| ToolingMenuItem {
-            id: tile_id,
-            label: tile_id.to_string(),
-            texture_key: Some(EditorObjectKind::Tile),
-            rect: Some(get_tex_rect(tile_id)),
-        })
-        .collect();
+    configure_tooling_menu(
+        &mut tooling_menu,
+        "Tile Parts",
+        Some(selected_tile_id.id),
+        (0..MAX_SPRITESHEET_ITEMS)
+            .map(|tile_id| ToolingMenuItem {
+                id: tile_id,
+                label: tile_id.to_string(),
+                texture_key: Some(EditorObjectKind::Tile),
+                rect: Some(Tile::get_tex_rect(tile_id)),
+            })
+            .collect(),
+    );
 }
 
 fn load_spritesheet(
@@ -71,67 +62,31 @@ fn tilemode_keybinds(
     //"P" handles placement of a tile and adding it to the scene
     //places the first tile in the selection rect
     if input.just_pressed(KeyCode::KeyP) {
-        //clean up the bevy query overhead
-        //get the coordinate of the crosshair AND snap it to the grid if gridsnap is enabled
-        let mut coord = Coordinate::from(crosshair.0.translation);
-        if gridsnap.get() == &GridSnap::Enabled {
-            coord = snap_coordinate_to_grid(coord);
-        }
-
-        let first_tile = selected_tile_id.id;
-
-        // create a new EditorObject to place
-        let to_place = EditorObject {
-            
-            kind: EditorObjectKind::Tile,
-            coordinate: coord,
-            internal_kind: first_tile as u64,
-            zone_id: TCoordinate::new(
-                EditorObjectKind::Other,
-                Coordinate {
-                    0: coord.0 / ZONE_SIZE as i64,
-                    1: coord.1 / ZONE_SIZE as i64,
-                },
-            ),
-        };
-
-        //place the tile using our SignificantComponent trait
-        Tile::place(
-            &mut commands,
-            to_place,
-            &tiles,
+        let coord = snapped_coordinate_from_translation(crosshair.0.translation, &gridsnap);
+        let to_place = build_editor_object(
+            EditorObjectKind::Tile,
+            selected_tile_id.id,
+            coord,
+            EditorObjectKind::Other,
         );
-        send_message!(
-            Some('i'),
-            message_queue,
-            format!("Placed tile at: ({}, {})", coord.0, coord.1)
-        );
+
+        Tile::place(&mut commands, to_place, &tiles);
+        send_placement_message(&mut message_queue, "tile", coord);
     }
 
     // "L" handles removal of a tile from the scene, similar to placing one just doesnt need to worry about the tile creation part afterwards
     if input.just_pressed(KeyCode::KeyL) {
-        let mut coord = Coordinate::from(crosshair.0.translation);
-        coord = snap_coordinate_to_grid(coord);
+        let coord = snap_coordinate_to_grid(Coordinate::from(crosshair.0.translation));
 
         Tile::remove(&mut commands, coord, EditorObjectKind::Tile, &tiles);
-        send_message!(
-            Some('i'),
-            message_queue,
-            format!("Removing tiles at: ({}, {})", coord.0, coord.1)
-        );
+        send_removal_message(&mut message_queue, "tiles", coord);
     }
 
     // Selection changes are now handled by the egui tooling panel.
 }
 
 fn exit_tilemode(mut message_queue: ResMut<EditorBottomBarQueuedMessages>) {
-    //remove the CurrentEditorObject resource
-    // commands.insert_resource(PlaceholderObject(EditorObject::default()));
-    send_message!(
-        Some('i'),
-        message_queue,
-        "Exiting Tile Editing Mode".to_string()
-    );
+    send_mode_exit_message(&mut message_queue, "Tile");
 }
 
 /// A component that marks an entity as part of the tile editing UI.
@@ -150,6 +105,19 @@ impl Tile {
     fn new() -> Self {
         Self {}
     }
+    
+    pub fn get_tex_rect(tile_id: u64) -> Rect {
+    Rect {
+        min: Vec2::new(
+            (tile_id % SPRITESHEET_WIDTH) as f32 * TILE_SIZE as f32,
+            (tile_id / SPRITESHEET_WIDTH) as f32 * TILE_SIZE as f32,
+        ),
+        max: Vec2::new(
+            (tile_id % SPRITESHEET_WIDTH + 1) as f32 * TILE_SIZE as f32,
+            (tile_id / SPRITESHEET_WIDTH + 1) as f32 * TILE_SIZE as f32,
+        ),
+    }
+}
 }
 
 impl Default for Tile {
@@ -169,11 +137,7 @@ impl SignificantComponent for Tile {
 }
 
 fn run_if_tile_update_needed(needs_update: Res<TileUpdateNeeded>) -> bool {
-    if needs_update.0 {
-        true
-    } else {
-        false
-    }
+    needs_update.0
 }
 
 fn reset_update_needed(mut needs_update: ResMut<TileUpdateNeeded>) {
@@ -194,12 +158,7 @@ pub fn tilemode_plugin(app: &mut App) {
         //OnEnter systems
         .add_systems(
             OnEnter(EditorState::Editing(EditingComponent::Tile)),
-            (
-                populate_tile_tooling_menu,
-                update_placeholder::<Tile>,
-                ui::spawn_tile_placeholder,
-            )
-                .chain(),
+            (populate_tile_tooling_menu, update_placeholder::<Tile>).chain(),
         )
         //Update systems, that run only while TileEditor is active
         .add_systems(

@@ -16,15 +16,24 @@ use super::*;
 use bevy_rapier2d::prelude::*;
 
 fn populate_actor_tooling_menu(mut tooling_menu: ResMut<ToolingMenuState>) {
-    tooling_menu.title = "Actor Parts".to_string();
-    tooling_menu.visible = true;
-    tooling_menu.selected_item_id = Some(0);
-    tooling_menu.items = vec![ToolingMenuItem {
-        id: 0,
-        label: "Default Actor".to_string(),
-        texture_key: None,
-        rect: None,
-    }];
+    configure_tooling_menu(
+        &mut tooling_menu,
+        "Actor Parts",
+        Some(0),
+        vec![ToolingMenuItem {
+            id: 0,
+            label: "Default Actor".to_string(),
+            texture_key: Some(EditorObjectKind::Actor),
+            rect: None,
+        }],
+    );
+}
+
+fn init(mut spritesheets: ResMut<TextureHandles>, asset_server: Res<AssetServer>) {
+    let texpath = PathBuf::from("textures/player/PlayerHD.png");
+    spritesheets
+        .0
+        .insert(EditorObjectKind::Actor, asset_server.load(texpath));
 }
 
 #[derive(Component, Reflect, Debug, Clone, PartialEq,)]
@@ -90,29 +99,20 @@ pub fn actor_mode_keybinds(
     //"P" handles placement of an actor and adding it to the scene
     //places the first actor in the selection rect
     if input.just_pressed(KeyCode::KeyP) {
-        //clean up the bevy query overhead
         let Ok((crosshair_location, _)) = crosshairs.single() else {
             return;
         };
 
-        //get the coordinate of the crosshair AND snap it to the grid if gridsnap is enabled
-        let mut coord = Coordinate::from(crosshair_location.translation);
-        if gridsnap.get() == &GridSnap::Enabled {
-            coord = snap_coordinate_to_grid(coord);
-        }
+        let coord = snapped_coordinate_from_translation(crosshair_location.translation, &gridsnap);
+        let to_place = build_editor_object(
+            EditorObjectKind::Actor,
+            Actor::new().internal_type,
+            coord,
+            EditorObjectKind::Actor,
+        );
 
-        let def_actor_id = Actor::new().internal_type;
-
-        let to_place = EditorObject {
-            kind: EditorObjectKind::Actor,
-            internal_kind: def_actor_id as u64,
-            coordinate: coord,
-            zone_id: TCoordinate::new(EditorObjectKind::Actor, Coordinate{0: coord.0 / ZONE_SIZE as i64, 1: coord.1 / ZONE_SIZE as i64}),
-        };
-
-        //place the tile using our SignificantComponent trait
         Actor::place(&mut commands, to_place, &actors);
-        send_message!(Some('i'), message_queue, format!("Placed actor at: ({}, {})", coord.0, coord.1));
+        send_placement_message(&mut message_queue, "actor", coord);
     }
 
     // "L" handles removal of a tile from the scene, similar to placing one just doesnt need to worry about the tile creation part afterwards
@@ -120,24 +120,28 @@ pub fn actor_mode_keybinds(
         let Ok((t, _)) = crosshairs.single() else {
             return;
         };
-        let mut coord = Coordinate::from(t.translation);
-        coord = snap_coordinate_to_grid(coord);
+        let coord = snap_coordinate_to_grid(Coordinate::from(t.translation));
 
-        Actor::remove(&mut commands, coord, EditorObjectKind::Actor,&actors);
-        send_message!(Some('i'), message_queue, format!("Removing actor at: ({}, {})", coord.0, coord.1));
+        Actor::remove(&mut commands, coord, EditorObjectKind::Actor, &actors);
+        send_removal_message(&mut message_queue, "actor", coord);
     }
+}
+
+fn exit_actormode(mut message_queue: ResMut<EditorBottomBarQueuedMessages>) {
+    send_mode_exit_message(&mut message_queue, "Actor");
 }
 
 
 pub fn actormode_plugin(app: &mut App) {
     app
+        .register_type::<Actor>()
         .register_type::<Player>()
         .register_type::<Coordinate>()
         .register_type::<TCoordinate>()
         .register_type::<ui::ActorModeUI>()
 
         //startup systems (may need to be moved from here to maintain order)
-        // .add_systems(Startup, init)
+        .add_systems(Startup, init)
 
         //OnEnter systems
         .add_systems(
@@ -158,6 +162,7 @@ pub fn actormode_plugin(app: &mut App) {
             OnExit(EditorState::Editing(EditingComponent::Actor)), 
             (
                 despawn_all::<ui::ActorModeUI>,
+                exit_actormode,
             ).chain()
         );
 }

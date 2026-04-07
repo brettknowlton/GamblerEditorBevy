@@ -9,15 +9,17 @@ use std::path::PathBuf;
 use tools::SignificantComponent;
 
 fn populate_collider_tooling_menu(mut tooling_menu: ResMut<ToolingMenuState>) {
-    tooling_menu.title = "Collider Parts".to_string();
-    tooling_menu.visible = true;
-    tooling_menu.selected_item_id = Some(0);
-    tooling_menu.items = vec![ToolingMenuItem {
-        id: 0,
-        label: "Solid".to_string(),
-        texture_key: Some(EditorObjectKind::Collider),
-        rect: Some(Rect::new(0.0, 0.0, TILE_SIZE as f32, TILE_SIZE as f32)),
-    }];
+    configure_tooling_menu(
+        &mut tooling_menu,
+        "Collider Parts",
+        Some(0),
+        vec![ToolingMenuItem {
+            id: 0,
+            label: "Solid".to_string(),
+            texture_key: Some(EditorObjectKind::Collider),
+            rect: Some(Rect::new(0.0, 0.0, TILE_SIZE as f32, TILE_SIZE as f32)),
+        }],
+    );
 }
 
 fn init(mut spritesheets: ResMut<TextureHandles>, asset_server: Res<AssetServer>) {
@@ -39,42 +41,20 @@ fn collidermode_keybinds(
 ) {
     //"P" handles placement of a collider and adding it to the scene
     if input.just_pressed(KeyCode::KeyP) {
-        //clean up the bevy query overhead
         let Ok((t, _)) = crosshairs.single() else {
             return;
         };
 
-        //get the coordinate of the crosshair AND snap it to the grid if gridsnap is enabled
-        let mut coord = Coordinate::from(t.translation);
-        if gridsnap.get() == &GridSnap::Enabled {
-            coord = snap_coordinate_to_grid(coord);
-        }
-
-        //define the editor object to place
-        let to_place = EditorObject {
-            coordinate: coord,
-            kind: EditorObjectKind::Collider,
-            internal_kind: 0,
-            zone_id: TCoordinate::new(
-                EditorObjectKind::Other,
-                Coordinate {
-                    0: coord.0 / ZONE_SIZE as i64,
-                    1: coord.1 / ZONE_SIZE as i64,
-                },
-            ),
-        };
-
-        //place the tile using our SignificantComponent trait
-        ColliderObject::place(
-            &mut commands,
-            to_place,
-            &colliders,
+        let coord = snapped_coordinate_from_translation(t.translation, &gridsnap);
+        let to_place = build_editor_object(
+            EditorObjectKind::Collider,
+            0,
+            coord,
+            EditorObjectKind::Other,
         );
-        send_message!(
-            Some('i'),
-            message_queue,
-            format!("Placed collider at: ({}, {})", coord.0, coord.1)
-        );
+
+        ColliderObject::place(&mut commands, to_place, &colliders);
+        send_placement_message(&mut message_queue, "collider", coord);
     }
 
     // "L" handles removal of a collider from the scene, similar to placing one just doesnt need to worry about the tile creation part afterwards
@@ -82,27 +62,15 @@ fn collidermode_keybinds(
         let Ok((t, _)) = crosshairs.single() else {
             return;
         };
-        let mut coord = Coordinate::from(t.translation);
-        coord = snap_coordinate_to_grid(coord);
+        let coord = snap_coordinate_to_grid(Coordinate::from(t.translation));
 
-        ColliderObject::remove(&mut commands, coord, EditorObjectKind::Collider,&colliders);
-        send_message!(
-            Some('i'),
-            message_queue,
-            format!("Removing colliders at: ({}, {})", coord.0, coord.1)
-        );
+        ColliderObject::remove(&mut commands, coord, EditorObjectKind::Collider, &colliders);
+        send_removal_message(&mut message_queue, "colliders", coord);
     }
 }
 
 fn exit_collidermode(mut message_queue: ResMut<EditorBottomBarQueuedMessages>) {
-    send_message!(
-        Some('i'),
-        message_queue,
-        "Exiting Collider Editing Mode".to_string()
-    );
-
-    // //remove the CurrentEditorObject resource
-    // commands.insert_resource(PlaceholderObject(EditorObject::default()));
+    send_mode_exit_message(&mut message_queue, "Collider");
 }
 
 /// A component to track some basic info about a tile

@@ -69,34 +69,6 @@ fn player_camera(
     }
 }
 
-#[derive(States, Clone, Copy, Debug, Eq, PartialEq, Hash)]
-pub enum PlayerState {
-    Idle,
-    Walking,
-    Running,
-    Attacking,
-    Hurt,
-    Dead,
-}
-
-#[derive(Clone, Reflect, Copy, Debug, PartialEq, Eq, Hash)]
-pub enum Direction {
-    Up,
-    Down,
-    Left,
-    Right,
-}
-
-#[derive(Component, Debug)]
-pub struct AnimationDef {
-    pub frame_size: Vec2,
-    pub layout: Vec2, //(rows, columns), ie # of frames in each direction of the spritesheet a 3x4 spritesheet would be (3, 4)
-    pub frame_count: u32, //total number of frames in the animation
-    pub frame_duration: f32,
-    pub current_frame: u32,
-    pub frame_timer: f32,
-}
-
 fn load_save_data(_commands: Commands, _asset_server: Res<AssetServer>) {
     // let save_data = asset_server.load("save_data.json");
     // commands.insert_resource(SaveData(save_data));

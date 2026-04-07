@@ -29,24 +29,33 @@ pub const SCALED_PLAYER_WIDTH: u32 = PLAYER_SIZE_X * PLAYER_SCALE;
 /// Total pixel size the player height takes up IN GAME
 pub const SCALED_PLAYER_HEIGHT: u32 = PLAYER_SIZE_Y * PLAYER_SCALE;
 
+/// Horizontal offset for the player's hitbox
 pub const PLAYER_HB_X_OFFSET: u32 = SCALED_PLAYER_WIDTH / 3;
+
+/// Vertical offset for the player's hitbox
 pub const PLAYER_HB_Y_OFFSET: u32 = SCALED_PLAYER_HEIGHT / 3;
 
+/// Force applied to the player when walking
 pub const PLAYER_WALK_FORCE: u32 = 200;
+/// Maximum walking speed for the player
 pub const MAX_PLAYER_WALK_SPEED: u32 = 300;
 
+/// Force applied to the player when jumping
 pub const PLAYER_JUMP_FORCE: f32 = 550.;
-pub const PLAYER_JUMP_GRACE_PERIOD: f32 = 0.3;//how long a vertical jump force can be applied to a player
+/// How long a vertical jump force can be applied to a player
+pub const PLAYER_JUMP_GRACE_PERIOD: f32 = 0.3;
 
+/// Scale factor of tiles
+pub const TILE_SCALE: u32 = DEFAULT_GENERAL_SCALE_FACTOR;
+/// Number of pixels wide the tile source image is
+pub const TILE_SIZE: u32 = 32;
 
-
-
-pub const TILE_SCALE: u32 = DEFAULT_GENERAL_SCALE_FACTOR; //scale factor of tiles
-pub const TILE_SIZE: u32 = 32; //number of pixels wide the tile source image is
-
+/// Total pixel size the tile width takes up IN GAME
 pub const SCALED_TILE_WIDTH: u32 = TILE_SIZE * TILE_SCALE;
-pub const SCALED_TILE_HEIGHT: u32 = SCALED_TILE_WIDTH;
+/// Total pixel size the tile height takes up IN GAME
+pub const SCALED_TILE_HEIGHT: u32 = TILE_SIZE * TILE_SCALE;
 
+/// Scale factor for UI elements
 pub const UI_SCALE: f32 = 10.0; //a scale value we can use to scale UI elements
 pub const UI_Z_LAYER: f32 = 10.0; //z layer for UI elements, we can use this to make to relatively place UI elements correctly
 

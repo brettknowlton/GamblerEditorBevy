@@ -2,7 +2,7 @@ use crate::ui::PlaceholderObjectTag;
 
 use super::*;
 
-pub fn spawn_collider_placeholder(
+pub fn spawn_actor_placeholder(
     mut commands: Commands,
     crosshairs: Query<(&Transform, &Crosshair)>,
     asset_server: Res<AssetServer>,
@@ -13,7 +13,7 @@ pub fn spawn_collider_placeholder(
     let x_off = t.translation.x;
     let y_off = t.translation.y;
 
-    let texpath = PathBuf::from("textures/tiles/collider_debug.png");
+    let texpath = PathBuf::from("textures/player/PlayerHD.png");
     let tex = asset_server.load(texpath);
 
 
@@ -47,7 +47,12 @@ pub fn spawn_collider_placeholder(
     ));
 }
 
-pub fn create_collidermode_ui(mut commands: Commands, asset_server: Res<AssetServer>, crosshairs: Query<(&Transform, &Crosshair)>, _tilesheet_handle: Res<TextureHandles>) {
+pub fn create_actormode_ui(
+    mut commands: Commands,
+    asset_server: Res<AssetServer>,
+    crosshairs: Query<(&Transform, &Crosshair)>,
+    _tilesheet_handle: Res<TextureHandles>,
+) {
     
     //display the "tilemode" menu
     let texpath = PathBuf::from("textures/menus/menu1.png");
@@ -65,7 +70,7 @@ pub fn create_collidermode_ui(mut commands: Commands, asset_server: Res<AssetSer
     let ui_y = DEFAULT_WINDOW_HEIGHT as f32;
     let ui_border = 4.0;
 
-    //spawn collidermode UI
+    //spawn actormode UI
     commands.spawn((
         Sprite {
             image: tex1,
@@ -95,7 +100,7 @@ pub fn create_collidermode_ui(mut commands: Commands, asset_server: Res<AssetSer
     commands.spawn((
         ActorModeUI,
         Text {
-            0: "Collider Mode".to_string(),
+            0: "Actor Mode".to_string(),
 
             ..default()
         },
@@ -109,9 +114,7 @@ pub fn create_collidermode_ui(mut commands: Commands, asset_server: Res<AssetSer
     ));
 }
 
-/// A component that marks an entity as part 
-/// 
-/// of the tile editing UI.
+/// A component that marks an entity as part of the actor editing UI.
 #[derive(Component, Reflect)]
 #[reflect(Component)]
 #[require(UIItem)]
