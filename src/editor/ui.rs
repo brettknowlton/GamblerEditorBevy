@@ -102,6 +102,23 @@ pub fn left_panel(
 
     let ctx = contexts.ctx_mut()?;
 
+    let items = tooling_menu.items.clone();
+    if items.is_empty() {
+        return Ok(());
+    }
+
+    let mut current_index = items
+        .iter()
+        .position(|item| Some(item.id) == tooling_menu.selected_item_id)
+        .unwrap_or(0);
+
+    let columns = if is_tile_mode {
+        SPRITESHEET_WIDTH as usize / 2
+    } else {
+        1
+    }
+    .max(1);
+
     if input.just_pressed(KeyCode::ArrowRight) {
         current_index = (current_index + 1) % items.len();
     }

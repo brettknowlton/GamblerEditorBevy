@@ -1,0 +1,218 @@
+{
+  "main": {
+    "id": "c8a5dcb9a628c929",
+    "type": "split",
+    "children": [
+      {
+        "id": "910eb2d2f3477b8e",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "6501e2465a8c915c",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "planning/Mechanic Breakdowns/Context Menu.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Context Menu"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "e4dbb6038445413e",
+    "type": "split",
+    "children": [
+      {
+        "id": "330d2a6bf6b45bc5",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "2e616ea53fb13ed6",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical",
+                "autoReveal": false
+              },
+              "icon": "lucide-folder-closed",
+              "title": "Files"
+            }
+          },
+          {
+            "id": "f537b2bae52ceb69",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-search",
+              "title": "Search"
+            }
+          },
+          {
+            "id": "08e59c97a16b0ed0",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {},
+              "icon": "lucide-bookmark",
+              "title": "Bookmarks"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 265.5
+  },
+  "right": {
+    "id": "bbec0168ba624e88",
+    "type": "split",
+    "children": [
+      {
+        "id": "6e16b934daa2cb72",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "e0123e31856dda55",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-coming-in",
+              "title": "Backlinks"
+            }
+          },
+          {
+            "id": "b9a2e7bfc60670e6",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-going-out",
+              "title": "Outgoing links"
+            }
+          },
+          {
+            "id": "c669732047f0a6d5",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true
+              },
+              "icon": "lucide-tags",
+              "title": "Tags"
+            }
+          },
+          {
+            "id": "689f317034001b43",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {},
+              "icon": "lucide-list",
+              "title": "Outline"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "bases:Create new base": false,
+      "switcher:Open quick switcher": false,
+      "graph:Open graph view": false,
+      "canvas:Create new canvas": false,
+      "daily-notes:Open today's daily note": false,
+      "templates:Insert template": false,
+      "command-palette:Open command palette": false,
+      "system3-relay:Relay": false,
+      "3d-graph-new:Global 3D Graph": false
+    }
+  },
+  "active": "6501e2465a8c915c",
+  "lastOpenFiles": [
+    "target/debug/incremental/gambler_bevy-3qb4mtmt7n2fs/s-hha3495tkd-1hiltkn-9t2isdq2hr64866j244gikldd/f15767phk5mt7n35fiqutxvk7.o",
+    "target/debug/incremental/gambler_bevy-3qb4mtmt7n2fs/s-hha3495tkd-1hiltkn-9t2isdq2hr64866j244gikldd/work-products.bin",
+    "target/debug/incremental/gambler_bevy-3qb4mtmt7n2fs/s-hha3495tkd-1hiltkn-9t2isdq2hr64866j244gikldd/f3k1yaq6xcym7tattt9r437vg.o",
+    "target/debug/incremental/gambler_bevy-3qb4mtmt7n2fs/s-hha3495tkd-1hiltkn-9t2isdq2hr64866j244gikldd/query-cache.bin",
+    "target/debug/incremental/gambler_bevy-3qb4mtmt7n2fs/s-hha3495tkd-1hiltkn-9t2isdq2hr64866j244gikldd/euy7qeaqi7eg3xcb76z1nf79x.o",
+    "target/debug/incremental/gambler_bevy-3qb4mtmt7n2fs/s-hha3495tkd-1hiltkn-9t2isdq2hr64866j244gikldd/eui6d67stmwkd3ktjnb85bczr.o",
+    "target/debug/incremental/gambler_bevy-3qb4mtmt7n2fs/s-hha3495tkd-1hiltkn-9t2isdq2hr64866j244gikldd/et8335e1bjnkq7f0xh7kzk38i.o",
+    "target/debug/incremental/gambler_bevy-3qb4mtmt7n2fs/s-hha3495tkd-1hiltkn-9t2isdq2hr64866j244gikldd/esbemjp47w80764s6qd20luzl.o",
+    "target/debug/incremental/gambler_bevy-3qb4mtmt7n2fs/s-hha3495tkd-1hiltkn-9t2isdq2hr64866j244gikldd/erq0ty4b9u4777zm5hyuy8ke0.o",
+    "target/debug/incremental/gambler_bevy-3qb4mtmt7n2fs/s-hha3495tkd-1hiltkn-9t2isdq2hr64866j244gikldd/eprjpjq9gam82uudd6qmekl54.o",
+    "target/debug/incremental/gambler_bevy-3qb4mtmt7n2fs/s-hha3495tkd-1hiltkn-9t2isdq2hr64866j244gikldd/epibt0umupklo8hnhi3dgo6ny.o",
+    "planning/Mechanic Breakdowns/Controls.md",
+    "planning/Mechanic Breakdowns/Context Menu.md",
+    "planning/Descriptions -thx gpt.md",
+    "assets/textures/player/PlayerHD.png",
+    "assets/textures/player/PlayerLD.png",
+    "planning/Art/Player/Player Concept Art.md",
+    "planning/Art/Player/original player design.png",
+    "planning/Dungeons and Dragons/Scripts/Player Creation Session Script.md",
+    "planning/Dungeons and Dragons/Scripts/02- Day One/02.01.01 Vesta + the Census Clerk.md",
+    "planning/Dungeons and Dragons/Player Breakdowns/00- Player List.md",
+    "Storyline.md",
+    "planning/Dungeons and Dragons/Gambler Story/00- Core.md",
+    "planning/Dungeons and Dragons/Player Breakdowns/Gib Gab (Hyrum).md",
+    "planning/Dungeons and Dragons/Races/Goblins.md",
+    "planning/Dungeons and Dragons/Races/00- Races.md",
+    "planning/Dungeons and Dragons/Races/Elves.md",
+    "planning/Dungeons and Dragons/Cheat Sheets/Spells.md",
+    "planning/Dungeons and Dragons/Cheat Sheets/00- Cheat Sheets.md",
+    "planning/Dungeons and Dragons/Cheat Sheets/Combat.md",
+    "planning/Dungeons and Dragons/Cheat Sheets/Player Action Cheat Sheet.md",
+    "planning/Dungeons and Dragons/DnD Tips from kael.md",
+    "planning/Dungeons and Dragons/Scripts/02- Day One/02.01.04 The Little Goblin that could.md",
+    "planning/Dungeons and Dragons/Lore Readings/Camp Ernest – Census Interview Log.md",
+    "planning/Dungeons and Dragons/Scripts/02- Day One/02.01.05 Human in Plain Sight.md",
+    "planning/Dungeons and Dragons/Scripts/02- Day One/02.01.03 Enter Rolen.md",
+    "Untitled 1.md",
+    "Untitled.md",
+    "Vesta.md",
+    "Pasted image 20250329213157.png",
+    "Pasted image 20250329213225.png",
+    "planning/Dungeons and Dragons/Scripts/02- Day One/02- Day One.canvas",
+    "background00.png",
+    "planning/Planning Canvas.canvas",
+    "planning/Dungeons and Dragons/Maps/Camp Ernest.png",
+    "planning/Dungeons and Dragons/Untitled.canvas",
+    "PCL Process.canvas",
+    "planning/Art/Interiors/zughy32.png",
+    "planning/Art/Interiors/rosy-42-palette-example-by-s-203792.png",
+    "planning/Art/Cards/H4.png"
+  ]
+}

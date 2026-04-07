@@ -1,17 +1,26 @@
+#[macro_use]
 pub mod ui;
 pub use tile::*;
 
 
 pub use crate::consts::*;
+pub use crate::game::*;
+pub use crate::resources::*;
 pub use crate::utilities::*;
+pub use tile::*;
+pub use tools::SignificantComponent;
 
-mod tile;
+pub mod actor;
+pub mod collider;
+pub mod tile;
+
+use bevy_rapier2d::prelude::*;
+
 mod scene;
-use resources::*;
-pub use std::{ fmt::Debug, path::PathBuf };
+pub use std::{fmt::Debug, path::PathBuf};
 
-
-use bevy::{ prelude::*, sprite::Anchor };
+use bevy::{prelude::*, sprite::Anchor};
+use bevy_egui::EguiPrimaryContextPass;
 
 //EditorState is an enum that defines the different states the editor can be in, this is used to determine what the editor is currently doing
 #[derive(Clone, Copy, Default, Eq, PartialEq, Debug, Hash, States)]
@@ -21,53 +30,72 @@ pub enum EditorState {
     Normal,
     LoadAsk,
     Loading,
-    LoadEmpty,
+    LoadingEmpty,
     SaveAsk,
     Saving,
-    Editing(EditingMode),
+    QuitAsk,
+    Editing(EditingComponent),
 }
 
-///The EditingMode enum is used to determine what type of object the user is currently trying to place in the scene, this is kind of like an "Internal Type" for the editor state. We will almost always be in EditorMode::Editing but its more granular than that
+///The EditingComponent enum is used to determine what type of object the user is currently trying to place in the scene, this is kind of like an "Internal Type" for the editor state.
+///We will almost always be in EditorMode::Editing but its more granular than that
 #[derive(Clone, Copy, Default, Eq, PartialEq, Debug, Hash)]
-pub enum EditingMode {
+pub enum EditingComponent {
     #[default]
     None,
+    Actor,
+    Collider,
     Interactable,
     Tile,
-    Actor,
-} 
+}
 
-// pub fn editor_plugin(app: &mut App) {
-//     app.init_state::<EditorState>()
-//         .register_type::<EditorObject>()
-//         .add_event::<BottomBarUpdate>()
+/// This enum is used as a setting for the editor to determine wether or not we are trying to snap placed objects to the grid.
+/// This is a user setting that can be toggled with CTRL + SHIFT + G, it is not saved to the document and will default to enabled on startup.
+#[derive(Clone, Default, Eq, PartialEq, Debug, Hash, States)]
+pub enum GridSnap {
+    #[default]
+    Enabled,
+    Disabled,
+}
 
-//         .init_resource::<EditorBottomBarDisplayed>()
-//         .init_resource::<EditorBottomBarQueued>()
-//         .init_resource::<EditorBottomBarQueuedMessages>()
+#[derive(Clone, Default, Eq, PartialEq, Debug, Hash, States)]
+pub enum ShowGrid {
+    #[default]
+    Yes,
+    No,
+}
 
-//         //The only true startup systems here:
-//         .add_systems(Startup, (initialize, create_crosshair, ui::general_editor_ui).chain())
+#[derive(Message)]
+pub struct UpdatePlaceholderMessage {
+    pub tcoord: TCoordinate,
+    pub rect: Rect,
+}
 
-//         //begin update system to update the bottom bar text
-//         .add_systems(Update, update_bot_output.run_if(on_event::<BottomBarUpdate>,))
+fn initialize(
+    mut commands: Commands,
 
-//         .add_systems(Startup, )
-//         .add_plugins(tile::tilemode_plugin)
-//         .add_plugins(scene::scene_plugin)
-//         .add_systems(Update, keybinds.run_if(not(in_state(EditorState::Inactive))));
-//     //placeholder resource for whatever tile we are trying to place
-// }
+    mut next_state: ResMut<NextState<EditorState>>,
+    mut message_queue: ResMut<EditorBottomBarQueuedMessages>,
+    mut texture_handles: ResMut<TextureHandles>,
 
-fn initialize(mut commands: Commands, mut next_state: ResMut<NextState<EditorState>>, message_queue: ResMut<EditorBottomBarQueuedMessages>) {
-    log_in_app(format!("Initializing the Editor"),'i', message_queue);
+    asset_server: ResMut<AssetServer>,
+) {
+    //load the rect_debug texture into the RectHandle resource
+    let tex_path = PathBuf::from("textures/tiles/tile_debug.png");
+    texture_handles.0.insert('r', asset_server.load(tex_path));
 
     //create camera and add a UIItem component to it
     commands.spawn((Camera2d::default(), UIItem::default()));
 
-    //create scene manager component that will read/write our scene data between the enviornment and a json file
-    println!("Would you like to load a scene? Y/N");
+    //set the state to ask about loading a scene
     next_state.set(EditorState::LoadAsk);
+
+    //push a message to the bottom bar that asks the user if they would like to load a scene
+    send_message!(
+        Some('i'),
+        message_queue,
+        "Would you like to load a scene? Yenter/Noscape"
+    );
 }
 
 fn create_crosshair(mut commands: Commands, asset_server: Res<AssetServer>) {
@@ -83,7 +111,7 @@ fn create_crosshair(mut commands: Commands, asset_server: Res<AssetServer>) {
             ..default()
         },
         Transform {
-            scale: Vec3::new(TILE_SCALE as f32, TILE_SCALE as f32, 0.),
+            scale: Vec3::new(TILE_SCALE as f32, TILE_SCALE as f32, 0.0),
             ..default()
         },
         Anchor::CENTER,
@@ -91,166 +119,344 @@ fn create_crosshair(mut commands: Commands, asset_server: Res<AssetServer>) {
 }
 
 //wow this is kind of dope if it work
-#[derive(Event)]
+#[derive(Message)]
 struct BottomBarUpdate;
 
-fn update_bot_output(mut bottom_text: ResMut<EditorBottomBarDisplayed>, input_text: Res<EditorBottomBarQueued>, queue: ResMut<EditorBottomBarQueuedMessages>) {
-    bottom_text.text = input_text.text.clone();
+#[derive(Message)]
+struct ResetScene;
 
-    for (level, msg) in queue.messages.iter() {
-        if let Some(l) = level {
-            match l {
-                'e' => error!("{}", msg),
-                'w' => warn!("{}", msg),
-                'i' => info!("{}", msg),
-                'd' => debug!("{}", msg),
-                't' => trace!("{}", msg),
-    
-                _ => println!("{}", msg),
-            }
-        }
-    }
-}
+fn stateful_keybinds(
+    editor_state: ResMut<State<EditorState>>,
+    mut next_editor_state: ResMut<NextState<EditorState>>,
+    game_state: ResMut<State<GameState>>,
+    mut next_game_state: ResMut<NextState<GameState>>,
 
-fn keybinds(
-    mut next_state: ResMut<NextState<EditorState>>,
-    state: ResMut<State<EditorState>>,
+    mut next_showgrid_state: ResMut<NextState<ShowGrid>>,
+    showgrid_state: ResMut<State<ShowGrid>>,
+
+    mut next_gridsnap_state: ResMut<NextState<GridSnap>>,
+    gridsnap_state: ResMut<State<GridSnap>>,
+
     time: Res<Time>,
     input: Res<ButtonInput<KeyCode>>,
+    mut message_queue: ResMut<EditorBottomBarQueuedMessages>,
     // m_input: Res<ButtonInput<MouseButton>>,
-
-    mut uiitems: Query<(&mut UIItem, &mut Transform), Without<Camera2d>>,
-    mut cameras: Query<(&mut UIItem, &mut Transform, &Camera2d)>
+    mut crosshairs: Query<(&mut Crosshair, &mut Transform, &mut Sprite), Without<Camera2d>>,
+    // mut active_selection: ResMut<PlaceholderHandle>,
+    mut uiitems: Query<(&mut UIItem, &mut Transform), (Without<Camera2d>, Without<Crosshair>)>,
+    mut cameras: Query<(&mut UIItem, &mut Transform, &mut Camera2d)>,
+    mut message_writer: MessageWriter<ResetScene>,
 ) {
-    //manage the editor state, you can switch between modes with ERTY except if you are attempting to save the document
-    //"E" enters editor mode and aborts any saving operation
-    if state.get() != &EditorState::LoadAsk {
-        if input.just_pressed(KeyCode::KeyE) {
-            if state.get() == &EditorState::SaveAsk {
-                println!("Saving aborted.");
-            }
-            next_state.set(EditorState::Normal);
-        }
+    let messages = &mut message_queue;
+    //manage the editor state, you can switch between modes with their letter call or number keys except if you are attempting to save/load the document
 
-        //"R" switches to interactable mode and aborts any saving operation
-        if input.just_pressed(KeyCode::KeyR) {
-            if state.get() != &EditorState::SaveAsk {
-                println!("Saving aborted.");
-            }
-            next_state.set(EditorState::Editing(EditingMode::Interactable));
-        }
+    //Universal keys, not dependant on state:
 
-        //"T" switches to tile mode and aborts any saving operation
-        if input.just_pressed(KeyCode::KeyT) {
-            if state.get() == &EditorState::SaveAsk {
-                println!("Saving aborted.");
-            }
-            next_state.set(EditorState::Editing(EditingMode::Tile));
-        }
-
-        //"Y" switches to actor mode and aborts any saving operation
-        if input.just_pressed(KeyCode::KeyY) {
-            if state.get() != &EditorState::SaveAsk {
-                println!("Saving aborted.");
-            }
-            next_state.set(EditorState::Editing(EditingMode::Actor));
-        }
-    } else {
-        if input.just_pressed(KeyCode::KeyY) || input.just_pressed(KeyCode::Enter) {
-            next_state.set(EditorState::Loading);
-            println!("Attempting to load scene");
-        }
-        if input.just_pressed(KeyCode::KeyN) || input.just_pressed(KeyCode::Escape) {
-            next_state.set(EditorState::LoadEmpty);
-            println!("Returning to Normal Mode");
-        }
-    }
-
-    // "Q" will prompt the user to save the scene if they are in normal mode,
-    // This action will put the editor into "saving" mode- pressing "Q" again will save the scene
-    // otherwise "Q"" will return to normal mode if in any mode other than normal or saving
+    // Q brings us back to normal mode
     if input.just_pressed(KeyCode::KeyQ) {
-        if state.get() == &EditorState::Normal {
-            //pressing q will enter "saving" mode if we are already in normal mode:
-            next_state.set(EditorState::SaveAsk);
-            println!("Would you like to save the current scene?");
-        } else if state.get() == &EditorState::SaveAsk {
-            println!("Attempting to save scene");
-            next_state.set(EditorState::Saving);
+        next_editor_state.set(EditorState::Normal);
+        send_message!(Some('i'), messages, "Returning to Normal Mode");
+    } else if
+    //CTRL + S will enter saveAsk mode
+    input.pressed(KeyCode::ControlLeft)
+        && input.just_pressed(KeyCode::KeyS)
+        && !input.just_pressed(KeyCode::ShiftLeft)
+        && editor_state.get() != &EditorState::SaveAsk
+    {
+        next_editor_state.set(EditorState::SaveAsk);
+        send_message!(
+            Some('i'),
+            messages,
+            "Would you like to save the scene? Yenter/Noscape"
+        );
+    } else if
+    //CTRL + L will enter loadAsk mode
+    input.pressed(KeyCode::ControlLeft)
+        && input.just_pressed(KeyCode::KeyL)
+        && editor_state.get() != &EditorState::LoadAsk
+    {
+        next_editor_state.set(EditorState::LoadAsk);
+        send_message!(
+            Some('i'),
+            messages,
+            "Would you like to load a scene? Yenter/Noscape"
+        );
+    } else if
+    //CTRL + Q will enter QuitAsk mode
+    input.pressed(KeyCode::ControlLeft)
+        && input.just_pressed(KeyCode::KeyQ)
+        && editor_state.get() != &EditorState::QuitAsk
+    {
+        next_editor_state.set(EditorState::QuitAsk);
+        send_message!(
+            Some('i'),
+            messages,
+            "Would you like to exit the editor? Yenter/Noscape"
+        );
+    } else if
+    //CTRL + T will toggle TEST mode, disabling the editor and enabling the game functionality.
+    input.pressed(KeyCode::ControlLeft)
+        && input.just_pressed(KeyCode::KeyT)
+        && editor_state.get() != &EditorState::Inactive
+    {
+        if game_state.get() != &GameState::Inactive && editor_state.get() == &EditorState::Inactive
+        {
+            next_editor_state.set(EditorState::Normal);
+            next_game_state.set(GameState::Inactive);
+            send_message!(Some('i'), messages, "Exiting Test Mode");
         } else {
-            next_state.set(EditorState::Normal);
-            println!("Returning to Normal Mode");
+            next_editor_state.set(EditorState::Inactive);
+            next_game_state.set(GameState::Running);
+            send_message!(Some('i'), messages, "Entering Test Mode");
+        }
+    } else if
+    //CTRL + R will "reset" the editor, for now that willjust move the player to the crosshair position
+    input.pressed(KeyCode::ControlLeft)
+        && input.just_pressed(KeyCode::KeyR)
+        && editor_state.get() != &EditorState::Inactive
+    {
+        // game::player::move_player_to_cursor(crosshairs.single_mut().unwrap().1, &mut cameras.single_mut().unwrap().1);
+        send_message!(Some('i'), messages, "Resetting Scene");
+        next_editor_state.set(EditorState::Normal);
+        //send a ResetScene event to the ResetScene system
+        message_writer.write(ResetScene);
+    } else if
+    //CTRL + G will toggle the grid
+    input.pressed(KeyCode::ControlLeft)
+        && input.just_pressed(KeyCode::KeyG)
+        && editor_state.get() != &EditorState::Inactive
+    {
+        if showgrid_state.get() == &ShowGrid::Yes {
+            next_showgrid_state.set(ShowGrid::No);
+            send_message!(Some('i'), messages, "Hiding Grid");
+        } else {
+            next_showgrid_state.set(ShowGrid::Yes);
+            send_message!(Some('i'), messages, "Showing Grid");
+        }
+    } else if
+    //CTRL + SHIFT + G will toggle the grid snap
+    input.pressed(KeyCode::ControlLeft)
+        && input.just_pressed(KeyCode::KeyG)
+        && input.pressed(KeyCode::ShiftLeft)
+        && editor_state.get() != &EditorState::Inactive
+    {
+        if gridsnap_state.get() == &GridSnap::Enabled {
+            next_gridsnap_state.set(GridSnap::Disabled);
+            send_message!(Some('i'), messages, "Disabling Grid Snap");
+        } else {
+            next_gridsnap_state.set(GridSnap::Enabled);
+            send_message!(Some('i'), messages, "Enabling Grid Snap");
+        } //
+    } else if
+    //CTRL + B will try to open the baground png, if it does not exist will create the file and then open it with aseprite program
+    input.pressed(KeyCode::ControlLeft)
+        && input.just_pressed(KeyCode::KeyB)
+        && editor_state.get() != &EditorState::Inactive
+    {
+        //open the background png in aseprite
+        //background will have the name backgroundXY where XY is the zone XY coordinates, we can find this by taking the crosshair position and dividing by the zone size
+        let zone_id = Coordinate {
+            0: (crosshairs.single().unwrap().1.translation.x as i64)
+                / ((ZONE_SIZE * SCALED_TILE_WIDTH) as i64),
+            1: (crosshairs.single().unwrap().1.translation.y as i64)
+                / ((ZONE_SIZE * SCALED_TILE_WIDTH) as i64),
+        };
+
+        let path = PathBuf::from(format!("background{}{}.png", zone_id.0, zone_id.1));
+
+        let aseprite_path =
+            PathBuf::from("C:/Program Files (x86)/Steam/steamapps/common/Aseprite/Aseprite.exe");
+        if path.exists() {
+            send_message!(Some('i'), messages, "Opening background.png");
+            std::process::Command::new(aseprite_path)
+                .arg(path)
+                .spawn()
+                .expect("Failed to open aseprite");
+        } else {
+            send_message!(Some('i'), messages, "Creating background.png");
+            std::fs::File::create(&path).expect("Failed to create background.png");
+            std::process::Command::new("aseprite")
+                .arg(path)
+                .spawn()
+                .expect("Failed to open aseprite");
         }
     }
 
-    //"E" (and escape) is used for switching back to editor mode from any other mode
-    if input.just_pressed(KeyCode::KeyE) || input.just_pressed(KeyCode::Escape) {
-        next_state.set(EditorState::Normal);
+    //O is the main button to directly use the Rectangle Tool
+    if input.just_pressed(KeyCode::KeyO) {
+        //use crosshair's coordinate as start
+        let Ok((_, _, _)) = crosshairs.single() else {
+            return;
+        };
+
+        // active_selection.selection_rect = Some(selection::SelectionRect::start(coord));
+
+        send_message!(Some('i'), messages, "This feature is not yet implemented");
+    } else if input.just_released(KeyCode::KeyO) {
+        //use crosshair's coordinate as end
+        let Ok((_, t, _)) = crosshairs.single() else {
+            return;
+        };
+        let _ = Coordinate {
+            0: t.translation.x as i64,
+            1: t.translation.y as i64,
+        };
+
+        // active_selection.selection_rect = active_selection.selection_rect.clone().map(|mut r| {
+        //     r.end(coord);
+        //     r
+        // });
+
+        // send_message!(
+        //     Some('i'),
+        //     messages,
+        //     format!("Selection Rect: {:?}", active_selection.selection_rect)
+        // );
     }
 
-    let mut vel_y = 0.0;
-    let mut vel_x = 0.0;
-
-    let list = &mut uiitems.iter_mut();
-    //WASD controls for crosshair movement
-    if input.pressed(KeyCode::KeyW) && !input.pressed(KeyCode::KeyS) {
-        vel_y = 200.0;
-    }
-    if input.pressed(KeyCode::KeyS) && !input.pressed(KeyCode::KeyW) {
-        vel_y = -200.0;
-    }
-    if input.pressed(KeyCode::KeyD) && !input.pressed(KeyCode::KeyA) {
-        vel_x = 200.0;
-    }
-    if input.pressed(KeyCode::KeyA) && !input.pressed(KeyCode::KeyD) {
-        vel_x = -200.0;
+    // 1 will switch to tile mode
+    if input.just_pressed(KeyCode::Digit1) || input.just_pressed(KeyCode::Numpad1) {
+        send_message!(Some('i'), messages, "Switching to Tile Mode");
+        next_editor_state.set(EditorState::Editing(EditingComponent::Tile));
     }
 
-    //update anything with a UIItem component
-    for (mut ui, mut t) in list {
-        ui.vel_x = vel_x;
-        ui.vel_y = vel_y;
-        t.translation.x += ui.vel_x * time.delta_secs();
-        t.translation.y += ui.vel_y * time.delta_secs();
-        //apply frictoin -1% of the velocity per frame
-        ui.vel_x *= 0.99;
-        ui.vel_y *= 0.99;
+    // 2 will switch to collider mode
+    if input.just_pressed(KeyCode::Digit2) || input.just_pressed(KeyCode::Numpad2) {
+        send_message!(Some('i'), messages, "Switching to Collider Mode");
+        next_editor_state.set(EditorState::Editing(EditingComponent::Collider));
     }
-    //update the camera in the same way
-    for (mut ui, mut t, _) in cameras.iter_mut() {
-        ui.vel_x = vel_x;
-        ui.vel_y = vel_y;
-        t.translation.x += ui.vel_x * time.delta_secs();
-        t.translation.y += ui.vel_y * time.delta_secs();
-        //apply frictoin -1% of the velocity per frame
-        ui.vel_x *= 0.99;
-        ui.vel_y *= 0.99;
+
+    // 3 will switch to actor mode
+    if input.just_pressed(KeyCode::Digit3) || input.just_pressed(KeyCode::Numpad3) {
+        send_message!(Some('i'), messages, "Switching to Actor Mode");
+        next_editor_state.set(EditorState::Editing(EditingComponent::Actor));
+    }
+
+    //state specific keybinds
+    match editor_state.get() {
+        EditorState::Normal => {
+            //there is not a lot unique to normal mode
+        }
+        EditorState::LoadAsk => {
+            if input.just_pressed(KeyCode::KeyY) || input.just_pressed(KeyCode::Enter) {
+                next_editor_state.set(EditorState::Loading);
+                send_message!(Some('i'), messages, "Attempting to load scene");
+            }
+            if input.just_pressed(KeyCode::KeyN) || input.just_pressed(KeyCode::Escape) {
+                next_editor_state.set(EditorState::LoadingEmpty);
+                send_message!(Some('w'), messages, "No scene loaded");
+            }
+        }
+        EditorState::Loading => {
+            //do nothing, we are waiting for the scene to load
+        }
+        EditorState::LoadingEmpty => {
+            //do nothing, we are waiting for the scene to load
+        }
+        EditorState::Saving => {
+            //do nothing, we are waiting for the scene to save
+        }
+        EditorState::Editing(_) => {
+            //in any editing mode, Q will bring us back to normal mode
+            if input.just_pressed(KeyCode::KeyQ)
+                || input.all_pressed(vec![KeyCode::ControlLeft, KeyCode::KeyS])
+            {
+                next_editor_state.set(EditorState::Normal);
+                send_message!(Some('i'), messages, "Returning to Normal Mode");
+            }
+        }
+
+        EditorState::SaveAsk => {
+            if input.just_pressed(KeyCode::KeyY) || input.just_pressed(KeyCode::Enter) {
+                next_editor_state.set(EditorState::Saving);
+                send_message!(Some('i'), messages, "Saving scene.");
+            } else if input.just_pressed(KeyCode::KeyN) || input.just_pressed(KeyCode::Escape) {
+                next_editor_state.set(EditorState::Normal);
+                send_message!(Some('w'), messages, "Saving aborted.");
+            }
+        }
+
+        EditorState::QuitAsk => {
+            if input.just_pressed(KeyCode::KeyY) || input.just_pressed(KeyCode::Enter) {
+                next_editor_state.set(EditorState::Inactive);
+                send_message!(Some('i'), messages, "Exiting the editor...");
+            } else if input.just_pressed(KeyCode::KeyN) || input.just_pressed(KeyCode::Escape) {
+                next_editor_state.set(EditorState::Normal);
+                send_message!(Some('w'), messages, "Exiting aborted.");
+            }
+        }
+        _ => {}
+    }
+
+    //Anti-Stateful Keybinds
+    if editor_state.get() != &EditorState::SaveAsk
+        && editor_state.get() != &EditorState::LoadAsk
+        && editor_state.get() != &EditorState::QuitAsk
+    {
+        //Camera Controls, just dont work in the save/load/quit states
+        let mut vel_y = 0.0;
+        let mut vel_x = 0.0;
+
+        let list = &mut uiitems.iter_mut();
+        //WASD controls for crosshair movement
+        if input.pressed(KeyCode::KeyW) && !input.pressed(KeyCode::KeyS) {
+            vel_y = 200.0;
+        }
+        if input.pressed(KeyCode::KeyS) && !input.pressed(KeyCode::KeyW) {
+            vel_y = -200.0;
+        }
+        if input.pressed(KeyCode::KeyD) && !input.pressed(KeyCode::KeyA) {
+            vel_x = 200.0;
+        }
+        if input.pressed(KeyCode::KeyA) && !input.pressed(KeyCode::KeyD) {
+            vel_x = -200.0;
+        }
+
+        //update anything with a UIItem component
+        for (mut ui, mut t) in list {
+            ui.vel_x = vel_x;
+            ui.vel_y = vel_y;
+            t.translation.x += ui.vel_x * time.delta_secs();
+            t.translation.y += ui.vel_y * time.delta_secs();
+            //apply frictoin -1% of the velocity per frame
+            ui.vel_x *= 0.99;
+            ui.vel_y *= 0.99;
+        }
+        //update the camera in the same way
+        for (mut ui, mut t, _) in cameras.iter_mut() {
+            ui.vel_x = vel_x;
+            ui.vel_y = vel_y;
+            t.translation.x += ui.vel_x * time.delta_secs();
+            t.translation.y += ui.vel_y * time.delta_secs();
+            //apply frictoin -1% of the velocity per frame
+            ui.vel_x *= 0.99;
+            ui.vel_y *= 0.99;
+        }
+        //also update the crosshair in the same way
+        for (_, mut t, _) in crosshairs.iter_mut() {
+            t.translation.x += vel_x * time.delta_secs();
+            t.translation.y += vel_y * time.delta_secs();
+        }
     }
 }
 
 #[derive(Component)]
-#[require(UIItem)]
-pub struct Crosshair {}
+#[require(ui::UIItem)]
+pub struct Crosshair {} //tags the main crosshair entity, in the editor this happens to only be our camera, but may be taken over by a crosshair entity in the future that tracks the mouse
 
-#[derive(Component, Reflect, Default)]
-#[reflect(Component)]
-#[require(Transform)]
-struct UIItem {
-    vel_x: f32,
-    vel_y: f32,
-}
-
-#[derive(Component, Reflect)]
-#[reflect(Component)]
-/// A component that marks an entity as a placeholder object, these are preview objects that are not yet placed into the scene.
-pub struct PlaceholderObject;
-
-/// A component that marks an entity as a savable editor item.
-#[derive(Component, Reflect, Default, Clone)]
+/// A component that marks an entity as a savable editor item, from this we have systems that load Tiles, Colliders, and other objects based on preset-defaults and the other saved components we may have.
+/// The main ones we need are the position of this object in the world, and the type of thing it is, and one more layer of optional specification on what "Kind of thing of thing" it is.
+/// Other components will be used to determine the specifics of the object. but a tile for example can be completley determined from just this component.
+/// eg.: Thing?: Tile. Kind of Thing?:0 (cut the spritesheet at index 0). Position: (0, 0), the logic for this is actually implemented on the SignificantComponent trait for each majortype of object
+#[derive(Component, Reflect, Debug, Default, Clone)]
 #[reflect(Component)]
 pub struct EditorObject {
-    internal_type: u64, //ultimatley an index into which style of tile or entity we are using within the major type
-    coordinate: TCoordinate, //the coordinate of the object as well as the major type of the object
+    ///ultimatley an index into which style of tile or entity we are using within the major type, extra specificiation we can use to fine tune what object we are loading in this space.
+    pub internal_type: u64,
+    //the coordinate of the object as well as the major type of the object combined into a neat little package
+    pub coordinate: TCoordinate,
+    //this zone ID will track which zone the object is in, this is used to determine which zone to load the object into and to help with performance by only loading objects in the current/neighrboring zones
+    pub zone_id: TCoordinate,
 }
 
 impl EditorObject {
@@ -261,13 +467,13 @@ impl EditorObject {
     //     }
     // }
 
-    // fn get_object_type(&self) -> char {
-    //     self.coordinate.object_type
-    // }
-    fn get_internal_type(&self) -> u64 {
+    pub fn get_major_type(&self) -> char {
+        self.coordinate.type_char
+    }
+    pub fn get_internal_type(&self) -> u64 {
         self.internal_type
     }
-    fn get_coordinate(&self) -> TCoordinate {
+    pub fn get_coordinate(&self) -> TCoordinate {
         self.coordinate.clone()
     }
 
@@ -371,7 +577,7 @@ pub fn editor_plugin(app: &mut App) {
         //The only true startup systems here:
         .add_systems(
             Startup,
-            (initialize, create_crosshair, ).chain(),
+            (initialize, create_crosshair).chain(),
         )
         //universal update systems for all editing modes
         .add_systems(

@@ -1,8 +1,11 @@
-use bevy::prelude::*;
+use bevy::{prelude::*, window::WindowResolution};
+use bevy_egui::EguiPlugin;
+use bevy_rapier2d::prelude::*;
 
 pub mod consts;
 pub mod utilities;
 pub mod editor;
+pub mod game;
 
 use bevy_egui::EguiPlugin;
 use bevy_rapier2d::{plugin::{NoUserData, RapierPhysicsPlugin}, render::RapierDebugRenderPlugin};
@@ -17,8 +20,8 @@ fn main() {
                 .set(ImagePlugin::default_nearest())
                 .set(WindowPlugin {
                     primary_window: Some(Window {
-                        title: WINDOW_TITLE.to_string(),
-                        resolution: (WINDOW_WIDTH, WINDOW_HEIGHT).into(),
+                        title: WINDOW_TITLE2.to_string(),
+                        resolution: WindowResolution::new(DEFAULT_WINDOW_WIDTH as u32, DEFAULT_WINDOW_HEIGHT as u32),
                         resizable: false,
                         decorations: true,
                         visible: true,
@@ -40,23 +43,10 @@ fn main() {
         
         .insert_resource(ClearColor(Color::from(WINDOW_DEFAULT_BACKGROUND_COLOR)))
         .insert_resource(Time::<Fixed>::from_hz(64.0))
+        
         .add_plugins(editor::editor_plugin)
+        .add_plugins(game::game_plugin)
+
         .run();
 }
 
-//test line for commit
-//bundles are a collection of components that are commonly used together
-//OrthographicCameraBundle is a bundle that contains the following components:
-//Transform, GlobalTransform, OrthographicCamera, Visible, and MainCamera
-
-// fn spawn_players(mut commands: Commands, asset_server: Res<AssetServer>) {
-//     let textures_path = Path::new(&format!("{TEXTURES_PATH}/player.png")).to_path_buf();
-
-//     let tex1 = asset_server.load(textures_path);
-
-//     commands.spawn(Sprite {
-//         custom_size: Some(Vec2::new(100.0, 100.0)),
-//         image: tex1,
-//         ..default()
-//     });
-// }

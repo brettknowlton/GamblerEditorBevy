@@ -1,0 +1,20 @@
+- [ ] Changing placeholder object in tilemode is not consistent with all button presses
+- [ ] Tilesheet display is funky
+- [x] Implement colliders and a debug sprite for colliders
+- [x] Begin on a "Test" Mode that allows player control
+	- [x] Make controllable player
+	- [x] drop crosshair control but NOT UI control in test mode.
+	- [x] player will just spawn on the crosshair's position for now
+- [ ] Implement a rectangle tool for SignificantComponents
+- [x] Get a functional/Moveable player
+	- [x] see above for making player spawn on the crosshair
+	- [x] jump with Space / W
+	- [x] move left/right with A / D
+	- [x] verify collision issues (colliders below x axis behaiving weirdly...)
+- [ ] 1st Cutscene Art!
+    - [ ] Player
+    - [ ] World
+    - [ ] Heart Rune
+    - [ ] Full World
+    - [ ] World Timelapse
+    - [ ] Main Menu
