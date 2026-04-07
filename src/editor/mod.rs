@@ -1,5 +1,7 @@
 #[macro_use]
 pub mod ui;
+use serde::Deserialize;
+use serde::Serialize;
 pub use tile::*;
 
 
@@ -30,14 +32,23 @@ use bevy_egui::EguiPrimaryContextPass;
 #[derive(Clone, Copy, Default, Eq, PartialEq, Debug, Hash, States)]
 pub enum EditorState {
     #[default]
+    /// The editor is currently inactive and not performing any actions
     Inactive,
+    /// The editor is in its normal state, ready for user interaction
     Normal,
+    /// The editor is currently asking the user if they would like to load a scene
     LoadAsk,
+    /// The editor is currently loading a scene
     Loading,
+    /// The editor is currently loading an empty scene
     LoadingEmpty,
+    /// The editor is currently asking the user if they would like to save the scene
     SaveAsk,
+    /// The editor is currently saving the scene
     Saving,
+    /// The editor is currently asking the user if they would like to quit
     QuitAsk,
+    /// The editor is currently in an editing mode, allowing the user to place or modify objects in the scene
     Editing(EditingComponent),
 }
 
@@ -47,9 +58,13 @@ pub enum EditorState {
 pub enum EditingComponent {
     #[default]
     None,
+    /// The user is currently trying to place an actor in the scene
     Actor,
+    /// The user is currently trying to place a collider in the scene
     Collider,
+    /// The user is currently trying to place an interactable object in the scene
     Interactable,
+    /// The user is currently trying to place a tile in the scene
     Tile,
 }
 
@@ -86,7 +101,7 @@ fn initialize(
 ) {
     //load the rect_debug texture into the RectHandle resource
     let tex_path = PathBuf::from("textures/tiles/tile_debug.png");
-    texture_handles.0.insert('r', asset_server.load(tex_path));
+    texture_handles.0.insert(EditorObjectKind::Other, asset_server.load(tex_path));
 
     //create camera and add a UIItem component to it
     commands.spawn((Camera2d::default(), UIItem::default()));
@@ -455,10 +470,12 @@ pub struct Crosshair {} //tags the main crosshair entity, in the editor this hap
 #[derive(Component, Reflect, Debug, Default, Clone)]
 #[reflect(Component)]
 pub struct EditorObject {
-    ///ultimatley an index into which style of tile or entity we are using within the major type, extra specificiation we can use to fine tune what object we are loading in this space.
-    pub internal_type: u64,
+    /// ultimatley an index into which style of tile or entity we are using within the major type, extra specificiation we can use to fine tune what object we are loading in this space.
+    /// for non-tile types this is currently always 0
+    pub kind: EditorObjectKind,
+    pub internal_kind: u64,
     //the coordinate of the object as well as the major type of the object combined into a neat little package
-    pub coordinate: TCoordinate,
+    pub coordinate: Coordinate,
     //this zone ID will track which zone the object is in, this is used to determine which zone to load the object into and to help with performance by only loading objects in the current/neighrboring zones
     pub zone_id: TCoordinate,
 }
@@ -471,13 +488,13 @@ impl EditorObject {
     //     }
     // }
 
-    pub fn get_major_type(&self) -> char {
-        self.coordinate.type_char
+    pub fn get_major_type(&self) -> EditorObjectKind {
+        self.kind
     }
     pub fn get_internal_type(&self) -> u64 {
-        self.internal_type
+        self.internal_kind
     }
-    pub fn get_coordinate(&self) -> TCoordinate {
+    pub fn get_coordinate(&self) -> Coordinate {
         self.coordinate.clone()
     }
 
@@ -490,6 +507,16 @@ impl EditorObject {
     // fn set_coordinate(&mut self, coord: Coordinate) {
     //     self.coordinate = TCoordinate::new(self.get_object_type(), coord);
     // }
+}
+
+#[derive(Default, Reflect, Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize, Copy)]
+pub enum EditorObjectKind {
+    #[default]
+    Other,
+    Tile,
+    Collider,
+    Actor,
+    Selector,
 }
 
 fn reset_scene(

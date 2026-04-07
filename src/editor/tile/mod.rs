@@ -1,14 +1,14 @@
 pub mod ui;
 
 use super::*;
-use crate::ui::{ToolingMenuItem, update_placeholder};
+use crate::ui::{update_placeholder, ToolingMenuItem};
 use crate::{EditorObject, TILE_SIZE};
 use bevy::prelude::*;
 use bevy::sprite::Anchor;
 use std::path::PathBuf;
 use tools::SignificantComponent;
 
-fn tile_texture_rect(tile_id: u64) -> Rect {
+fn get_tex_rect(tile_id: u64) -> Rect {
     Rect {
         min: Vec2::new(
             (tile_id % SPRITESHEET_WIDTH) as f32 * TILE_SIZE as f32,
@@ -32,8 +32,8 @@ fn populate_tile_tooling_menu(
         .map(|tile_id| ToolingMenuItem {
             id: tile_id,
             label: tile_id.to_string(),
-            texture_key: Some('t'),
-            rect: Some(tile_texture_rect(tile_id)),
+            texture_key: Some(EditorObjectKind::Tile),
+            rect: Some(get_tex_rect(tile_id)),
         })
         .collect();
 }
@@ -41,7 +41,7 @@ fn populate_tile_tooling_menu(
 fn load_spritesheet(
     asset_server: Res<AssetServer>,
     mut message_queue: ResMut<EditorBottomBarQueuedMessages>,
-    mut textures: ResMut<TextureHandles>,
+    mut texture_handles: ResMut<TextureHandles>,
 ) {
     //load the tilesheet for this mode
     let tex_path = PathBuf::from("textures/tiles/tilesheet.png");
@@ -53,7 +53,9 @@ fn load_spritesheet(
     );
 
     //load happens here
-    textures.0.insert('t', asset_server.load(tex_path));
+    texture_handles
+        .0
+        .insert(EditorObjectKind::Tile, asset_server.load(tex_path));
 }
 
 fn tilemode_keybinds(
@@ -79,11 +81,14 @@ fn tilemode_keybinds(
 
         let first_tile = selected_tile_id.id;
 
+        // create a new EditorObject to place
         let to_place = EditorObject {
-            coordinate: TCoordinate::new('t', coord),
-            internal_type: first_tile as u64,
+            
+            kind: EditorObjectKind::Tile,
+            coordinate: coord,
+            internal_kind: first_tile as u64,
             zone_id: TCoordinate::new(
-                'f',
+                EditorObjectKind::Other,
                 Coordinate {
                     0: coord.0 / ZONE_SIZE as i64,
                     1: coord.1 / ZONE_SIZE as i64,
@@ -92,7 +97,11 @@ fn tilemode_keybinds(
         };
 
         //place the tile using our SignificantComponent trait
-        Tile::place(&mut commands, to_place, 't', coord, &tiles);
+        Tile::place(
+            &mut commands,
+            to_place,
+            &tiles,
+        );
         send_message!(
             Some('i'),
             message_queue,
@@ -105,7 +114,7 @@ fn tilemode_keybinds(
         let mut coord = Coordinate::from(crosshair.0.translation);
         coord = snap_coordinate_to_grid(coord);
 
-        Tile::remove(&mut commands, coord, &tiles);
+        Tile::remove(&mut commands, coord, EditorObjectKind::Tile, &tiles);
         send_message!(
             Some('i'),
             message_queue,

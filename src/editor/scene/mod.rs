@@ -2,9 +2,9 @@ use crate::actor::Actor;
 
 use super::*;
 use bevy::log::*;
-use bevy::{ prelude::*, tasks::IoTaskPool };
+use bevy::{prelude::*, tasks::IoTaskPool};
 use resources::*;
-use std::{ fs::File, io::Write };
+use std::{fs::File, io::Write};
 
 pub fn scene_plugin(app: &mut App) {
     app.register_type::<EditorObject>()
@@ -12,36 +12,49 @@ pub fn scene_plugin(app: &mut App) {
         .register_type::<Tile>()
         .register_type::<TCoordinate>()
         .register_type::<Coordinate>()
-
-        .add_systems(OnEnter(EditorState::LoadingEmpty), load_empty_scene)
-        .add_systems(OnEnter(EditorState::Loading), return_state.after(load_empty_scene))
-        .add_systems(OnEnter(EditorState::Loading), (load_scene, return_state.after(load_scene)))
-        .add_systems(OnEnter(EditorState::Saving), (save_items, return_state.after(save_items)))
+        .add_systems(
+            OnEnter(EditorState::LoadingEmpty),
+            (load_empty_scene, goto_normal_state).chain(),
+        )
+        .add_systems(
+            OnEnter(EditorState::Loading),
+            (load_scene, goto_normal_state).chain(),
+        )
+        .add_systems(
+            OnEnter(EditorState::Saving),
+            (save_items, goto_normal_state).chain(),
+        )
         .add_systems(
             Update,
             (spawn_sprites, add_missing_colliders)
                 .chain()
-                .run_if(not(in_state(EditorState::LoadAsk)))
+                .run_if(not(in_state(EditorState::LoadAsk))),
         );
 }
 
 // struct MyGenericType<T>(PhantomData<T>);
 fn load_scene(mut commands: Commands, asset_server: Res<AssetServer>) {
     //create scene manager component that will read/write our scene data between the enviornment and a json file
-    commands.spawn(DynamicSceneRoot(asset_server.load(format!("{DEFAULT_SCENE_PATH}.ron"))));
+    commands.spawn(DynamicSceneRoot(
+        asset_server.load(format!("{DEFAULT_SCENE_PATH}.ron")),
+    ));
 }
 
 fn add_missing_colliders(
     mut commands: Commands,
-    editor_objects: Query<(Entity, &EditorObject), Without<Collider>>
+    editor_objects: Query<(Entity, &EditorObject), Without<Collider>>,
 ) {
     for (entity, editor_object) in editor_objects.iter() {
-        if editor_object.get_major_type() == 'c' {
-            println!("Adding missing collider for EditorObject ID: {:?}", editor_object.coordinate);
-    
+        if editor_object.get_major_type() == EditorObjectKind::Collider {
+            println!(
+                "Adding missing collider for EditorObject ID: {:?}",
+                editor_object.coordinate
+            );
+
             // Add a collider based on the EditorObject's properties
             commands.entity(entity).insert((
-                Collider::cuboid(((TILE_SIZE / 2)) as f32, (TILE_SIZE / 2) as f32), Friction::coefficient(0.5)
+                Collider::cuboid((TILE_SIZE / 2) as f32, (TILE_SIZE / 2) as f32),
+                Friction::coefficient(0.5),
             ));
         }
     }
@@ -50,46 +63,49 @@ fn add_missing_colliders(
 fn spawn_sprites(
     mut tiles: Query<(Entity, &mut EditorObject), Without<Sprite>>,
     mut commands: Commands,
-    spritesheets: Res<TextureHandles>
+    spritesheets: Res<TextureHandles>,
 ) {
     //spawn the sprites for each tile, use the editorObject's tcoords to determine the sprite's position
     //if the EditorObject has a tcoord beginning with 'T'
     for (entity, eo) in tiles.iter_mut() {
-        if eo.get_major_type() == 't' {
+        if eo.get_major_type() == EditorObjectKind::Tile {
             let sprite_bundle = Sprite {
-                image: spritesheets.0.get(&'t').unwrap().clone(),
+                image: spritesheets.0.get(&EditorObjectKind::Tile).unwrap().clone(),
                 //the UVs are the same for every tile, just change the offset by using the tiletype as a multiplier
                 rect: Some(Rect {
                     min: Vec2::new(
-                        (((eo.get_internal_type() as u64) % SPRITESHEET_WIDTH) as f32) *
-                            (TILE_SIZE as f32),
-                        (((eo.get_internal_type() as u64) / SPRITESHEET_WIDTH) as f32) *
-                            (TILE_SIZE as f32)
+                        (((eo.get_internal_type() as u64) % SPRITESHEET_WIDTH) as f32)
+                            * (TILE_SIZE as f32),
+                        (((eo.get_internal_type() as u64) / SPRITESHEET_WIDTH) as f32)
+                            * (TILE_SIZE as f32),
                     ),
                     max: Vec2::new(
-                        (((eo.get_internal_type() as u64) % SPRITESHEET_WIDTH) as f32) *
-                            (TILE_SIZE as f32) +
-                            (TILE_SIZE as f32),
-                        (((eo.get_internal_type() as u64) / SPRITESHEET_WIDTH) as f32) *
-                            (TILE_SIZE as f32) +
-                            (TILE_SIZE as f32)
+                        (((eo.get_internal_type() as u64) % SPRITESHEET_WIDTH) as f32)
+                            * (TILE_SIZE as f32)
+                            + (TILE_SIZE as f32),
+                        (((eo.get_internal_type() as u64) / SPRITESHEET_WIDTH) as f32)
+                            * (TILE_SIZE as f32)
+                            + (TILE_SIZE as f32),
                     ),
                 }),
-            
+
                 ..default()
             };
 
-            let coord = eo.get_coordinate().coord;
+            let coord = eo.get_coordinate();
 
             commands
                 .entity(entity)
                 .insert((sprite_bundle, Anchor::CENTER, Visibility::default()))
                 .entry::<Transform>()
                 .and_modify(move |mut t| {
-                    t.translation = Vec3::new(coord.0 as f32, coord.1 as f32, 0.0);
+                    t.translation = Vec3::new(
+                        (coord.0 + (SCALED_TILE_WIDTH / 2) as i64) as f32,
+                        (coord.1 + (SCALED_TILE_HEIGHT / 2) as i64) as f32,
+                        t.translation.z,
+                    );
                 });
         }
-
     }
 }
 
@@ -98,16 +114,16 @@ fn load_empty_scene(mut commands: Commands) {
     commands.spawn(DynamicSceneRoot(Handle::default()));
 }
 
-fn return_state(
+fn goto_normal_state(
     mut next_state: ResMut<NextState<EditorState>>,
-    mut message_queue: ResMut<EditorBottomBarQueuedMessages>
+    mut message_queue: ResMut<EditorBottomBarQueuedMessages>,
 ) {
     //change the state
     next_state.set(EditorState::Normal);
     send_message!(
         Some('i'),
         message_queue,
-        "FileIO Operations completed successfullly, returning to Normal Mode".to_string()
+        "FileIO Operations completed, returning to Normal Mode".to_string()
     );
 }
 
@@ -129,23 +145,24 @@ fn save_items(world: &mut World) {
         .collect::<Vec<&Entity>>();
 
     //create a new world (copy of orignial world) that will actually be saved
-    let mut new_world = world.query::<Entity>()
-        .iter(world)
-        .map(|e| e)
-        .fold(World::new(), |mut acc, e| {
-            if let Some(editor_object) = world.get::<EditorObject>(e) {
-                acc.spawn(editor_object.clone());
-            }
-            acc
-        });
+    let mut new_world =
+        world
+            .query::<Entity>()
+            .iter(world)
+            .map(|e| e)
+            .fold(World::new(), |mut acc, e| {
+                if let Some(editor_object) = world.get::<EditorObject>(e) {
+                    acc.spawn(editor_object.clone());
+                }
+                acc
+            });
 
-        
     // despawn the entities from the new world that are not EditorObjects
     for t in filtered_objects.iter() {
         debug!("despawning non-serializable entity: {t:?} from the simulated world-to-save");
         new_world.despawn(**t);
     }
-    
+
     //create a new scene from the new world that now only contains EditorObjects
     let scene = DynamicSceneBuilder::from_world(world)
         .deny_all_resources()

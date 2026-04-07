@@ -1,7 +1,10 @@
 use bevy::prelude::*;
 use serde::{ Serialize, Deserialize };
 
+
+
 use crate::{ TILE_SCALE, TILE_SIZE };
+use crate::editor::EditorObjectKind;
 
 pub mod resources;
 pub mod tools;
@@ -14,27 +17,24 @@ pub fn despawn_all<T: Component>(mut commands: Commands, to_despawn: Query<Entit
     }
 }
 
-pub fn snap_value_to_grid(coord: Coordinate, grid_size: i64) -> Coordinate {
+pub fn snap_value_to_grid(value: i64, grid_size: i64) -> i64 {
     //floor x and y values to the last multiple of grid_size
     //if coordinate is negative, this will round down to the nearest multiple of grid_size further negative
     let x: i64;
-    let y: i64;
-    if coord.0 < 0 {
-        x = coord.0 - (grid_size + (coord.0 % grid_size));
+    if value < 0 {
+        x = value - (grid_size + (value % grid_size));
     } else {
-        x = coord.0 - (coord.0 % grid_size);
-    }
-    if coord.1 < 0 {
-        y = coord.1 - (grid_size + (coord.1 % grid_size));
-    } else {
-        y = coord.1 - (coord.1 % grid_size);
+        x = value - (value % grid_size);
     }
 
-    Coordinate(x, y)
+    x
 }
 
 pub fn snap_coordinate_to_grid(coord: Coordinate) -> Coordinate {
-    snap_value_to_grid(coord, (TILE_SIZE * TILE_SCALE) as i64)
+    Coordinate(
+        snap_value_to_grid(coord.0, (TILE_SIZE * TILE_SCALE) as i64),
+        snap_value_to_grid(coord.1, (TILE_SIZE * TILE_SCALE) as i64),
+    )
 }
 
 
@@ -97,14 +97,14 @@ impl Into<bevy::prelude::Vec2> for Coordinate {
 #[derive(Component, Reflect, Deserialize, Serialize, Debug, Clone, PartialEq, Eq, Hash)]
 #[reflect(Component)]
 pub struct TCoordinate {
-    pub type_char: char,
+    pub kind: EditorObjectKind,
     pub coord: Coordinate,
 }
 
 impl TCoordinate {
-    pub fn new(object_type: char, coord: Coordinate) -> Self {
+    pub fn new(kind: EditorObjectKind, coord: Coordinate) -> Self {
         Self {
-            type_char: object_type,
+            kind,
             coord,
         }
     }
@@ -113,7 +113,7 @@ impl TCoordinate {
 impl Default for TCoordinate {
     fn default() -> Self {
         Self {
-            type_char: ' ',
+            kind: EditorObjectKind::Tile,
             coord: Coordinate(0, 0),
         }
     }

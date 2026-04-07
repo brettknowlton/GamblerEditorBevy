@@ -19,7 +19,7 @@ pub struct DisplayMessage;
 pub struct ToolingMenuItem {
     pub id: u64,
     pub label: String,
-    pub texture_key: Option<char>,
+    pub texture_key: Option<EditorObjectKind>,
     pub rect: Option<Rect>,
 }
 
@@ -94,7 +94,7 @@ pub fn left_panel(
     let tile_texture_id = if is_tile_mode {
         textures
             .0
-            .get(&'t')
+            .get(&EditorObjectKind::Tile)
             .map(|handle| contexts.add_image(EguiTextureHandle::Strong(handle.clone())))
     } else {
         None
@@ -279,7 +279,7 @@ pub fn left_panel(
                     });
 
                 placeholder_update_writer.write(UpdatePlaceholderMessage {
-                    tcoord: TCoordinate::new('t', Coordinate(0, 0)),
+                    tcoord: TCoordinate::new(EditorObjectKind::Tile, Coordinate(0, 0)),
                     rect,
                 });
             }
@@ -493,10 +493,10 @@ pub fn update_placeholder<T: SignificantComponent + Component + Default>(
     }
 
     let m = match state.get() {
-        EditorState::Editing(EditingComponent::Tile) => 't',
-        EditorState::Editing(EditingComponent::Collider) => 'c',
+        EditorState::Editing(EditingComponent::Tile) => EditorObjectKind::Tile,
+        EditorState::Editing(EditingComponent::Collider) => EditorObjectKind::Collider,
         _ => {
-            'r' //use selection rects as fallback
+            EditorObjectKind::Other //use formatting
         }
     };
     //update the placeholder object to be the major type of the current editing mode

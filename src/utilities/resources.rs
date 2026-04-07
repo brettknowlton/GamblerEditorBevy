@@ -1,18 +1,21 @@
 use bevy::prelude::*;
 use std::collections::HashMap;
 
+use crate::EditorObjectKind;
+
 #[derive(Resource, Default)]
 /// A placeholder object is a temporary object that is used to represent an object that will be created later,
 ///  we display this as a half-alpha sprite of the sprite that would-be placed..
 pub struct PlaceholderHandle(pub Handle<Image>);
 
 #[derive(Resource, Default)]
-///All loaded spritesheets are added to this hashmap, with a character key signiftying the mode
+///All loaded spritesheets are added to this hashmap, with a EditorObjectKind key signifying the mode it relates to
 /// t: tiles
 /// c: colliders
 /// r: editor_rects
-///
-pub struct TextureHandles(pub HashMap<char, Handle<Image>>);
+/// f: formatting
+
+pub struct TextureHandles(pub HashMap<EditorObjectKind, Handle<Image>>);
 
 // /// A handle to the tilesheet image.
 // #[derive(Resource, Default, Reflect)]

@@ -7,19 +7,27 @@ pub(crate) const _WINDOW_TITLE: &str = "Gambler";
 ///////////////////////////////////////
 pub const WINDOW_TITLE2: &str = "GamblerEditor";
 
-//Default color that the background will be replaced by if nothing is being rendered
+/// Default color that the background will be replaced by if nothing is being rendered
 pub const WINDOW_DEFAULT_BACKGROUND_COLOR: Srgba = Srgba::new(0.31, 0.643, 0.722, 1.0);
 
+/// Default scale factor for general elements
 pub const DEFAULT_GENERAL_SCALE_FACTOR: u32 = 2;
 
-pub const ZONE_SIZE: u32 = 16; //width/height of a zone in tiles
+/// width/height of a zone in tiles
+pub const ZONE_SIZE: u32 = 16; 
+/// Width of the player source image in pixels
+pub const PLAYER_SIZE_X: u32 = 72;
 
-pub const PLAYER_SIZE_X: u32 = 72;//pixels wide the player source image
-pub const PLAYER_SIZE_Y: u32 = 90;//pixels tall the player source image
+/// Height of the player source image in pixels
+pub const PLAYER_SIZE_Y: u32 = 90;
+
+/// Scale factor for the player
 pub const PLAYER_SCALE: u32 = DEFAULT_GENERAL_SCALE_FACTOR;//by default player has normal scaling
 
-pub const SCALED_PLAYER_WIDTH: u32 = PLAYER_SIZE_X * PLAYER_SCALE;//total pixel size the player width takes up IN GAME
-pub const SCALED_PLAYER_HEIGHT: u32 = PLAYER_SIZE_Y * PLAYER_SCALE;//total pixel size the player height takes up IN GAME
+/// Total pixel size the player width takes up IN GAME
+pub const SCALED_PLAYER_WIDTH: u32 = PLAYER_SIZE_X * PLAYER_SCALE;
+/// Total pixel size the player height takes up IN GAME
+pub const SCALED_PLAYER_HEIGHT: u32 = PLAYER_SIZE_Y * PLAYER_SCALE;
 
 pub const PLAYER_HB_X_OFFSET: u32 = SCALED_PLAYER_WIDTH / 3;
 pub const PLAYER_HB_Y_OFFSET: u32 = SCALED_PLAYER_HEIGHT / 3;

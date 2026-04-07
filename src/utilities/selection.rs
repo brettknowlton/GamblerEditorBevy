@@ -30,23 +30,18 @@ impl SelectionRect {
 
 impl SignificantComponent for SelectionRect {
 
-    fn place<T: SignificantComponent + Component>(commands: &mut Commands, item: crate::EditorObject, _item_type: char, coord: Coordinate, _from: &Query<(Entity, &EditorObject), With<T>>) {
+    fn place<T: SignificantComponent + Component>(commands: &mut Commands, item: crate::EditorObject, _from: &Query<(Entity, &EditorObject), With<T>>) {
         commands.spawn((
             SelectionRect {
-                start: coord,
-                end: Some(coord.add_tile_scale()),
+                start: item.coordinate,
+                end: Some(item.coordinate.add_tile_scale()),
             },
             Transform {
-                translation: Vec3::new(coord.0 as f32, coord.1 as f32, -5.0),
+                translation: Vec3::new(item.coordinate.0 as f32, item.coordinate.1 as f32, -5.0),
                 scale: Vec3::new(TILE_SCALE as f32, TILE_SCALE as f32, 1.0),
                 ..default()
             },
-            EditorObject {
-                internal_type: item.get_internal_type(),
-                coordinate: TCoordinate::new('T', coord),
-                zone_id: item.zone_id,
-            },
-            
+            item,
         ));
     }
     

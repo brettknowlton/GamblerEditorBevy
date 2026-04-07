@@ -39,7 +39,7 @@ impl Actor {
     pub fn new() -> Self {
         Self {
            internal_type: 0,
-            coordinate: TCoordinate::new('a', Coordinate{0: 0, 1: 0}),
+            coordinate: TCoordinate::new(EditorObjectKind::Actor, Coordinate{0: 0, 1: 0}),
             rect: Rect::new(0.0, 0.0, 1.0, 1.0),
         }
     }
@@ -91,12 +91,12 @@ pub fn actor_mode_keybinds(
     //places the first actor in the selection rect
     if input.just_pressed(KeyCode::KeyP) {
         //clean up the bevy query overhead
-        let Ok((t, _)) = crosshairs.single() else {
+        let Ok((crosshair_location, _)) = crosshairs.single() else {
             return;
         };
 
         //get the coordinate of the crosshair AND snap it to the grid if gridsnap is enabled
-        let mut coord = Coordinate::from(t.translation);
+        let mut coord = Coordinate::from(crosshair_location.translation);
         if gridsnap.get() == &GridSnap::Enabled {
             coord = snap_coordinate_to_grid(coord);
         }
@@ -104,13 +104,14 @@ pub fn actor_mode_keybinds(
         let def_actor_id = Actor::new().internal_type;
 
         let to_place = EditorObject {
-            coordinate: TCoordinate::new('a', coord),
-            internal_type: def_actor_id as u64,
-            zone_id: TCoordinate::new('a', Coordinate{0: coord.0 / ZONE_SIZE as i64, 1: coord.1 / ZONE_SIZE as i64}),
+            kind: EditorObjectKind::Actor,
+            internal_kind: def_actor_id as u64,
+            coordinate: coord,
+            zone_id: TCoordinate::new(EditorObjectKind::Actor, Coordinate{0: coord.0 / ZONE_SIZE as i64, 1: coord.1 / ZONE_SIZE as i64}),
         };
 
         //place the tile using our SignificantComponent trait
-        Actor::place(&mut commands, to_place, 'a', coord, &actors);
+        Actor::place(&mut commands, to_place, &actors);
         send_message!(Some('i'), message_queue, format!("Placed actor at: ({}, {})", coord.0, coord.1));
     }
 
@@ -122,7 +123,7 @@ pub fn actor_mode_keybinds(
         let mut coord = Coordinate::from(t.translation);
         coord = snap_coordinate_to_grid(coord);
 
-        Actor::remove(&mut commands, coord, &actors);
+        Actor::remove(&mut commands, coord, EditorObjectKind::Actor,&actors);
         send_message!(Some('i'), message_queue, format!("Removing actor at: ({}, {})", coord.0, coord.1));
     }
 }
