@@ -1,7 +1,7 @@
 use crate::EditorObject;
 
 use super::*;
-use bevy::math::Rect;
+use bevy::{math::Rect, sprite::Anchor};
 
 pub trait SignificantComponent {
     fn place_rectangle(rect: Rect, commands: Commands);

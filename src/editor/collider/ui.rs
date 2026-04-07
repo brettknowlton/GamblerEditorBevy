@@ -1,3 +1,5 @@
+use crate::ui::PlaceholderObjectTag;
+
 use super::*;
 
 pub fn spawn_collider_placeholder(

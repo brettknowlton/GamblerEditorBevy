@@ -8,6 +8,7 @@ use player::Player;
 use bevy::prelude::*;
 use tools::SignificantComponent;
 use std::path::PathBuf;
+use crate::ui::ToolingMenuItem;
 use crate::{ utilities::*, EditorObject, TILE_SIZE };
 use crate::consts::*;
 use super::*;

@@ -102,14 +102,14 @@ pub fn left_panel(
 
     let ctx = contexts.ctx_mut()?;
 
-    let items = tooling_menu.items.clone();
+    let items = tooling_menu_state.items.clone();
     if items.is_empty() {
         return Ok(());
     }
 
     let mut current_index = items
         .iter()
-        .position(|item| Some(item.id) == tooling_menu.selected_item_id)
+        .position(|item| Some(item.id) == tooling_menu_state.selected_item_id)
         .unwrap_or(0);
 
     let columns = if is_tile_mode {

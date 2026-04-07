@@ -7,7 +7,6 @@ pub mod utilities;
 pub mod editor;
 pub mod game;
 
-use bevy_egui::EguiPlugin;
 use bevy_rapier2d::{plugin::{NoUserData, RapierPhysicsPlugin}, render::RapierDebugRenderPlugin};
 pub use consts::*;
 pub use utilities::*;

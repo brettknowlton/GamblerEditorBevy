@@ -1,6 +1,7 @@
 pub mod ui;
 
 use super::*;
+use crate::ui::{ToolingMenuItem, update_placeholder};
 use crate::{EditorObject, TILE_SIZE};
 use bevy::prelude::*;
 use bevy::sprite::Anchor;
