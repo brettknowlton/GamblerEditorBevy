@@ -70,71 +70,53 @@ fn tilemode_keybinds(
     mut commands: Commands,
     input: Res<ButtonInput<KeyCode>>,
 
-    crosshairs: Query<(&Transform, &Crosshair)>,
-    mut current_editor_object: ResMut<PlaceholderTile>,
-    tiles: Query<(Entity, &Tile)>
+    crosshair: Single<(&Transform, &Crosshair)>,
+    tiles: Query<(Entity, &EditorObject), With<Tile>>,
+    gridsnap: Res<State<GridSnap>>,
+    selected_tile_id: ResMut<SelectedTileID>,
 ) {
     //"P" handles placement of a tile and adding it to the scene
     if input.just_pressed(KeyCode::KeyP) {
         //clean up the bevy query overhead
-        let (t, _) = crosshairs.single();
-        let focused_item = &current_editor_object.0;
-        let mut coord = Coordinate::from(t.translation);
-        let pushover = 1000 * ((TILE_SIZE * TILE_SCALE) as i64); //this effectively offsets all my tiles 1000 to the right and down, so that negative coordinates arent a problem and rounds to the nearest integer
-        coord = Coordinate(
-            ((coord.0 + pushover) / ((TILE_SIZE * TILE_SCALE) as i64)) *
-                ((TILE_SIZE * TILE_SCALE) as i64) -
-                pushover,
-            ((coord.1 + pushover) / ((TILE_SIZE * TILE_SCALE) as i64)) *
-                ((TILE_SIZE * TILE_SCALE) as i64) -
-                pushover
-        );
-
-        // println!("coords: {}{}", coord.0, coord.1);
-
-        //check if a tile already exists at this location and remove it if it does
-        if let Some(item) = tiles.iter().find(|(_, t)| t.coordinate == coord) {
-            //remove the old tile
-            commands.entity(item.0).despawn();
+        //get the coordinate of the crosshair AND snap it to the grid if gridsnap is enabled
+        let mut coord = Coordinate::from(crosshair.0.translation);
+        if gridsnap.get() == &GridSnap::Enabled {
+            coord = snap_coordinate_to_grid(coord);
         }
-        commands.spawn((
-            Tile {
-                tile_type: focused_item.tile_type,
-                coordinate: coord,
-            },
-            Transform {
-                translation: Vec3::new(coord.0 as f32, coord.1 as f32, -5.0),
-                scale: Vec3::new(TILE_SCALE as f32, TILE_SCALE as f32, 1.0),
-                ..default()
-            },
-            EditorObject {
-                coordinate: TCoordinate::new('T', coord),
-                internal_type: focused_item.tile_type,
-            },
-        ));
+
+        let first_tile = selected_tile_id.id;
+
+        let to_place = EditorObject {
+            coordinate: TCoordinate::new('t', coord),
+            internal_type: first_tile as u64,
+            zone_id: TCoordinate::new(
+                'f',
+                Coordinate {
+                    0: coord.0 / ZONE_SIZE as i64,
+                    1: coord.1 / ZONE_SIZE as i64,
+                },
+            ),
+        };
+
+        //place the tile using our SignificantComponent trait
+        Tile::place(&mut commands, to_place, 't', coord, &tiles);
+        send_message!(
+            Some('i'),
+            message_queue,
+            format!("Placed tile at: ({}, {})", coord.0, coord.1)
+        );
     }
     // "L" handles removal of a tile from the scene, similar to placing one just doesnt need to worry about the tile creation part afterwards
     if input.just_pressed(KeyCode::KeyL) {
-        let (t, _) = crosshairs.single();
-        let mut coord = Coordinate::from(t.translation);
-        //"floor" the coordinate to the nearest tile grid space in a way that (kind of) respects the negative coordinate space, just dont place anything more than 1000 tiles away from the origin until I can figure that out
-        let pushover = 1000 * ((TILE_SIZE * TILE_SCALE) as i64);
-        coord = Coordinate(
-            ((coord.0 + pushover) / ((TILE_SIZE * TILE_SCALE) as i64)) *
-                ((TILE_SIZE * TILE_SCALE) as i64) -
-                pushover,
-            ((coord.1 + pushover) / ((TILE_SIZE * TILE_SCALE) as i64)) *
-                ((TILE_SIZE * TILE_SCALE) as i64) -
-                pushover
+        let mut coord = Coordinate::from(crosshair.0.translation);
+        coord = snap_coordinate_to_grid(coord);
+
+        Tile::remove(&mut commands, coord, &tiles);
+        send_message!(
+            Some('i'),
+            message_queue,
+            format!("Removing tiles at: ({}, {})", coord.0, coord.1)
         );
-
-        // println!("coords: {}{}", coord.0, coord.1);
-
-        //check if a tile already exists at this location and remove it if it does
-        if let Some(item) = tiles.iter().find(|(_, t)| t.coordinate == coord) {
-            //remove the old tile
-            commands.entity(item.0).despawn();
-        }
     }
 
 

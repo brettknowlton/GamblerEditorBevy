@@ -1,5 +1,7 @@
 pub mod ui;
 pub use tile::*;
+
+
 pub use crate::consts::*;
 pub use crate::utilities::*;
 
@@ -35,27 +37,27 @@ pub enum EditingMode {
     Actor,
 } 
 
-pub fn editor_plugin(app: &mut App) {
-    app.init_state::<EditorState>()
-        .register_type::<EditorObject>()
-        .add_event::<BottomBarUpdate>()
+// pub fn editor_plugin(app: &mut App) {
+//     app.init_state::<EditorState>()
+//         .register_type::<EditorObject>()
+//         .add_event::<BottomBarUpdate>()
 
-        .init_resource::<EditorBottomBarDisplayed>()
-        .init_resource::<EditorBottomBarQueued>()
-        .init_resource::<EditorBottomBarQueuedMessages>()
+//         .init_resource::<EditorBottomBarDisplayed>()
+//         .init_resource::<EditorBottomBarQueued>()
+//         .init_resource::<EditorBottomBarQueuedMessages>()
 
-        //The only true startup systems here:
-        .add_systems(Startup, (initialize, create_crosshair, ui::spawn_general_editor_ui).chain())
+//         //The only true startup systems here:
+//         .add_systems(Startup, (initialize, create_crosshair, ui::general_editor_ui).chain())
 
-        //begin update system to update the bottom bar text
-        .add_systems(Update, update_bot_output.run_if(on_event::<BottomBarUpdate>,))
+//         //begin update system to update the bottom bar text
+//         .add_systems(Update, update_bot_output.run_if(on_event::<BottomBarUpdate>,))
 
-        .add_systems(Startup, )
-        .add_plugins(tile::tilemode_plugin)
-        .add_plugins(scene::scene_plugin)
-        .add_systems(Update, keybinds.run_if(not(in_state(EditorState::Inactive))));
-    //placeholder resource for whatever tile we are trying to place
-}
+//         .add_systems(Startup, )
+//         .add_plugins(tile::tilemode_plugin)
+//         .add_plugins(scene::scene_plugin)
+//         .add_systems(Update, keybinds.run_if(not(in_state(EditorState::Inactive))));
+//     //placeholder resource for whatever tile we are trying to place
+// }
 
 fn initialize(mut commands: Commands, mut next_state: ResMut<NextState<EditorState>>, message_queue: ResMut<EditorBottomBarQueuedMessages>) {
     log_in_app(format!("Initializing the Editor"),'i', message_queue);
@@ -78,13 +80,13 @@ fn create_crosshair(mut commands: Commands, asset_server: Res<AssetServer>) {
         Crosshair {},
         Sprite {
             image: tex1,
-            anchor: Anchor::Center,
             ..default()
         },
         Transform {
             scale: Vec3::new(TILE_SCALE as f32, TILE_SCALE as f32, 0.),
             ..default()
         },
+        Anchor::CENTER,
     ));
 }
 
@@ -279,3 +281,107 @@ impl EditorObject {
     //     self.coordinate = TCoordinate::new(self.get_object_type(), coord);
     // }
 }
+
+fn reset_scene(
+    mut players: Query<
+        (&mut actor::player::Player, &mut Transform, &mut Velocity),
+        (Without<Crosshair>, Without<Camera2d>),
+    >,
+    mut cameras: Query<(&mut Transform, &mut Camera2d), Without<Crosshair>>,
+    crosshairs: Query<&Transform, (With<Crosshair>, Without<Camera2d>)>, // mut ui_items: Query<(&mut UIItem, &mut Transform), Without<Crosshair>>,
+) {
+    //reset the player to the crosshair position
+    let cs = crosshairs.single().unwrap().clone();
+
+    for (_, mut t, mut vel) in players.iter_mut() {
+        
+        actor::player::move_player_to_cursor(cs, &mut t);
+        vel.linvel = Vec2::new(0.0, 0.0);
+    }
+
+    //reset the camera to the crosshair position
+    let cs = crosshairs.single().unwrap().clone();
+    for (mut t, _) in cameras.iter_mut() {
+        t.translation = cs.translation;
+    }
+}
+
+fn draw_grid(mut gizmos: Gizmos) {
+    gizmos
+        .grid_2d(
+            Isometry2d::new(Vec2::new(0.0, 0.0), Rot2::degrees(0.0)),
+            UVec2::new(100, 100),
+            Vec2::new(
+                (TILE_SIZE * TILE_SCALE) as f32,
+                (TILE_SIZE * TILE_SCALE) as f32,
+            ),
+            Color::srgba(0.0, 1.0, 0.0, 0.5),
+        )
+        .outer_edges();
+
+    gizmos
+        .grid_2d(
+            Isometry2d::IDENTITY,
+            UVec2::new(10, 10),
+            Vec2::new(
+                (TILE_SIZE * TILE_SCALE * ZONE_SIZE) as f32,
+                (TILE_SIZE * TILE_SCALE * ZONE_SIZE) as f32,
+            ),
+            Color::srgba(1.0, 0.0, 0.0, 0.5),
+        )
+        .outer_edges();
+}
+
+pub fn editor_plugin(app: &mut App) {
+    app
+        //states
+        .init_state::<EditorState>()
+        .init_state::<GridSnap>()
+        .init_state::<ShowGrid>()
+        //registrations
+        .register_type::<EditorObject>()
+        .add_message::<BottomBarUpdate>()
+        .add_message::<UpdatePlaceholderMessage>()
+        .add_message::<ResetScene>()
+        //resources
+        .init_resource::<EditorBottomBarDisplayed>()
+        .init_resource::<EditorBottomBarMessage>()
+        .init_resource::<EditorBottomBarQueuedMessages>()
+        .init_resource::<PlaceholderHandle>()
+        .init_resource::<TextureHandles>()
+        .init_resource::<ActiveSelection>()
+        .init_resource::<ToolingMenuState>()
+        // .init_resource::<ActiveSelection>()
+        //begin update system to send debug messages (to bottom bar and to console)
+        .add_systems(Update, ui::send_messages)
+        //plugins
+        .add_plugins(tile::tilemode_plugin)
+        .add_plugins(collider::collidermode_plugin)
+        .add_plugins(scene::scene_plugin)
+        .add_plugins(actor::actormode_plugin)
+        //on entrance to this state, we give our placeholder object a handle to the default SignificantComponent of this mode- in normal mode this is a SelectionRect
+        .add_systems(
+            OnEnter(EditorState::Normal),
+            (
+                ui::hide_tooling_menu,
+                ui::update_placeholder::<SelectionRect>,
+            )
+                .chain(),
+        )
+        //The only true startup systems here:
+        .add_systems(
+            Startup,
+            (initialize, create_crosshair, ).chain(),
+        )
+        //universal update systems for all editing modes
+        .add_systems(
+            Update,
+            stateful_keybinds.run_if(not(in_state(EditorState::Inactive))),
+        )
+        .add_systems(Update, draw_grid.run_if(in_state(ShowGrid::Yes)))
+        .add_systems(Update, ui::trigger_placeholder_update)
+        .add_systems(Update, ui::sync_tooling_menu_visibility)
+        .add_systems(EguiPrimaryContextPass, (ui::egui_panel_render, ui::general_editor_ui))
+        .add_systems(Update, reset_scene.chain().run_if(on_message::<ResetScene>));
+}
+//NOTHING BELOW THE PLUGINS >:(

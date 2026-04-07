@@ -4,6 +4,8 @@ pub mod consts;
 pub mod utilities;
 pub mod editor;
 
+use bevy_egui::EguiPlugin;
+use bevy_rapier2d::{plugin::{NoUserData, RapierPhysicsPlugin}, render::RapierDebugRenderPlugin};
 pub use consts::*;
 pub use utilities::*;
 pub use editor::*;
@@ -27,6 +29,15 @@ fn main() {
                 .build(),
         )
 
+        .add_plugins(
+            RapierPhysicsPlugin::<NoUserData>::pixels_per_meter(32.0)
+        )
+        .add_plugins(RapierDebugRenderPlugin::default())
+        
+        .add_plugins(EguiPlugin::default())
+        
+
+        
         .insert_resource(ClearColor(Color::from(WINDOW_DEFAULT_BACKGROUND_COLOR)))
         .insert_resource(Time::<Fixed>::from_hz(64.0))
         .add_plugins(editor::editor_plugin)
