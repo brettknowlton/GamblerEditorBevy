@@ -4,7 +4,6 @@ use super::*;
 use crate::ui::{update_placeholder, ToolingMenuItem};
 use crate::{EditorObject, TILE_SIZE};
 use bevy::prelude::*;
-use bevy::sprite::Anchor;
 use std::path::PathBuf;
 use tools::SignificantComponent;
 

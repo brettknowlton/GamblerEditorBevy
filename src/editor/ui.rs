@@ -74,22 +74,11 @@ pub fn left_panel(
         return Ok(());
     }
 
-    let mut current_index = items
-        .iter()
-        .position(|item| Some(item.id) == tooling_menu_state.selected_item_id)
-        .unwrap_or(0);
-
     let is_tile_mode = matches!(
         editor_state.get(),
         EditorState::Editing(EditingComponent::Tile)
     );
 
-    let columns = if is_tile_mode {
-        SPRITESHEET_WIDTH as usize / 2
-    } else {
-        1
-    }
-    .max(1);
 
     let tile_texture_id = if is_tile_mode {
         textures
@@ -344,10 +333,10 @@ pub struct UIItem {
 
 pub fn general_editor_ui(
     mut contexts: EguiContexts,
-    editor_state: Res<State<EditorState>>,
     display_message: ResMut<EditorBottomBarDisplayed>,
 ) -> Result {
-    let is_in_editor = *editor_state.get() != EditorState::Inactive;
+
+    // let is_in_editor = *editor_state.get() != EditorState::Inactive;
     let ctx = contexts.ctx_mut()?;
 
     let panel_height = 30.0;

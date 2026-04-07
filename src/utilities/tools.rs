@@ -1,7 +1,6 @@
 use crate::{EditorObject, SCALED_TILE_HEIGHT, SCALED_TILE_WIDTH};
 
 use super::*;
-use bevy::{math::Rect, sprite::Anchor};
 
 pub trait SignificantComponent {
     fn place_rectangle(rect: Rect, commands: Commands);

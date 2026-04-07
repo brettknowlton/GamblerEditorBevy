@@ -1,6 +1,3 @@
-use bevy::window::PrimaryWindow;
-use bevy_egui::*;
-
 use crate::ui::PlaceholderObjectTag;
 
 use super::*;

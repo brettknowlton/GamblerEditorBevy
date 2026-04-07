@@ -2,9 +2,8 @@ mod ui;
 pub use ui::*;
 
 use super::*;
-use crate::consts::*;
 use crate::ui::ToolingMenuItem;
-use crate::{utilities::*, EditorObject, TILE_SIZE};
+use crate::{EditorObject, TILE_SIZE};
 use bevy::prelude::*;
 use std::path::PathBuf;
 use tools::SignificantComponent;

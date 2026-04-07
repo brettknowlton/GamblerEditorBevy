@@ -13,7 +13,6 @@ use crate::selection::SelectionRect;
 use crate::ui::ToolingMenuState;
 use crate::ui::UIItem;
 pub use crate::utilities::*;
-pub use tile::*;
 pub use tools::SignificantComponent;
 
 pub mod actor;

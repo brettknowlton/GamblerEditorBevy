@@ -1,6 +1,5 @@
 use bevy::{prelude::*, window::WindowResolution};
 use bevy_egui::EguiPlugin;
-use bevy_rapier2d::prelude::*;
 
 pub mod consts;
 pub mod utilities;
