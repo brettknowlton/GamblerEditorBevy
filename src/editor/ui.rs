@@ -359,6 +359,7 @@ pub fn general_editor_ui(
 ) -> Result {
 
     // let is_in_editor = *editor_state.get() != EditorState::Inactive;
+    
     let ctx = contexts.ctx_mut()?;
 
     let panel_height = 30.0;

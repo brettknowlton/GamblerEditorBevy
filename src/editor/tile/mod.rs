@@ -7,8 +7,6 @@ use bevy::prelude::*;
 use std::path::PathBuf;
 use tools::SignificantComponent;
 
-
-
 fn populate_tile_tooling_menu(
     mut tooling_menu: ResMut<ToolingMenuState>,
     selected_tile_id: Res<SelectedTileID>,
@@ -101,23 +99,24 @@ struct TileModeUI;
 #[require(EditorObject)]
 
 pub struct Tile {}
+
 impl Tile {
     fn new() -> Self {
         Self {}
     }
-    
+
     pub fn get_tex_rect(tile_id: u64) -> Rect {
-    Rect {
-        min: Vec2::new(
-            (tile_id % SPRITESHEET_WIDTH) as f32 * TILE_SIZE as f32,
-            (tile_id / SPRITESHEET_WIDTH) as f32 * TILE_SIZE as f32,
-        ),
-        max: Vec2::new(
-            (tile_id % SPRITESHEET_WIDTH + 1) as f32 * TILE_SIZE as f32,
-            (tile_id / SPRITESHEET_WIDTH + 1) as f32 * TILE_SIZE as f32,
-        ),
+        Rect {
+            min: Vec2::new(
+                (tile_id % SPRITESHEET_WIDTH) as f32 * TILE_SIZE as f32,
+                (tile_id / SPRITESHEET_WIDTH) as f32 * TILE_SIZE as f32,
+            ),
+            max: Vec2::new(
+                (tile_id % SPRITESHEET_WIDTH + 1) as f32 * TILE_SIZE as f32,
+                (tile_id / SPRITESHEET_WIDTH + 1) as f32 * TILE_SIZE as f32,
+            ),
+        }
     }
-}
 }
 
 impl Default for Tile {
@@ -142,6 +141,10 @@ fn run_if_tile_update_needed(needs_update: Res<TileUpdateNeeded>) -> bool {
 
 fn reset_update_needed(mut needs_update: ResMut<TileUpdateNeeded>) {
     needs_update.0 = false;
+}
+
+fn say_hello(mut commands: Commands) {
+    println!("Hello from say_hello system!");
 }
 
 pub fn tilemode_plugin(app: &mut App) {
@@ -174,6 +177,10 @@ pub fn tilemode_plugin(app: &mut App) {
         .add_systems(
             OnExit(EditorState::Editing(EditingComponent::Tile)),
             (despawn_all::<TileModeUI>, exit_tilemode).chain(),
+        )
+        .add_systems(
+            OnEnter(EditorState::Editing(EditingComponent::Tile)),
+            say_hello,
         );
     //we could also take care of some post-exit cleanup here, like despawning all the UI elements by using the schedule OnEnter(EditorState::Inactive) and then despawning all the UI elements
 }

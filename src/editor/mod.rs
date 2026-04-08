@@ -687,11 +687,13 @@ pub fn editor_plugin(app: &mut App) {
         .init_state::<EditorState>()
         .init_state::<GridSnap>()
         .init_state::<ShowGrid>()
+
         //registrations
         .register_type::<EditorObject>()
         .add_message::<BottomBarUpdate>()
         .add_message::<UpdatePlaceholderMessage>()
         .add_message::<ResetScene>()
+        
         //resources
         .init_resource::<EditorBottomBarDisplayed>()
         .init_resource::<EditorBottomBarMessage>()
@@ -731,6 +733,6 @@ pub fn editor_plugin(app: &mut App) {
         .add_systems(Update, ui::trigger_placeholder_update)
         .add_systems(Update, ui::sync_tooling_menu_visibility)
         .add_systems(EguiPrimaryContextPass, (ui::egui_panel_render, ui::general_editor_ui))
-        .add_systems(Update, reset_scene.chain().run_if(on_message::<ResetScene>));
+        .add_systems(Update, reset_scene.run_if(on_message::<ResetScene>));
 }
 //NOTHING BELOW THE PLUGINS >:(

@@ -56,6 +56,7 @@ pub fn snap_coordinate_to_grid(coord: Coordinate) -> Coordinate {
 )]
 #[reflect(Component)]
 pub struct Coordinate(pub i64, pub i64);
+
 impl Coordinate {
     pub fn new(x: i64, y: i64) -> Self {
         Self(x, y)
@@ -100,7 +101,6 @@ pub struct TCoordinate {
     pub kind: EditorObjectKind,
     pub coord: Coordinate,
 }
-
 impl TCoordinate {
     pub fn new(kind: EditorObjectKind, coord: Coordinate) -> Self {
         Self {
@@ -108,7 +108,16 @@ impl TCoordinate {
             coord,
         }
     }
+
+    pub fn print(&self){
+        println!("TCoordinate {{ kind: {:?}, coord: {:?} }}", self.kind, self.coord);
+    }
+
 }
+
+
+
+
 
 impl Default for TCoordinate {
     fn default() -> Self {

@@ -13,7 +13,7 @@ pub use editor::*;
 
 fn main() {
     App::new()
-        .add_plugins(
+    .add_plugins(
             DefaultPlugins
                 .set(ImagePlugin::default_nearest())
                 .set(WindowPlugin {
@@ -36,7 +36,6 @@ fn main() {
         .add_plugins(RapierDebugRenderPlugin::default())
         
         .add_plugins(EguiPlugin::default())
-        
 
         
         .insert_resource(ClearColor(Color::from(WINDOW_DEFAULT_BACKGROUND_COLOR)))

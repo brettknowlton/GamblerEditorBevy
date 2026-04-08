@@ -3,7 +3,10 @@ use crate::{EditorObject, SCALED_TILE_HEIGHT, SCALED_TILE_WIDTH};
 use super::*;
 
 pub trait SignificantComponent {
+
     fn place_rectangle(rect: Rect, commands: Commands);
+    fn from_rect(rect: Rect, coord: Coordinate) -> Self;
+
     fn place<T: SignificantComponent + Component + Default>(
         commands: &mut Commands,
         item: EditorObject,
@@ -52,7 +55,6 @@ pub trait SignificantComponent {
         ));
     }
 
-    fn from_rect(rect: Rect, coord: Coordinate) -> Self;
 
     fn remove<T: SignificantComponent + Component>(
         commands: &mut Commands,
