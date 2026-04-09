@@ -1,5 +1,5 @@
 use bevy::{prelude::*, window::WindowResolution};
-use bevy_egui::EguiPlugin;
+use bevy_egui::{EguiPlugin, EguiPrimaryContextPass};
 
 pub mod consts;
 pub mod utilities;
@@ -36,7 +36,6 @@ fn main() {
         .add_plugins(RapierDebugRenderPlugin::default())
         
         .add_plugins(EguiPlugin::default())
-
         
         .insert_resource(ClearColor(Color::from(WINDOW_DEFAULT_BACKGROUND_COLOR)))
         .insert_resource(Time::<Fixed>::from_hz(64.0))
@@ -46,4 +45,5 @@ fn main() {
 
         .run();
 }
+
 

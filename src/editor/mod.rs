@@ -4,14 +4,13 @@ use serde::Deserialize;
 use serde::Serialize;
 pub use tile::*;
 
-
 pub use crate::consts::*;
 pub use crate::game::*;
 pub use crate::resources::*;
 use crate::selection::ActiveSelection;
 use crate::selection::SelectionRect;
-use crate::ui::{ToolingMenuItem, ToolingMenuState};
 use crate::ui::UIItem;
+use crate::ui::{ToolingMenuItem, ToolingMenuState};
 pub use crate::utilities::*;
 pub use tools::SignificantComponent;
 
@@ -175,10 +174,7 @@ pub fn send_removal_message(
     );
 }
 
-pub fn send_mode_exit_message(
-    message_queue: &mut EditorBottomBarQueuedMessages,
-    label: &str,
-) {
+pub fn send_mode_exit_message(message_queue: &mut EditorBottomBarQueuedMessages, label: &str) {
     send_message!(
         Some('i'),
         message_queue,
@@ -197,7 +193,9 @@ fn initialize(
 ) {
     //load the rect_debug texture into the RectHandle resource
     let tex_path = PathBuf::from("textures/tiles/tile_debug.png");
-    texture_handles.0.insert(EditorObjectKind::Other, asset_server.load(tex_path));
+    texture_handles
+        .0
+        .insert(EditorObjectKind::Other, asset_server.load(tex_path));
 
     //create camera and add a UIItem component to it
     commands.spawn((Camera2d::default(), UIItem::default()));
@@ -377,7 +375,11 @@ fn handle_rectangle_tool_shortcuts(
             return;
         };
 
-        send_message!(Some('i'), message_queue, "This feature is not yet implemented");
+        send_message!(
+            Some('i'),
+            message_queue,
+            "This feature is not yet implemented"
+        );
     } else if input.just_released(KeyCode::KeyO) {
         let Ok((_, t, _)) = crosshairs.single() else {
             return;
@@ -417,7 +419,10 @@ fn handle_state_specific_keybinds(
     message_queue: &mut EditorBottomBarQueuedMessages,
 ) {
     match editor_state.get() {
-        EditorState::Normal | EditorState::Loading | EditorState::LoadingEmpty | EditorState::Saving => {}
+        EditorState::Normal
+        | EditorState::Loading
+        | EditorState::LoadingEmpty
+        | EditorState::Saving => {}
         EditorState::LoadAsk => {
             if input.just_pressed(KeyCode::KeyY) || input.just_pressed(KeyCode::Enter) {
                 next_editor_state.set(EditorState::Loading);
@@ -571,6 +576,21 @@ fn stateful_keybinds(
     }
 }
 
+fn modify_avaiable_keybinds(mut available_keybinds: ResMut<AvailableKeybinds>) {
+    available_keybinds.add_keycode(
+        CustomInput::Combo(vec![KeyCode::ControlLeft, KeyCode::KeyS]),
+        "Save Scene".into(),
+    );
+    available_keybinds.add_keycode(
+        CustomInput::Combo(vec![KeyCode::ControlLeft, KeyCode::KeyT]),
+        "Test Scene".into(),
+    );
+    available_keybinds.add_keycode(
+        CustomInput::Single(KeyCode::KeyQ),
+        "Quit Edit Mode".into(),
+    );
+}
+
 #[derive(Component)]
 #[require(ui::UIItem)]
 pub struct Crosshair {} //tags the main crosshair entity, in the editor this happens to only be our camera, but may be taken over by a crosshair entity in the future that tracks the mouse
@@ -643,7 +663,6 @@ fn reset_scene(
     let cs = crosshairs.single().unwrap().clone();
 
     for (_, mut t, mut vel) in players.iter_mut() {
-        
         actor::player::move_player_to_cursor(cs, &mut t);
         vel.linvel = Vec2::new(0.0, 0.0);
     }
@@ -681,19 +700,52 @@ fn draw_grid(mut gizmos: Gizmos) {
         .outer_edges();
 }
 
+#[derive(Default, Clone, Debug)]
+pub enum CustomInput {
+    #[default]
+    Empty,
+    Single(KeyCode),
+    Combo(Vec<KeyCode>),
+    Multi(Vec<KeyCode>),
+}
+
+#[derive(Default, Clone)]
+struct CustomInputAction {
+    input_type: CustomInput,
+    action: String,
+}
+
+#[derive(Resource, Default)]
+pub struct AvailableKeybinds {
+    keybinds: Vec<CustomInputAction>,
+}
+
+impl AvailableKeybinds {
+    fn add(&mut self, input_action: CustomInputAction) {
+        self.keybinds.append(&mut vec![input_action]);
+    }
+
+    pub fn add_keycode(&mut self, input: CustomInput, action: String) {
+        let input = CustomInputAction {
+            input_type: input,
+            action,
+        };
+
+        self.add(input);
+    }
+}
+
 pub fn editor_plugin(app: &mut App) {
     app
         //states
         .init_state::<EditorState>()
         .init_state::<GridSnap>()
         .init_state::<ShowGrid>()
-
         //registrations
         .register_type::<EditorObject>()
         .add_message::<BottomBarUpdate>()
         .add_message::<UpdatePlaceholderMessage>()
         .add_message::<ResetScene>()
-        
         //resources
         .init_resource::<EditorBottomBarDisplayed>()
         .init_resource::<EditorBottomBarMessage>()
@@ -702,6 +754,9 @@ pub fn editor_plugin(app: &mut App) {
         .init_resource::<TextureHandles>()
         .init_resource::<ActiveSelection>()
         .init_resource::<ToolingMenuState>()
+        .init_resource::<AvailableKeybinds>()
+
+        .init_resource::<ui::KBIcon>()
         // .init_resource::<ActiveSelection>()
         //begin update system to send debug messages (to bottom bar and to console)
         .add_systems(Update, ui::send_messages)
@@ -716,14 +771,12 @@ pub fn editor_plugin(app: &mut App) {
             (
                 ui::hide_tooling_menu,
                 ui::update_placeholder::<SelectionRect>,
+                modify_avaiable_keybinds,
             )
                 .chain(),
         )
         //The only true startup systems here:
-        .add_systems(
-            Startup,
-            (initialize, create_crosshair).chain(),
-        )
+        .add_systems(Startup, (initialize, create_crosshair).chain())
         //universal update systems for all editing modes
         .add_systems(
             Update,
@@ -732,7 +785,10 @@ pub fn editor_plugin(app: &mut App) {
         .add_systems(Update, draw_grid.run_if(in_state(ShowGrid::Yes)))
         .add_systems(Update, ui::trigger_placeholder_update)
         .add_systems(Update, ui::sync_tooling_menu_visibility)
-        .add_systems(EguiPrimaryContextPass, (ui::egui_panel_render, ui::general_editor_ui))
+        .add_systems(
+            EguiPrimaryContextPass,
+            (ui::egui_panel_render, ui::general_editor_ui).chain(),
+        )
         .add_systems(Update, reset_scene.run_if(on_message::<ResetScene>));
 }
 //NOTHING BELOW THE PLUGINS >:(

@@ -143,10 +143,6 @@ fn reset_update_needed(mut needs_update: ResMut<TileUpdateNeeded>) {
     needs_update.0 = false;
 }
 
-fn say_hello(mut commands: Commands) {
-    println!("Hello from say_hello system!");
-}
-
 pub fn tilemode_plugin(app: &mut App) {
     app.register_type::<Tile>()
         .register_type::<Coordinate>()
@@ -177,10 +173,6 @@ pub fn tilemode_plugin(app: &mut App) {
         .add_systems(
             OnExit(EditorState::Editing(EditingComponent::Tile)),
             (despawn_all::<TileModeUI>, exit_tilemode).chain(),
-        )
-        .add_systems(
-            OnEnter(EditorState::Editing(EditingComponent::Tile)),
-            say_hello,
         );
     //we could also take care of some post-exit cleanup here, like despawning all the UI elements by using the schedule OnEnter(EditorState::Inactive) and then despawning all the UI elements
 }

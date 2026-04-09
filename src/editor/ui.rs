@@ -1,5 +1,7 @@
-use bevy::prelude::*;
-use bevy_egui::{EguiContexts, EguiTextureHandle, egui::{self, RichText}};
+use bevy_egui::{
+    egui::{self, RichText, TextureId},
+    EguiContexts, EguiTextureHandle,
+};
 
 use super::*;
 
@@ -161,7 +163,6 @@ pub fn left_panel(
         EditorState::Editing(EditingComponent::Tile)
     );
 
-
     let tile_texture_id = if is_tile_mode {
         textures
             .0
@@ -197,7 +198,12 @@ pub fn left_panel(
         .resizable(false)
         .default_width(panel_width)
         .show(ctx, |ui| {
-            ui.heading(RichText::new(tooling_menu_state.title.clone()).strong().size(18.0).color(egui::Color32::from_rgba_unmultiplied(220, 230, 245, 255)));
+            ui.heading(
+                RichText::new(tooling_menu_state.title.clone())
+                    .strong()
+                    .size(18.0)
+                    .color(egui::Color32::from_rgba_unmultiplied(220, 230, 245, 255)),
+            );
             ui.separator();
 
             egui::ScrollArea::vertical().show(ui, |ui| {
@@ -293,7 +299,12 @@ pub fn left_panel(
         tooling_menu_state.selected_item_id = next_selected_id;
 
         if is_tile_mode {
-            sync_tile_selection(selected_tile_id, placeholder_update_writer, &items, next_selected_id);
+            sync_tile_selection(
+                selected_tile_id,
+                placeholder_update_writer,
+                &items,
+                next_selected_id,
+            );
         }
     }
 
@@ -353,25 +364,101 @@ pub struct UIItem {
     pub vel_y: f32,
 }
 
+#[derive(Resource, FromWorld)]
+pub struct KBIcon(Option<TextureId>);
+
+fn simplify_key(kc: &KeyCode) -> String{
+    let key_str = format!("{:?}", kc);
+
+    let mut raw_key: String = "".into();
+    if key_str.contains("Key"){
+        raw_key = key_str.replace("Key", "");
+    }
+
+    format!("{}", raw_key)
+
+}
+
+fn keybind_hint_text(input_type: &CustomInput) -> String {
+    match input_type {
+        CustomInput::Single(key_code) => {
+            simplify_key(key_code)
+        }
+        CustomInput::Multi(key_codes) => key_codes
+            .first()
+            .map(|key| {simplify_key(key)})
+            .unwrap_or_default(),
+
+        CustomInput::Combo(key_codes) => key_codes
+            .first()
+            .map(|key| {format!("^{}", simplify_key(key))})
+            .unwrap_or_default(),
+
+        CustomInput::Empty => String::new(),
+    }
+}
+
 pub fn general_editor_ui(
     mut contexts: EguiContexts,
     display_message: ResMut<EditorBottomBarDisplayed>,
+    available_keybinds: Res<AvailableKeybinds>,
+    mut kb_icon: ResMut<KBIcon>,
+    asset_server: Res<AssetServer>,
 ) -> Result {
-
     // let is_in_editor = *editor_state.get() != EditorState::Inactive;
-    
-    let ctx = contexts.ctx_mut()?;
 
-    let panel_height = 30.0;
+    let panel_height = 30.0; //TO REMOVE (MAGIC NUMBER)
 
     let message_string = &display_message.text;
 
+    if kb_icon.0.is_none() {
+        kb_icon.0 = Some(contexts.add_image(EguiTextureHandle::Strong(
+            asset_server.load(PathBuf::from("textures/menus/keyboard_tip_icon.png")),
+        )))
+    }
+
+    let ctx = contexts.ctx_mut()?;
     egui::TopBottomPanel::bottom("bottom_panel")
         .frame(editor_panel_frame())
         .resizable(false)
         .default_height(panel_height)
         .show(ctx, |ui| {
-            ui.add(egui::Label::new(RichText::new(message_string).strong().size(18.0).color(egui::Color32::from_rgba_unmultiplied(220, 230, 245, 255))));
+            ui.with_layout(egui::Layout::left_to_right(egui::Align::TOP), |ui| {
+                ui.add(egui::Label::new(
+                    RichText::new(message_string)
+                        .strong()
+                        .size(18.0)
+                        .color(egui::Color32::from_rgba_unmultiplied(220, 230, 245, 255)),
+                ));
+
+                ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+                    let icon_size = 20.0;
+
+                    for item in &available_keybinds.keybinds {
+                        ui.add(egui::Label::new(
+                            RichText::new(item.action.as_str())
+                                .size(16.0)
+                                .color(egui::Color32::from_rgba_unmultiplied(220, 230, 245, 255)),
+                        ));
+
+                        if let Some(texture_id) = kb_icon.0 {
+                            let image = egui::widgets::Image::new(egui::load::SizedTexture::new(
+                                texture_id,
+                                [icon_size, icon_size],
+                            ));
+
+                            let rect = ui.add(image).rect;
+                            ui.painter().text(
+                                rect.center(),
+                                egui::Align2::CENTER_CENTER,
+                                keybind_hint_text(&item.input_type),
+                                egui::FontId::proportional(11.0),
+                                egui::Color32::from_rgb(18, 22, 30),
+                            );
+                        }
+                    }
+                });
+            });
         });
 
     Ok(())
