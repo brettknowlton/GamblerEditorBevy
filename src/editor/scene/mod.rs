@@ -11,18 +11,34 @@ pub fn scene_plugin(app: &mut App) {
         .register_type::<Tile>()
         .register_type::<TCoordinate>()
         .register_type::<Coordinate>()
+
         .add_systems(
             OnEnter(EditorState::LoadingEmpty),
             (load_empty_scene, goto_normal_state).chain(),
         )
+
         .add_systems(
             OnEnter(EditorState::Loading),
             (load_scene, goto_normal_state).chain(),
         )
+
         .add_systems(
             OnEnter(EditorState::Saving),
             (save_items, goto_normal_state).chain(),
         )
+
+        .add_systems(OnEnter(EditorState::SaveAsk), (add_save_ask_mode_kb).chain())
+        .add_systems(
+            OnExit(EditorState::SaveAsk),
+            (remove_io_ask_mode_kb).chain(),
+        )
+
+        .add_systems(OnEnter(EditorState::LoadAsk), (add_load_ask_mode_kb).chain())
+        .add_systems(
+            OnExit(EditorState::LoadAsk),
+            (remove_io_ask_mode_kb).chain(),
+        )
+
         .add_systems(
             Update,
             (spawn_sprites)
@@ -35,6 +51,32 @@ pub fn scene_plugin(app: &mut App) {
                 .chain()
                 .run_if(not(in_state(EditorState::LoadAsk))),
         );
+}
+
+fn add_save_ask_mode_kb(mut available_keybinds: ResMut<AvailableKeybinds>) {
+    available_keybinds.add_keycode(
+        CustomInput::Multi(vec![KeyCode::KeyY, KeyCode::Enter]),
+        "Save Scene".into(),
+    );
+    available_keybinds.add_keycode(
+        CustomInput::Multi(vec![KeyCode::KeyN, KeyCode::Escape]),
+        "Cancel".into(),
+    );
+}
+
+fn add_load_ask_mode_kb(mut available_keybinds: ResMut<AvailableKeybinds>) {
+    available_keybinds.add_keycode(
+        CustomInput::Multi(vec![KeyCode::KeyY, KeyCode::Enter]),
+        "Load Scene".into(),
+    );
+    available_keybinds.add_keycode(
+        CustomInput::Multi(vec![KeyCode::KeyN, KeyCode::Escape]),
+        "Cancel".into(),
+    );
+}
+
+fn remove_io_ask_mode_kb(mut available_keybinds: ResMut<AvailableKeybinds>) {
+    available_keybinds.clear()
 }
 
 // struct MyGenericType<T>(PhantomData<T>);

@@ -3,19 +3,27 @@ use bevy_egui::{
     EguiContexts, EguiTextureHandle,
 };
 
-use super::*;
+use crate::{
+    coordinate::*, EditorObjectKind, SelectedTileID, TextureHandles, MAX_SPRITESHEET_ITEMS,
+    SCALED_TILE_HEIGHT, SCALED_TILE_WIDTH, SPRITESHEET_WIDTH, TILE_SIZE,
+};
 
-macro_rules! send_message {
-    ($key:expr, $messages:expr, $message:expr) => {
-        $messages.messages.push(($key, $message.to_string()));
-    };
-    (_) => {
-        $messages.messages.push((None, " ".to_string()));
-    };
-}
+use super::*;
 
 #[derive(Component)]
 pub struct DisplayMessage;
+
+pub fn configure_tooling_menu(
+    tooling_menu: &mut ToolingMenuState,
+    title: &str,
+    selected_item_id: Option<u64>,
+    items: Vec<ToolingMenuItem>,
+) {
+    tooling_menu.title = title.to_string();
+    tooling_menu.visible = true;
+    tooling_menu.selected_item_id = selected_item_id;
+    tooling_menu.items = items;
+}
 
 #[derive(Clone, Debug, Default)]
 pub struct ToolingMenuItem {
@@ -160,7 +168,7 @@ pub fn left_panel(
 
     let is_tile_mode = matches!(
         editor_state.get(),
-        EditorState::Editing(EditingComponent::Tile)
+        EditorState::Editing(EditorObjectKind::Tile)
     );
 
     let tile_texture_id = if is_tile_mode {
@@ -333,89 +341,43 @@ pub fn egui_panel_render(
     Ok(())
 }
 
-pub fn send_messages(
-    mut queued_messages: ResMut<EditorBottomBarQueuedMessages>,
-    mut display_message: ResMut<EditorBottomBarDisplayed>,
-) {
-    if let Some((_, message)) = queued_messages.messages.first() {
-        display_message.text = format!("{message}",);
-    }
-    //push any messages into the in-game console and leave the last one in our BottomBarMessage for display
-    let item = queued_messages.messages.pop();
-    {
-        match item {
-            Some((k, m)) => {
-                let k = k.unwrap_or('i');
-                println!("{}:> {}", k, m);
-            }
-            None => {}
-        }
-    }
-}
-
 ///Systems have been added for this component to keep all UI items moving at the same speed, and therefore always relatively positioned to eachother.
 /// Useful for menus, or any thing that you want to keep moving based on the camera's location. This does not prevent movement of the object by other systems,
 /// we are just also using this to TAG all UI items so we can easily find them in queries (typically for movement so far)
 #[derive(Component, Reflect, Default)]
 #[reflect(Component)]
 #[require(Transform)]
-pub struct UIItem {
+pub struct CameraLockedUI {
     pub vel_x: f32,
     pub vel_y: f32,
 }
 
 #[derive(Resource, FromWorld)]
-pub struct KBIcon(Option<TextureId>);
+pub struct KBIcon(pub Option<TextureId>);
 
-fn simplify_key(kc: &KeyCode) -> String{
-    let key_str = format!("{:?}", kc);
-
-    let mut raw_key: String = "".into();
-    if key_str.contains("Key"){
-        raw_key = key_str.replace("Key", "");
-    }
-
-    format!("{}", raw_key)
-
+fn init_kb_icon(contexts: &mut EguiContexts, asset_server: Res<AssetServer>) -> TextureId {
+    contexts.add_image(EguiTextureHandle::Strong(
+        asset_server.load(PathBuf::from("textures/menus/keyboard_tip_icon.png")),
+    ))
 }
 
-fn keybind_hint_text(input_type: &CustomInput) -> String {
-    match input_type {
-        CustomInput::Single(key_code) => {
-            simplify_key(key_code)
-        }
-        CustomInput::Multi(key_codes) => key_codes
-            .first()
-            .map(|key| {simplify_key(key)})
-            .unwrap_or_default(),
-
-        CustomInput::Combo(key_codes) => key_codes
-            .first()
-            .map(|key| {format!("^{}", simplify_key(key))})
-            .unwrap_or_default(),
-
-        CustomInput::Empty => String::new(),
-    }
-}
-
-pub fn general_editor_ui(
+pub fn bottom_bar_ui(
     mut contexts: EguiContexts,
-    display_message: ResMut<EditorBottomBarDisplayed>,
+    display_message: ResMut<bottom_bar::EditorBottomBarDisplayed>,
     available_keybinds: Res<AvailableKeybinds>,
-    mut kb_icon: ResMut<KBIcon>,
+    kb_icon: ResMut<KBIcon>,
     asset_server: Res<AssetServer>,
 ) -> Result {
-    // let is_in_editor = *editor_state.get() != EditorState::Inactive;
+
+    let tex_id = if kb_icon.0.is_none() {
+        init_kb_icon(&mut contexts, asset_server)
+    } else {
+        kb_icon.0.unwrap()
+    };
 
     let panel_height = 30.0; //TO REMOVE (MAGIC NUMBER)
 
     let message_string = &display_message.text;
-
-    if kb_icon.0.is_none() {
-        kb_icon.0 = Some(contexts.add_image(EguiTextureHandle::Strong(
-            asset_server.load(PathBuf::from("textures/menus/keyboard_tip_icon.png")),
-        )))
-    }
 
     let ctx = contexts.ctx_mut()?;
     egui::TopBottomPanel::bottom("bottom_panel")
@@ -424,6 +386,7 @@ pub fn general_editor_ui(
         .default_height(panel_height)
         .show(ctx, |ui| {
             ui.with_layout(egui::Layout::left_to_right(egui::Align::TOP), |ui| {
+                // Main label containing most recent message:
                 ui.add(egui::Label::new(
                     RichText::new(message_string)
                         .strong()
@@ -431,31 +394,10 @@ pub fn general_editor_ui(
                         .color(egui::Color32::from_rgba_unmultiplied(220, 230, 245, 255)),
                 ));
 
+                //add all available buttons starting from the right hand side
                 ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
-                    let icon_size = 20.0;
-
                     for item in &available_keybinds.keybinds {
-                        ui.add(egui::Label::new(
-                            RichText::new(item.action.as_str())
-                                .size(16.0)
-                                .color(egui::Color32::from_rgba_unmultiplied(220, 230, 245, 255)),
-                        ));
-
-                        if let Some(texture_id) = kb_icon.0 {
-                            let image = egui::widgets::Image::new(egui::load::SizedTexture::new(
-                                texture_id,
-                                [icon_size, icon_size],
-                            ));
-
-                            let rect = ui.add(image).rect;
-                            ui.painter().text(
-                                rect.center(),
-                                egui::Align2::CENTER_CENTER,
-                                keybind_hint_text(&item.input_type),
-                                egui::FontId::proportional(11.0),
-                                egui::Color32::from_rgb(18, 22, 30),
-                            );
-                        }
+                        item.show(ui, tex_id)
                     }
                 });
             });
@@ -561,84 +503,3 @@ pub fn render_tooling_menu(
 pub fn hide_tooling_menu(mut tooling_menu: ResMut<ToolingMenuState>) {
     tooling_menu.visible = false;
 }
-
-#[derive(Component, Reflect)]
-#[reflect(Component)]
-/// A component that marks an entity as a placeholder object, these are preview objects that are not yet placed into the scene.
-/// note: this is separate from our placeholder resources, we could create many of these if we are prepping to place a lot of items in one keypress
-pub struct PlaceholderObjectTag;
-
-pub fn update_placeholder<T: SignificantComponent + Component + Default>(
-    mut commands: Commands,
-
-    state: ResMut<State<EditorState>>,
-    mut placeholder: ResMut<PlaceholderHandle>,
-    textures: Res<TextureHandles>,
-
-    crosshairs: Query<(&Crosshair, &Transform)>,
-    placeholders: Query<(Entity, &PlaceholderObjectTag)>,
-) {
-    //delete any existing placeholder objects
-    for (e, _) in placeholders.iter() {
-        commands.entity(e).despawn();
-    }
-
-    let m = current_editing_kind(state.as_ref());
-    //update the placeholder object to be the major type of the current editing mode
-    let Some(texture) = textures.0.get(&m) else {
-        return;
-    };
-    placeholder.0 = texture.clone();
-
-    let Ok((_, t)) = crosshairs.single() else {
-        return;
-    };
-
-    commands.spawn((
-        T::default(),
-        Sprite {
-            image: placeholder.0.clone(),
-            rect: Some(Rect {
-                min: Vec2::new(0.0, 0.0),
-                max: Vec2::new(TILE_SIZE as f32, TILE_SIZE as f32),
-            }),
-            ..default()
-        },
-        Transform {
-            translation: Vec3::new(t.translation.x, t.translation.y, UI_Z_LAYER),
-            ..default()
-        },
-        UIItem { ..default() },
-        ui::NormalModeUI, // give it normalModeUI so it will just be destroyed when we exit normalMode
-        PlaceholderObjectTag, //tag it as a placeholder object so we can delete it when we switch from this mode.
-    ));
-}
-
-pub fn trigger_placeholder_update(
-    mut ev: MessageReader<UpdatePlaceholderMessage>,
-    mut commands: Commands,
-
-    placeholder: ResMut<PlaceholderHandle>,
-
-    // crosshairs: Query<(&Crosshair, &Transform)>,
-    placeholders: Query<(Entity, &PlaceholderObjectTag)>,
-) {
-    for e in ev.read() {
-        println!("Placeholder Update Event Triggered");
-        //update the placeholder object's texture rect to align with the rect given by the event
-        for ent in placeholders.iter() {
-            commands.entity(ent.0).insert(Sprite {
-                image: placeholder.0.clone(),
-                rect: Some(Rect {
-                    min: Vec2::new(e.rect.min.x, e.rect.min.y),
-                    max: Vec2::new(e.rect.max.x, e.rect.max.y),
-                }),
-                ..default()
-            });
-        }
-    }
-}
-
-#[derive(Component, Reflect)]
-#[reflect(Component)]
-pub struct NormalModeUI;

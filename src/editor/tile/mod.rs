@@ -1,7 +1,8 @@
-pub mod ui;
+pub mod tile_ui;
 
 use super::*;
-use crate::ui::{update_placeholder, ToolingMenuItem};
+use crate::ui::{bottom_bar::*, update_placeholder, ToolingMenuItem};
+
 use crate::{EditorObject, TILE_SIZE};
 use bevy::prelude::*;
 use std::path::PathBuf;
@@ -69,7 +70,7 @@ fn tilemode_keybinds(
         );
 
         Tile::place(&mut commands, to_place, &tiles);
-        send_placement_message(&mut message_queue, "tile", coord);
+        send_place_eo_message(&mut message_queue, "tile", coord);
     }
 
     // "L" handles removal of a tile from the scene, similar to placing one just doesnt need to worry about the tile creation part afterwards
@@ -77,7 +78,7 @@ fn tilemode_keybinds(
         let coord = snap_coordinate_to_grid(Coordinate::from(crosshair.0.translation));
 
         Tile::remove(&mut commands, coord, EditorObjectKind::Tile, &tiles);
-        send_removal_message(&mut message_queue, "tiles", coord);
+        send_remove_eo_message(&mut message_queue, "tiles", coord);
     }
 
     // Selection changes are now handled by the egui tooling panel.
@@ -90,7 +91,7 @@ fn exit_tilemode(mut message_queue: ResMut<EditorBottomBarQueuedMessages>) {
 /// A component that marks an entity as part of the tile editing UI.
 #[derive(Component, Reflect)]
 #[reflect(Component)]
-#[require(UIItem)]
+#[require(CameraLockedUI)]
 struct TileModeUI;
 
 /// A component to track some basic info about a tile (actually its just a tag right now but that might change)
@@ -143,6 +144,15 @@ fn reset_update_needed(mut needs_update: ResMut<TileUpdateNeeded>) {
     needs_update.0 = false;
 }
 
+fn add_tile_mode_kb(mut available_keybinds: ResMut<AvailableKeybinds>) {
+    available_keybinds.add_keycode(CustomInput::Single(KeyCode::KeyL), "Remove Tile".into());
+    available_keybinds.add_keycode(CustomInput::Single(KeyCode::KeyP), "Place Tile".into());
+    available_keybinds.add_keycode(CustomInput::Single(KeyCode::KeyQ), "Quit Edit Mode".into());
+}
+fn remove_tile_mode_kb(mut available_keybinds: ResMut<AvailableKeybinds>) {
+    available_keybinds.clear();
+}
+
 pub fn tilemode_plugin(app: &mut App) {
     app.register_type::<Tile>()
         .register_type::<Coordinate>()
@@ -156,8 +166,17 @@ pub fn tilemode_plugin(app: &mut App) {
         .add_systems(Startup, load_spritesheet)
         //OnEnter systems
         .add_systems(
-            OnEnter(EditorState::Editing(EditingComponent::Tile)),
-            (populate_tile_tooling_menu, update_placeholder::<Tile>).chain(),
+            OnEnter(EditorState::Editing(EditorObjectKind::Tile)),
+            (
+                populate_tile_tooling_menu,
+                update_placeholder::<Tile>,
+                add_tile_mode_kb,
+            )
+                .chain(),
+        )
+        .add_systems(
+            OnExit(EditorState::Editing(EditorObjectKind::Tile)),
+            (remove_tile_mode_kb).chain(),
         )
         //Update systems, that run only while TileEditor is active
         .add_systems(
@@ -167,11 +186,11 @@ pub fn tilemode_plugin(app: &mut App) {
                 (update_placeholder::<Tile>, reset_update_needed).run_if(run_if_tile_update_needed),
             )
                 .chain()
-                .run_if(in_state(EditorState::Editing(EditingComponent::Tile))),
+                .run_if(in_state(EditorState::Editing(EditorObjectKind::Tile))),
         )
         //OnExit systems
         .add_systems(
-            OnExit(EditorState::Editing(EditingComponent::Tile)),
+            OnExit(EditorState::Editing(EditorObjectKind::Tile)),
             (despawn_all::<TileModeUI>, exit_tilemode).chain(),
         );
     //we could also take care of some post-exit cleanup here, like despawning all the UI elements by using the schedule OnEnter(EditorState::Inactive) and then despawning all the UI elements

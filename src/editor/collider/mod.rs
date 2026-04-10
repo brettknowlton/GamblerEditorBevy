@@ -1,12 +1,14 @@
-mod ui;
-pub use ui::*;
+mod collider_ui;
+pub use collider_ui::*;
 
 use super::*;
-use crate::ui::ToolingMenuItem;
+use crate::bottom_bar::{send_mode_exit_message, send_place_eo_message, send_remove_eo_message};
 use crate::{EditorObject, TILE_SIZE};
 use bevy::prelude::*;
 use std::path::PathBuf;
 use tools::SignificantComponent;
+
+
 
 fn populate_collider_tooling_menu(mut tooling_menu: ResMut<ToolingMenuState>) {
     configure_tooling_menu(
@@ -54,7 +56,7 @@ fn collidermode_keybinds(
         );
 
         ColliderObject::place(&mut commands, to_place, &colliders);
-        send_placement_message(&mut message_queue, "collider", coord);
+        send_place_eo_message(&mut message_queue, "collider", coord);
     }
 
     // "L" handles removal of a collider from the scene, similar to placing one just doesnt need to worry about the tile creation part afterwards
@@ -65,7 +67,7 @@ fn collidermode_keybinds(
         let coord = snap_coordinate_to_grid(Coordinate::from(t.translation));
 
         ColliderObject::remove(&mut commands, coord, EditorObjectKind::Collider, &colliders);
-        send_removal_message(&mut message_queue, "colliders", coord);
+        send_remove_eo_message(&mut message_queue, "colliders", coord);
     }
 }
 
@@ -126,7 +128,7 @@ pub fn collidermode_plugin(app: &mut App) {
         .add_systems(Startup, init)
         //OnEnter systems
         .add_systems(
-            OnEnter(EditorState::Editing(EditingComponent::Collider)),
+            OnEnter(EditorState::Editing(EditorObjectKind::Collider)),
             (
                 populate_collider_tooling_menu,
                 crate::ui::update_placeholder::<ColliderObject>,
@@ -141,12 +143,12 @@ pub fn collidermode_plugin(app: &mut App) {
                 super::ui::update_placeholder::<ColliderObject>,
             )
                 .chain()
-                .run_if(in_state(EditorState::Editing(EditingComponent::Collider))),
+                .run_if(in_state(EditorState::Editing(EditorObjectKind::Collider))),
         )
         //OnExit systems
         .add_systems(
-            OnExit(EditorState::Editing(EditingComponent::Collider)),
-            (despawn_all::<ui::ColliderModeUI>, exit_collidermode).chain(),
+            OnExit(EditorState::Editing(EditorObjectKind::Collider)),
+            (despawn_all::<collider_ui::ColliderModeUI>, exit_collidermode).chain(),
         );
 }
 //NOTHING BELOW THE PLUGINS

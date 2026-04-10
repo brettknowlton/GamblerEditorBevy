@@ -1,6 +1,8 @@
-use crate::{EditorObject, SCALED_TILE_HEIGHT, SCALED_TILE_WIDTH};
+use crate::{EditorObject, SCALED_TILE_HEIGHT, SCALED_TILE_WIDTH, TILE_SCALE};
 
 use super::*;
+
+use super::coordinate::*;
 
 pub trait SignificantComponent {
 

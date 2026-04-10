@@ -1,6 +1,6 @@
 #[macro_use]
-mod ui;
-pub use ui::*;
+mod actor_ui;
+pub use actor_ui::*;
 
 pub mod player;
 use player::Player;
@@ -8,6 +8,7 @@ use player::Player;
 use bevy::prelude::*;
 use tools::SignificantComponent;
 use std::path::PathBuf;
+use crate::bottom_bar::{send_mode_exit_message, send_place_eo_message, send_remove_eo_message};
 use crate::ui::ToolingMenuItem;
 use crate::{ utilities::*, EditorObject, TILE_SIZE };
 use crate::consts::*;
@@ -112,7 +113,7 @@ pub fn actor_mode_keybinds(
         );
 
         Actor::place(&mut commands, to_place, &actors);
-        send_placement_message(&mut message_queue, "actor", coord);
+        send_place_eo_message(&mut message_queue, "actor", coord);
     }
 
     // "L" handles removal of a tile from the scene, similar to placing one just doesnt need to worry about the tile creation part afterwards
@@ -123,7 +124,7 @@ pub fn actor_mode_keybinds(
         let coord = snap_coordinate_to_grid(Coordinate::from(t.translation));
 
         Actor::remove(&mut commands, coord, EditorObjectKind::Actor, &actors);
-        send_removal_message(&mut message_queue, "actor", coord);
+        send_remove_eo_message(&mut message_queue, "actor", coord);
     }
 }
 
@@ -138,14 +139,14 @@ pub fn actormode_plugin(app: &mut App) {
         .register_type::<Player>()
         .register_type::<Coordinate>()
         .register_type::<TCoordinate>()
-        .register_type::<ui::ActorModeUI>()
+        .register_type::<actor_ui::ActorModeUI>()
 
         //startup systems (may need to be moved from here to maintain order)
         .add_systems(Startup, init)
 
         //OnEnter systems
         .add_systems(
-            OnEnter(EditorState::Editing(EditingComponent::Actor)),
+            OnEnter(EditorState::Editing(EditorObjectKind::Actor)),
             (populate_actor_tooling_menu, crate::ui::update_placeholder::<Actor>).chain(),
         )
 
@@ -153,15 +154,15 @@ pub fn actormode_plugin(app: &mut App) {
         .add_systems(
             Update,
             (super::ui::update_placeholder::<Actor>, actor_mode_keybinds).chain()
-                .run_if(in_state(EditorState::Editing(EditingComponent::Actor)))
+                .run_if(in_state(EditorState::Editing(EditorObjectKind::Actor)))
         )
 
 
         //OnExit systems
         .add_systems(
-            OnExit(EditorState::Editing(EditingComponent::Actor)), 
+            OnExit(EditorState::Editing(EditorObjectKind::Actor)), 
             (
-                despawn_all::<ui::ActorModeUI>,
+                despawn_all::<actor_ui::ActorModeUI>,
                 exit_actormode,
             ).chain()
         );

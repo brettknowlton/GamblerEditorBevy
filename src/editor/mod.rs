@@ -1,22 +1,29 @@
-#[macro_use]
-pub mod ui;
 use serde::Deserialize;
 use serde::Serialize;
-pub use tile::*;
 
+use crate::bottom_bar::EditorBottomBarQueuedMessages;
 pub use crate::consts::*;
+use crate::coordinate::*;
+
 pub use crate::game::*;
 pub use crate::resources::*;
+
 use crate::selection::ActiveSelection;
 use crate::selection::SelectionRect;
-use crate::ui::UIItem;
-use crate::ui::{ToolingMenuItem, ToolingMenuState};
+
 pub use crate::utilities::*;
 pub use tools::SignificantComponent;
 
 pub mod actor;
+
 pub mod collider;
+
 pub mod tile;
+pub use tile::*;
+
+#[macro_use]
+pub mod ui;
+pub use ui::*;
 
 use bevy_rapier2d::prelude::*;
 
@@ -24,7 +31,6 @@ mod scene;
 pub use std::{fmt::Debug, path::PathBuf};
 
 use bevy::{prelude::*, sprite::Anchor};
-use bevy_egui::EguiPrimaryContextPass;
 
 //EditorState is an enum that defines the different states the editor can be in, this is used to determine what the editor is currently doing
 #[derive(Clone, Copy, Default, Eq, PartialEq, Debug, Hash, States)]
@@ -47,23 +53,55 @@ pub enum EditorState {
     /// The editor is currently asking the user if they would like to quit
     QuitAsk,
     /// The editor is currently in an editing mode, allowing the user to place or modify objects in the scene
-    Editing(EditingComponent),
+    Editing(EditorObjectKind),
 }
 
-///The EditingComponent enum is used to determine what type of object the user is currently trying to place in the scene, this is kind of like an "Internal Type" for the editor state.
-///We will almost always be in EditorMode::Editing but its more granular than that
-#[derive(Clone, Copy, Default, Eq, PartialEq, Debug, Hash)]
-pub enum EditingComponent {
+impl EditorState {
+    fn get_editing_kind(&self) -> Option<EditorObjectKind> {
+        match self {
+            EditorState::Editing(kind) => Some(*kind),
+            _ => None,
+        }
+    }
+}
+
+/// A component that marks an entity as a savable editor item, from this we have systems that load Tiles, Colliders, and other objects based on preset-defaults and the other saved components we may have.
+/// The main ones we need are the position of this object in the world, and the type of thing it is, and one more layer of optional specification on what "Kind of thing of thing" it is.
+/// Other components will be used to determine the specifics of the object. but a tile for example can be completley determined from just this component.
+/// eg.: Thing?: Tile. Kind of Thing?:0 (cut the spritesheet at index 0). Position: (0, 0), the logic for this is actually implemented on the SignificantComponent trait for each majortype of object
+#[derive(Component, Reflect, Debug, Default, Clone)]
+#[reflect(Component)]
+pub struct EditorObject {
+    /// ultimatley an index into which style of tile or entity we are using within the major type, extra specificiation we can use to fine tune what object we are loading in this space.
+    /// for non-tile types this is currently always 0
+    pub kind: EditorObjectKind,
+    pub internal_kind: u64,
+    //the coordinate of the object as well as the major type of the object combined into a neat little package
+    pub coordinate: Coordinate,
+    //this zone ID will track which zone the object is in, this is used to determine which zone to load the object into and to help with performance by only loading objects in the current/neighrboring zones
+    pub zone_id: TCoordinate,
+}
+
+impl EditorObject {
+    pub fn get_major_type(&self) -> EditorObjectKind {
+        self.kind
+    }
+    pub fn get_internal_type(&self) -> u64 {
+        self.internal_kind
+    }
+    pub fn get_coordinate(&self) -> Coordinate {
+        self.coordinate.clone()
+    }
+}
+
+#[derive(Default, Reflect, Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize, Copy)]
+pub enum EditorObjectKind {
     #[default]
-    None,
-    /// The user is currently trying to place an actor in the scene
-    Actor,
-    /// The user is currently trying to place a collider in the scene
-    Collider,
-    /// The user is currently trying to place an interactable object in the scene
-    Interactable,
-    /// The user is currently trying to place a tile in the scene
+    Other,
     Tile,
+    Collider,
+    Actor,
+    Selector,
 }
 
 /// This enum is used as a setting for the editor to determine wether or not we are trying to snap placed objects to the grid.
@@ -82,40 +120,6 @@ pub enum ShowGrid {
     No,
 }
 
-#[derive(Message)]
-pub struct UpdatePlaceholderMessage {
-    pub tcoord: TCoordinate,
-    pub rect: Rect,
-}
-
-pub fn configure_tooling_menu(
-    tooling_menu: &mut ToolingMenuState,
-    title: &str,
-    selected_item_id: Option<u64>,
-    items: Vec<ToolingMenuItem>,
-) {
-    tooling_menu.title = title.to_string();
-    tooling_menu.visible = true;
-    tooling_menu.selected_item_id = selected_item_id;
-    tooling_menu.items = items;
-}
-
-pub fn editing_component_kind(component: EditingComponent) -> EditorObjectKind {
-    match component {
-        EditingComponent::Actor => EditorObjectKind::Actor,
-        EditingComponent::Collider => EditorObjectKind::Collider,
-        EditingComponent::Tile => EditorObjectKind::Tile,
-        _ => EditorObjectKind::Other,
-    }
-}
-
-pub fn current_editing_kind(state: &State<EditorState>) -> EditorObjectKind {
-    match state.get() {
-        EditorState::Editing(component) => editing_component_kind(*component),
-        _ => EditorObjectKind::Other,
-    }
-}
-
 pub fn snapped_coordinate_from_translation(
     translation: Vec3,
     gridsnap: &State<GridSnap>,
@@ -129,13 +133,6 @@ pub fn snapped_coordinate_from_translation(
     }
 }
 
-pub fn zone_coordinate_for(coord: Coordinate) -> Coordinate {
-    Coordinate {
-        0: coord.0 / ZONE_SIZE as i64,
-        1: coord.1 / ZONE_SIZE as i64,
-    }
-}
-
 pub fn build_editor_object(
     kind: EditorObjectKind,
     internal_kind: u64,
@@ -146,47 +143,15 @@ pub fn build_editor_object(
         kind,
         internal_kind,
         coordinate,
-        zone_id: TCoordinate::new(zone_kind, zone_coordinate_for(coordinate)),
+        zone_id: TCoordinate::new(zone_kind, coordinate.containing_zone_coordinate()),
     }
-}
-
-pub fn send_placement_message(
-    message_queue: &mut EditorBottomBarQueuedMessages,
-    label: &str,
-    coord: Coordinate,
-) {
-    send_message!(
-        Some('i'),
-        message_queue,
-        format!("Placed {label} at: ({}, {})", coord.0, coord.1)
-    );
-}
-
-pub fn send_removal_message(
-    message_queue: &mut EditorBottomBarQueuedMessages,
-    label: &str,
-    coord: Coordinate,
-) {
-    send_message!(
-        Some('i'),
-        message_queue,
-        format!("Removing {label} at: ({}, {})", coord.0, coord.1)
-    );
-}
-
-pub fn send_mode_exit_message(message_queue: &mut EditorBottomBarQueuedMessages, label: &str) {
-    send_message!(
-        Some('i'),
-        message_queue,
-        format!("Exiting {label} Editing Mode")
-    );
 }
 
 fn initialize(
     mut commands: Commands,
 
     mut next_state: ResMut<NextState<EditorState>>,
-    mut message_queue: ResMut<EditorBottomBarQueuedMessages>,
+    mut message_queue: ResMut<ui::bottom_bar::EditorBottomBarQueuedMessages>,
     mut texture_handles: ResMut<TextureHandles>,
 
     asset_server: ResMut<AssetServer>,
@@ -198,17 +163,13 @@ fn initialize(
         .insert(EditorObjectKind::Other, asset_server.load(tex_path));
 
     //create camera and add a UIItem component to it
-    commands.spawn((Camera2d::default(), UIItem::default()));
+    commands.spawn((Camera2d::default(), CameraLockedUI::default()));
 
     //set the state to ask about loading a scene
     next_state.set(EditorState::LoadAsk);
 
     //push a message to the bottom bar that asks the user if they would like to load a scene
-    send_message!(
-        Some('i'),
-        message_queue,
-        "Would you like to load a scene? Yenter/Noscape"
-    );
+    send_message!(Some('i'), message_queue, "Would you like to load a scene?");
 }
 
 fn create_crosshair(mut commands: Commands, asset_server: Res<AssetServer>) {
@@ -248,7 +209,9 @@ fn handle_global_editor_shortcuts(
     next_gridsnap_state: &mut NextState<GridSnap>,
     gridsnap_state: &State<GridSnap>,
     input: &ButtonInput<KeyCode>,
-    message_queue: &mut EditorBottomBarQueuedMessages,
+
+    message_queue: &mut ui::bottom_bar::EditorBottomBarQueuedMessages,
+
     crosshairs: &mut Query<(&mut Crosshair, &mut Transform, &mut Sprite), Without<Camera2d>>,
     message_writer: &mut MessageWriter<ResetScene>,
 ) {
@@ -264,18 +227,14 @@ fn handle_global_editor_shortcuts(
         send_message!(
             Some('i'),
             message_queue,
-            "Would you like to save the scene? Yenter/Noscape"
+            "Would you like to save the scene?"
         );
     } else if input.pressed(KeyCode::ControlLeft)
         && input.just_pressed(KeyCode::KeyL)
         && editor_state.get() != &EditorState::LoadAsk
     {
         next_editor_state.set(EditorState::LoadAsk);
-        send_message!(
-            Some('i'),
-            message_queue,
-            "Would you like to load a scene? Yenter/Noscape"
-        );
+        send_message!(Some('i'), message_queue, "Would you like to load a scene?");
     } else if input.pressed(KeyCode::ControlLeft)
         && input.just_pressed(KeyCode::KeyQ)
         && editor_state.get() != &EditorState::QuitAsk
@@ -284,7 +243,7 @@ fn handle_global_editor_shortcuts(
         send_message!(
             Some('i'),
             message_queue,
-            "Would you like to exit the editor? Yenter/Noscape"
+            "Would you like to exit the editor?"
         );
     } else if input.pressed(KeyCode::ControlLeft)
         && input.just_pressed(KeyCode::KeyT)
@@ -398,17 +357,17 @@ fn handle_mode_switch_shortcuts(
 ) {
     if input.just_pressed(KeyCode::Digit1) || input.just_pressed(KeyCode::Numpad1) {
         send_message!(Some('i'), message_queue, "Switching to Tile Mode");
-        next_editor_state.set(EditorState::Editing(EditingComponent::Tile));
+        next_editor_state.set(EditorState::Editing(EditorObjectKind::Tile));
     }
 
     if input.just_pressed(KeyCode::Digit2) || input.just_pressed(KeyCode::Numpad2) {
         send_message!(Some('i'), message_queue, "Switching to Collider Mode");
-        next_editor_state.set(EditorState::Editing(EditingComponent::Collider));
+        next_editor_state.set(EditorState::Editing(EditorObjectKind::Collider));
     }
 
     if input.just_pressed(KeyCode::Digit3) || input.just_pressed(KeyCode::Numpad3) {
         send_message!(Some('i'), message_queue, "Switching to Actor Mode");
-        next_editor_state.set(EditorState::Editing(EditingComponent::Actor));
+        next_editor_state.set(EditorState::Editing(EditorObjectKind::Actor));
     }
 }
 
@@ -469,7 +428,7 @@ fn should_apply_editor_movement(editor_state: &State<EditorState>) -> bool {
         && editor_state.get() != &EditorState::QuitAsk
 }
 
-fn movement_velocity(input: &ButtonInput<KeyCode>) -> Vec2 {
+fn camera_movement_velocity(input: &ButtonInput<KeyCode>) -> Vec2 {
     let mut velocity = Vec2::ZERO;
 
     if input.pressed(KeyCode::KeyW) && !input.pressed(KeyCode::KeyS) {
@@ -489,13 +448,26 @@ fn movement_velocity(input: &ButtonInput<KeyCode>) -> Vec2 {
 }
 
 fn apply_editor_movement(
-    uiitems: &mut Query<(&mut UIItem, &mut Transform), (Without<Camera2d>, Without<Crosshair>)>,
-    cameras: &mut Query<(&mut UIItem, &mut Transform, &mut Camera2d)>,
+    ui_items: &mut Query<
+        (&mut CameraLockedUI, &mut Transform),
+        (Without<Camera2d>, Without<Crosshair>),
+    >,
+    cameras: &mut Query<(&mut CameraLockedUI, &mut Transform), With<Camera2d>>,
     crosshairs: &mut Query<(&mut Crosshair, &mut Transform, &mut Sprite), Without<Camera2d>>,
     velocity: Vec2,
     delta_secs: f32,
 ) {
-    for (mut ui, mut t) in uiitems.iter_mut() {
+    //move ui_items (like the placeholder image)
+    for (mut ui, mut t) in ui_items.iter_mut() {
+        ui.vel_x = velocity.x;
+        ui.vel_y = velocity.y;
+        t.translation.x += ui.vel_x * delta_secs;
+        t.translation.y += ui.vel_y * delta_secs;
+        ui.vel_x *= 0.99;
+        ui.vel_y *= 0.99;
+    }
+    //move camera
+    for (mut ui, mut t) in cameras.iter_mut() {
         ui.vel_x = velocity.x;
         ui.vel_y = velocity.y;
         t.translation.x += ui.vel_x * delta_secs;
@@ -504,15 +476,7 @@ fn apply_editor_movement(
         ui.vel_y *= 0.99;
     }
 
-    for (mut ui, mut t, _) in cameras.iter_mut() {
-        ui.vel_x = velocity.x;
-        ui.vel_y = velocity.y;
-        t.translation.x += ui.vel_x * delta_secs;
-        t.translation.y += ui.vel_y * delta_secs;
-        ui.vel_x *= 0.99;
-        ui.vel_y *= 0.99;
-    }
-
+    //move crosshair
     for (_, mut t, _) in crosshairs.iter_mut() {
         t.translation.x += velocity.x * delta_secs;
         t.translation.y += velocity.y * delta_secs;
@@ -537,8 +501,11 @@ fn stateful_keybinds(
     // m_input: Res<ButtonInput<MouseButton>>,
     mut crosshairs: Query<(&mut Crosshair, &mut Transform, &mut Sprite), Without<Camera2d>>,
     // mut active_selection: ResMut<PlaceholderHandle>,
-    mut uiitems: Query<(&mut UIItem, &mut Transform), (Without<Camera2d>, Without<Crosshair>)>,
-    mut cameras: Query<(&mut UIItem, &mut Transform, &mut Camera2d)>,
+    mut cameras: Query<(&mut CameraLockedUI, &mut Transform), With<Camera2d>>,
+    mut ui_items: Query<
+        (&mut CameraLockedUI, &mut Transform),
+        (Without<Camera2d>, Without<Crosshair>),
+    >,
     mut message_writer: MessageWriter<ResetScene>,
 ) {
     handle_global_editor_shortcuts(
@@ -556,7 +523,9 @@ fn stateful_keybinds(
         &mut message_writer,
     );
     handle_rectangle_tool_shortcuts(&input, &mut message_queue, &mut crosshairs);
+
     handle_mode_switch_shortcuts(&input, &mut next_editor_state, &mut message_queue);
+
     handle_state_specific_keybinds(
         editor_state.as_ref(),
         &mut next_editor_state,
@@ -565,9 +534,9 @@ fn stateful_keybinds(
     );
 
     if should_apply_editor_movement(editor_state.as_ref()) {
-        let velocity = movement_velocity(&input);
+        let velocity = camera_movement_velocity(&input);
         apply_editor_movement(
-            &mut uiitems,
+            &mut ui_items,
             &mut cameras,
             &mut crosshairs,
             velocity,
@@ -576,80 +545,9 @@ fn stateful_keybinds(
     }
 }
 
-fn modify_avaiable_keybinds(mut available_keybinds: ResMut<AvailableKeybinds>) {
-    available_keybinds.add_keycode(
-        CustomInput::Combo(vec![KeyCode::ControlLeft, KeyCode::KeyS]),
-        "Save Scene".into(),
-    );
-    available_keybinds.add_keycode(
-        CustomInput::Combo(vec![KeyCode::ControlLeft, KeyCode::KeyT]),
-        "Test Scene".into(),
-    );
-    available_keybinds.add_keycode(
-        CustomInput::Single(KeyCode::KeyQ),
-        "Quit Edit Mode".into(),
-    );
-}
-
 #[derive(Component)]
-#[require(ui::UIItem)]
-pub struct Crosshair {} //tags the main crosshair entity, in the editor this happens to only be our camera, but may be taken over by a crosshair entity in the future that tracks the mouse
-
-/// A component that marks an entity as a savable editor item, from this we have systems that load Tiles, Colliders, and other objects based on preset-defaults and the other saved components we may have.
-/// The main ones we need are the position of this object in the world, and the type of thing it is, and one more layer of optional specification on what "Kind of thing of thing" it is.
-/// Other components will be used to determine the specifics of the object. but a tile for example can be completley determined from just this component.
-/// eg.: Thing?: Tile. Kind of Thing?:0 (cut the spritesheet at index 0). Position: (0, 0), the logic for this is actually implemented on the SignificantComponent trait for each majortype of object
-#[derive(Component, Reflect, Debug, Default, Clone)]
-#[reflect(Component)]
-pub struct EditorObject {
-    /// ultimatley an index into which style of tile or entity we are using within the major type, extra specificiation we can use to fine tune what object we are loading in this space.
-    /// for non-tile types this is currently always 0
-    pub kind: EditorObjectKind,
-    pub internal_kind: u64,
-    //the coordinate of the object as well as the major type of the object combined into a neat little package
-    pub coordinate: Coordinate,
-    //this zone ID will track which zone the object is in, this is used to determine which zone to load the object into and to help with performance by only loading objects in the current/neighrboring zones
-    pub zone_id: TCoordinate,
-}
-
-impl EditorObject {
-    // fn new(mt: char, it: u64, coord: Coordinate) -> Self {
-    //     Self {
-    //         internal_type: it,
-    //         coordinate: TCoordinate::new(mt, coord),
-    //     }
-    // }
-
-    pub fn get_major_type(&self) -> EditorObjectKind {
-        self.kind
-    }
-    pub fn get_internal_type(&self) -> u64 {
-        self.internal_kind
-    }
-    pub fn get_coordinate(&self) -> Coordinate {
-        self.coordinate.clone()
-    }
-
-    // fn set_major_type(&mut self, v: char) {
-    //     self.coordinate.object_type = v;
-    // }
-    // fn set_internal_type(&mut self, v: u64) {
-    //     self.internal_type = v;
-    // }
-    // fn set_coordinate(&mut self, coord: Coordinate) {
-    //     self.coordinate = TCoordinate::new(self.get_object_type(), coord);
-    // }
-}
-
-#[derive(Default, Reflect, Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize, Copy)]
-pub enum EditorObjectKind {
-    #[default]
-    Other,
-    Tile,
-    Collider,
-    Actor,
-    Selector,
-}
+#[require(ui::CameraLockedUI)]
+pub struct Crosshair; //tags the main crosshair entity, in the editor this happens to only be our camera, but may be taken over by a crosshair entity in the future that tracks the mouse
 
 fn reset_scene(
     mut players: Query<
@@ -663,7 +561,7 @@ fn reset_scene(
     let cs = crosshairs.single().unwrap().clone();
 
     for (_, mut t, mut vel) in players.iter_mut() {
-        actor::player::move_player_to_cursor(cs, &mut t);
+        actor::player::move_player_to_cursor(cs, &mut t); // TODO This isnt working
         vel.linvel = Vec2::new(0.0, 0.0);
     }
 
@@ -671,67 +569,6 @@ fn reset_scene(
     let cs = crosshairs.single().unwrap().clone();
     for (mut t, _) in cameras.iter_mut() {
         t.translation = cs.translation;
-    }
-}
-
-fn draw_grid(mut gizmos: Gizmos) {
-    gizmos
-        .grid_2d(
-            Isometry2d::new(Vec2::new(0.0, 0.0), Rot2::degrees(0.0)),
-            UVec2::new(100, 100),
-            Vec2::new(
-                (TILE_SIZE * TILE_SCALE) as f32,
-                (TILE_SIZE * TILE_SCALE) as f32,
-            ),
-            Color::srgba(0.0, 1.0, 0.0, 0.5),
-        )
-        .outer_edges();
-
-    gizmos
-        .grid_2d(
-            Isometry2d::IDENTITY,
-            UVec2::new(10, 10),
-            Vec2::new(
-                (TILE_SIZE * TILE_SCALE * ZONE_SIZE) as f32,
-                (TILE_SIZE * TILE_SCALE * ZONE_SIZE) as f32,
-            ),
-            Color::srgba(1.0, 0.0, 0.0, 0.5),
-        )
-        .outer_edges();
-}
-
-#[derive(Default, Clone, Debug)]
-pub enum CustomInput {
-    #[default]
-    Empty,
-    Single(KeyCode),
-    Combo(Vec<KeyCode>),
-    Multi(Vec<KeyCode>),
-}
-
-#[derive(Default, Clone)]
-struct CustomInputAction {
-    input_type: CustomInput,
-    action: String,
-}
-
-#[derive(Resource, Default)]
-pub struct AvailableKeybinds {
-    keybinds: Vec<CustomInputAction>,
-}
-
-impl AvailableKeybinds {
-    fn add(&mut self, input_action: CustomInputAction) {
-        self.keybinds.append(&mut vec![input_action]);
-    }
-
-    pub fn add_keycode(&mut self, input: CustomInput, action: String) {
-        let input = CustomInputAction {
-            input_type: input,
-            action,
-        };
-
-        self.add(input);
     }
 }
 
@@ -744,23 +581,14 @@ pub fn editor_plugin(app: &mut App) {
         //registrations
         .register_type::<EditorObject>()
         .add_message::<BottomBarUpdate>()
-        .add_message::<UpdatePlaceholderMessage>()
         .add_message::<ResetScene>()
         //resources
-        .init_resource::<EditorBottomBarDisplayed>()
-        .init_resource::<EditorBottomBarMessage>()
-        .init_resource::<EditorBottomBarQueuedMessages>()
         .init_resource::<PlaceholderHandle>()
         .init_resource::<TextureHandles>()
         .init_resource::<ActiveSelection>()
-        .init_resource::<ToolingMenuState>()
-        .init_resource::<AvailableKeybinds>()
-
-        .init_resource::<ui::KBIcon>()
         // .init_resource::<ActiveSelection>()
-        //begin update system to send debug messages (to bottom bar and to console)
-        .add_systems(Update, ui::send_messages)
         //plugins
+        .add_plugins(ui::editor_ui_plugin)
         .add_plugins(tile::tilemode_plugin)
         .add_plugins(collider::collidermode_plugin)
         .add_plugins(scene::scene_plugin)
@@ -771,7 +599,6 @@ pub fn editor_plugin(app: &mut App) {
             (
                 ui::hide_tooling_menu,
                 ui::update_placeholder::<SelectionRect>,
-                modify_avaiable_keybinds,
             )
                 .chain(),
         )
@@ -782,13 +609,7 @@ pub fn editor_plugin(app: &mut App) {
             Update,
             stateful_keybinds.run_if(not(in_state(EditorState::Inactive))),
         )
-        .add_systems(Update, draw_grid.run_if(in_state(ShowGrid::Yes)))
-        .add_systems(Update, ui::trigger_placeholder_update)
-        .add_systems(Update, ui::sync_tooling_menu_visibility)
-        .add_systems(
-            EguiPrimaryContextPass,
-            (ui::egui_panel_render, ui::general_editor_ui).chain(),
-        )
         .add_systems(Update, reset_scene.run_if(on_message::<ResetScene>));
 }
+
 //NOTHING BELOW THE PLUGINS >:(

@@ -1,9 +1,10 @@
 use tools::SignificantComponent;
 
-use crate::EditorObject;
+use crate::{EditorObject, TILE_SCALE};
 
 use super::*;
 
+use super::coordinate::*;
 
 #[derive(Component, Default, Debug, Clone)]
 pub struct SelectionRect {

@@ -2,27 +2,23 @@ use crate::ui::PlaceholderObjectTag;
 
 use super::*;
 
-pub fn spawn_actor_placeholder(
+pub fn spawn_collider_placeholder(
     mut commands: Commands,
     crosshairs: Query<(&Transform, &Crosshair)>,
     asset_server: Res<AssetServer>,
 ) {
-    let Ok((t, _))= crosshairs.single() else {
+    let Ok((t, _)) = crosshairs.single() else {
         return;
     };
     let x_off = t.translation.x;
     let y_off = t.translation.y;
 
-    let texpath = PathBuf::from("textures/player/PlayerHD.png");
+    let texpath = PathBuf::from("textures/tiles/collider_debug.png");
     let tex = asset_server.load(texpath);
-
 
     //display the placeholder tile
     commands.spawn((
-        Actor {
-            ..default()
-        },
-
+        ColliderObject { ..default() },
         Sprite {
             image: tex,
             rect: Some(Rect {
@@ -31,29 +27,22 @@ pub fn spawn_actor_placeholder(
             }),
             ..default()
         },
-
         Transform {
             translation: Vec3::new(x_off, y_off, 0.0),
             ..default()
         },
-
-        UIItem {
-            ..default()
-        },
-        
-        ActorModeUI,
-
+        CameraLockedUI { ..default() },
+        ColliderModeUI,
         PlaceholderObjectTag,
     ));
 }
 
-pub fn create_actormode_ui(
+pub fn create_collidermode_ui(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
     crosshairs: Query<(&Transform, &Crosshair)>,
     _tilesheet_handle: Res<TextureHandles>,
 ) {
-    
     //display the "tilemode" menu
     let texpath = PathBuf::from("textures/menus/menu1.png");
     let tex1 = asset_server.load(texpath);
@@ -63,14 +52,14 @@ pub fn create_actormode_ui(
         return;
     };
 
-    let ui_x_off = -(DEFAULT_WINDOW_WIDTH as f32 / 2.0) + t.translation.x;
-    let ui_y_off = -(DEFAULT_WINDOW_HEIGHT as f32 / 2.0) + t.translation.y;
+    let ui_x_off = -(DEFAULT_WINDOW_WIDTH as f32) / 2.0 + t.translation.x;
+    let ui_y_off = -(DEFAULT_WINDOW_HEIGHT as f32) / 2.0 + t.translation.y;
 
     let ui_x = DEFAULT_WINDOW_WIDTH as f32 / 6.0;
     let ui_y = DEFAULT_WINDOW_HEIGHT as f32;
     let ui_border = 4.0;
 
-    //spawn actormode UI
+    //spawn collidermode UI
     commands.spawn((
         Sprite {
             image: tex1,
@@ -89,33 +78,33 @@ pub fn create_actormode_ui(
             translation: Vec3::new(ui_x_off, ui_y_off, UI_Z_LAYER - 0.1),
             ..default()
         },
-        UIItem {
-            ..default()
-        },
-        ActorModeUI,
+        CameraLockedUI { ..default() },
+        ColliderModeUI,
         Anchor::CENTER,
     ));
 
     //spawn the mode title at the top
     commands.spawn((
-        ActorModeUI,
+        ColliderModeUI,
         Text {
-            0: "Actor Mode".to_string(),
+            0: "Collider Mode".to_string(),
 
             ..default()
         },
-        Node{
+        Node {
             position_type: PositionType::Absolute,
             top: Val::Px(3.0),
             left: Val::Px(3.0),
             ..default()
         },
-        UIItem::default(),
+        CameraLockedUI::default(),
     ));
 }
 
-/// A component that marks an entity as part of the actor editing UI.
+/// A component that marks an entity as part
+///
+/// of the collider editing UI.
 #[derive(Component, Reflect)]
 #[reflect(Component)]
-#[require(UIItem)]
-pub struct ActorModeUI;
+#[require(CameraLockedUI)]
+pub struct ColliderModeUI;

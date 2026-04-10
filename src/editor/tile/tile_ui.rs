@@ -31,7 +31,7 @@ pub fn spawn_tile_placeholder(
             translation: Vec3::new(x_off, y_off, 0.0),
             ..default()
         },
-        UIItem { ..default() },
+        CameraLockedUI { ..default() },
         TileModeUI, // give it tilemodeUI so it will just be destroyed when we exit tilemode
         PlaceholderObjectTag,
     ));
