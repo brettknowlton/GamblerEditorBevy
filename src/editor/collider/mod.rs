@@ -8,8 +8,6 @@ use bevy::prelude::*;
 use std::path::PathBuf;
 use tools::SignificantComponent;
 
-
-
 fn populate_collider_tooling_menu(mut tooling_menu: ResMut<ToolingMenuState>) {
     configure_tooling_menu(
         &mut tooling_menu,
@@ -29,6 +27,15 @@ fn init(mut spritesheets: ResMut<TextureHandles>, asset_server: Res<AssetServer>
     spritesheets
         .0
         .insert(EditorObjectKind::Collider, asset_server.load(texpath));
+}
+
+fn add_collider_mode_kb(mut available_keybinds: ResMut<AvailableKeybinds>) {
+    available_keybinds.add_keycode(CustomInput::Single(KeyCode::KeyL), "Remove Collider".into());
+    available_keybinds.add_keycode(CustomInput::Single(KeyCode::KeyP), "Place Collider".into());
+    available_keybinds.add_keycode(CustomInput::Single(KeyCode::KeyQ), "Quit Edit Mode".into());
+}
+fn remove_collider_mode_kb(mut available_keybinds: ResMut<AvailableKeybinds>) {
+    available_keybinds.clear();
 }
 
 fn collidermode_keybinds(
@@ -132,9 +139,13 @@ pub fn collidermode_plugin(app: &mut App) {
             (
                 populate_collider_tooling_menu,
                 crate::ui::update_placeholder::<ColliderObject>,
+                add_collider_mode_kb,
             )
                 .chain(),
         )
+        .add_systems(OnExit(EditorState::Editing(EditorObjectKind::Collider)),
+        remove_collider_mode_kb
+    )
         //Update systems, that run only while TileEditor is active
         .add_systems(
             Update,
@@ -148,7 +159,11 @@ pub fn collidermode_plugin(app: &mut App) {
         //OnExit systems
         .add_systems(
             OnExit(EditorState::Editing(EditorObjectKind::Collider)),
-            (despawn_all::<collider_ui::ColliderModeUI>, exit_collidermode).chain(),
+            (
+                despawn_all::<collider_ui::ColliderModeUI>,
+                exit_collidermode,
+            )
+                .chain(),
         );
 }
 //NOTHING BELOW THE PLUGINS
