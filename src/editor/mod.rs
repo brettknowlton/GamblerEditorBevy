@@ -1,8 +1,8 @@
-use bevy::picking::window;
 use bevy::window::PrimaryWindow;
 use serde::Deserialize;
 use serde::Serialize;
 
+use crate::actor::player::Player;
 use crate::bottom_bar::EditorBottomBarQueuedMessages;
 pub use crate::consts::*;
 use crate::coordinate::*;
@@ -30,6 +30,7 @@ pub use ui::*;
 use bevy_rapier2d::prelude::*;
 
 mod scene;
+use std::ops::DerefMut;
 pub use std::{fmt::Debug, path::PathBuf};
 
 use bevy::{prelude::*, sprite::Anchor};
@@ -490,7 +491,7 @@ impl Dragging {
     pub fn is_dragging(&self) -> bool {
         self.dragging_btn.is_some()
     }
-    
+
     fn start_drag(&mut self, btn: MouseButton, pos: Vec2) {
         self.dragging_btn = Some(btn);
         self.start_pos = Some(pos);
@@ -605,25 +606,38 @@ fn stateful_keybinds(
 pub struct Crosshair; //tags the main crosshair entity, in the editor this happens to only be our camera, but may be taken over by a crosshair entity in the future that tracks the mouse
 
 fn reset_scene(
-    mut players: Query<
-        (&mut actor::player::Player, &mut Transform, &mut Velocity),
-        (Without<Crosshair>, Without<Camera2d>),
+    commands: Commands,
+    asset_server: Res<AssetServer>,
+    mut player_q: Option<
+        Single<
+            (
+                Entity,
+                &mut actor::player::Player,
+                &mut KinematicCharacterController,
+            ),
+            (Without<Crosshair>, Without<Camera2d>),
+        >,
     >,
     mut cameras: Query<(&mut Transform, &mut Camera2d), Without<Crosshair>>,
-    crosshairs: Query<&Transform, (With<Crosshair>, Without<Camera2d>)>, // mut ui_items: Query<(&mut UIItem, &mut Transform), Without<Crosshair>>,
+    crosshair: Single<&Transform, (With<Crosshair>, Without<Camera2d>)>, // mut ui_items: Query<(&mut UIItem, &mut Transform), Without<Crosshair>>,
 ) {
+    println!("Resetting scene...");
     //reset the player to the crosshair position
-    let cs = crosshairs.single().unwrap().clone();
+    let crosshair_position = crosshair.clone().translation;
 
-    for (_, mut t, mut vel) in players.iter_mut() {
-        actor::player::move_player_to_cursor(cs, &mut t); // TODO This isnt working
-        vel.linvel = Vec2::new(0.0, 0.0);
+    if let Some(player_q) = player_q.as_mut() {
+        let (e, _, controller) = player_q.deref_mut();
+        controller.translation = None;
+
+        println!("Respawning player...");
+        Player::respawn(commands, *e, asset_server, crosshair);
+    } else {
+        println!("No player found, spawning new player...");
+        Player::spawn_player(commands, asset_server, crosshair);
     }
 
-    //reset the camera to the crosshair position
-    let cs = crosshairs.single().unwrap().clone();
     for (mut t, _) in cameras.iter_mut() {
-        t.translation = cs.translation;
+        t.translation = crosshair_position;
     }
 }
 

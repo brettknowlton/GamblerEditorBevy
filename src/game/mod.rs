@@ -18,10 +18,7 @@ pub enum GameState {
 pub fn game_plugin(app: &mut App) {
     app.init_state::<GameState>()
         //OnEnter systems
-        .add_systems(
-            OnEnter(GameState::Inactive),
-            (load_save_data, actor::player::spawn_player).chain(),
-        )
+        .add_systems(OnEnter(GameState::Inactive), load_save_data)
         .add_systems(
             Update,
             (
@@ -40,7 +37,6 @@ pub fn game_plugin(app: &mut App) {
     // );
 }
 
-
 fn game_keybinds(
     editor_state: ResMut<State<EditorState>>,
     mut next_editor_state: ResMut<NextState<EditorState>>,
@@ -56,16 +52,12 @@ fn game_keybinds(
 }
 
 fn player_camera(
-    players: Query<(&actor::player::Player, &Transform), Without<Camera>>,
+    player: Single<(&actor::player::Player, &Transform), Without<Camera>>,
     mut camera_query: Query<(&mut Camera, &mut Transform)>,
 ) {
-    for (_, player_t) in players.iter() {
-        for (_, mut t) in camera_query.iter_mut() {
-            let mut new_t = player_t.clone();
-            new_t.translation.z = t.translation.z;
-
-            t.translation = new_t.translation;
-        }
+    let player_t = player.1.translation;
+    for (_, mut t) in camera_query.iter_mut() {
+        t.translation = Vec3::new(player_t.x, player_t.y, t.translation.z);
     }
 }
 

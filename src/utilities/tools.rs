@@ -5,7 +5,6 @@ use super::*;
 use super::coordinate::*;
 
 pub trait SignificantComponent {
-
     fn place_rectangle(rect: Rect, commands: Commands);
     fn from_rect(rect: Rect, coord: Coordinate) -> Self;
 
@@ -56,7 +55,6 @@ pub trait SignificantComponent {
             item.clone(),
         ));
     }
-
 
     fn remove<T: SignificantComponent + Component>(
         commands: &mut Commands,
