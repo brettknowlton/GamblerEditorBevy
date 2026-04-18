@@ -30,17 +30,17 @@ pub trait SignificantComponent {
 
         //create a rectangle representing the item's hitbox (one grid space)
         let item_rect = Rect::new(
-            item.coordinate.0 as f32 * TILE_SCALE as f32,
-            item.coordinate.1 as f32 * TILE_SCALE as f32,
-            (item.coordinate.0 as f32 + 1.0) * TILE_SCALE as f32,
-            (item.coordinate.1 as f32 + 1.0) * TILE_SCALE as f32,
+            item.coordinate.x as f32 * TILE_SCALE as f32,
+            item.coordinate.y as f32 * TILE_SCALE as f32,
+            (item.coordinate.x as f32 + 1.0) * TILE_SCALE as f32,
+            (item.coordinate.y as f32 + 1.0) * TILE_SCALE as f32,
         );
         println!("item's rectangle calculated: {:?}", item_rect);
 
         // calculate the position for the Transform component, this will be in the center of the item's hitbox locked to the grid
         let pos = Vec3::new(
-            (item.coordinate.0 + (SCALED_TILE_WIDTH / 2) as i64) as f32,
-            (item.coordinate.1 + (SCALED_TILE_HEIGHT / 2) as i64) as f32,
+            (item.coordinate.x + (SCALED_TILE_WIDTH / 2) as i64) as f32,
+            (item.coordinate.y + (SCALED_TILE_HEIGHT / 2) as i64) as f32,
             -5.0,
         );
         println!("item's position offset calculated: {:?}", pos);

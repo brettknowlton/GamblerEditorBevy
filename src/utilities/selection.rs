@@ -38,7 +38,7 @@ impl SignificantComponent for SelectionRect {
                 end: Some(item.coordinate.add_tile_scale()),
             },
             Transform {
-                translation: Vec3::new(item.coordinate.0 as f32, item.coordinate.1 as f32, -5.0),
+                translation: Vec3::new(item.coordinate.x as f32, item.coordinate.y as f32, -5.0),
                 scale: Vec3::new(TILE_SCALE as f32, TILE_SCALE as f32, 1.0),
                 ..default()
             },

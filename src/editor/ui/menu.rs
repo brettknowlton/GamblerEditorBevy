@@ -142,7 +142,7 @@ fn sync_tile_selection(
             .unwrap_or_else(|| tile_rect_for_item_id(id));
 
         placeholder_update_writer.write(UpdatePlaceholderMessage {
-            tcoord: TCoordinate::new(EditorObjectKind::Tile, Coordinate(0, 0)),
+            tcoord: TCoordinate::new(EditorObjectKind::Tile, Coordinate::game(0, 0)),
             rect,
         });
     }
@@ -368,7 +368,6 @@ pub fn bottom_bar_ui(
     kb_icon: ResMut<KBIcon>,
     asset_server: Res<AssetServer>,
 ) -> Result {
-
     let tex_id = if kb_icon.0.is_none() {
         init_kb_icon(&mut contexts, asset_server)
     } else {

@@ -80,10 +80,7 @@ pub fn trigger_placeholder_update(
         for ent in placeholders.iter() {
             commands.entity(ent.0).insert(Sprite {
                 image: placeholder.0.clone(),
-                rect: Some(Rect {
-                    min: Vec2::new(e.rect.min.x, e.rect.min.y),
-                    max: Vec2::new(e.rect.max.x, e.rect.max.y),
-                }),
+                rect: Some(e.rect),
                 ..default()
             });
         }

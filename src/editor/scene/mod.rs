@@ -11,34 +11,34 @@ pub fn scene_plugin(app: &mut App) {
         .register_type::<Tile>()
         .register_type::<TCoordinate>()
         .register_type::<Coordinate>()
-
         .add_systems(
             OnEnter(EditorState::LoadingEmpty),
             (load_empty_scene, goto_normal_state).chain(),
         )
-
         .add_systems(
             OnEnter(EditorState::Loading),
             (load_scene, goto_normal_state).chain(),
         )
-
         .add_systems(
             OnEnter(EditorState::Saving),
             (save_items, goto_normal_state).chain(),
         )
-
-        .add_systems(OnEnter(EditorState::SaveAsk), (add_save_ask_mode_kb).chain())
+        .add_systems(
+            OnEnter(EditorState::SaveAsk),
+            (add_save_ask_mode_kb).chain(),
+        )
         .add_systems(
             OnExit(EditorState::SaveAsk),
             (remove_io_ask_mode_kb).chain(),
         )
-
-        .add_systems(OnEnter(EditorState::LoadAsk), (add_load_ask_mode_kb).chain())
+        .add_systems(
+            OnEnter(EditorState::LoadAsk),
+            (add_load_ask_mode_kb).chain(),
+        )
         .add_systems(
             OnExit(EditorState::LoadAsk),
             (remove_io_ask_mode_kb).chain(),
         )
-
         .add_systems(
             Update,
             (spawn_sprites)
@@ -107,8 +107,8 @@ fn add_missing_colliders(
                 Friction::coefficient(0.5),
                 Transform {
                     translation: Vec3::new(
-                        (editor_object.coordinate.0 + (SCALED_TILE_WIDTH / 2) as i64) as f32,
-                        (editor_object.coordinate.1 + (SCALED_TILE_HEIGHT / 2) as i64) as f32,
+                        (editor_object.coordinate.x + (SCALED_TILE_WIDTH / 2) as i64) as f32,
+                        (editor_object.coordinate.y + (SCALED_TILE_HEIGHT / 2) as i64) as f32,
                         -5.0,
                     ),
                     ..default()
@@ -140,8 +140,8 @@ fn spawn_sprites(
 
             // calculate the position for the Transform component, this will be in the center of the item's hitbox locked to the grid
             let pos = Vec3::new(
-                (eo.coordinate.0 + (SCALED_TILE_WIDTH / 2) as i64) as f32,
-                (eo.coordinate.1 + (SCALED_TILE_HEIGHT / 2) as i64) as f32,
+                (eo.coordinate.x + (SCALED_TILE_WIDTH / 2) as i64) as f32,
+                (eo.coordinate.y + (SCALED_TILE_HEIGHT / 2) as i64) as f32,
                 -5.0,
             );
             println!("item's position offset calculated: {:?}", pos);

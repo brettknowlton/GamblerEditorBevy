@@ -1,3 +1,5 @@
+use bevy::picking::window;
+use bevy::window::PrimaryWindow;
 use serde::Deserialize;
 use serde::Serialize;
 
@@ -120,19 +122,6 @@ pub enum ShowGrid {
     No,
 }
 
-pub fn snapped_coordinate_from_translation(
-    translation: Vec3,
-    gridsnap: &State<GridSnap>,
-) -> Coordinate {
-    let coord = Coordinate::from(translation);
-
-    if gridsnap.get() == &GridSnap::Enabled {
-        snap_coordinate_to_grid(coord)
-    } else {
-        coord
-    }
-}
-
 pub fn build_editor_object(
     kind: EditorObjectKind,
     internal_kind: u64,
@@ -143,7 +132,10 @@ pub fn build_editor_object(
         kind,
         internal_kind,
         coordinate,
-        zone_id: TCoordinate::new(zone_kind, coordinate.containing_zone_coordinate()),
+        zone_id: TCoordinate::new(
+            zone_kind,
+            coordinate.convert(CoordinateFormat::ZoneSpace, None, None),
+        ),
     }
 }
 
@@ -298,12 +290,12 @@ fn handle_global_editor_shortcuts(
             return;
         };
 
-        let zone_id = Coordinate {
-            0: (transform.translation.x as i64) / ((ZONE_SIZE * SCALED_TILE_WIDTH) as i64),
-            1: (transform.translation.y as i64) / ((ZONE_SIZE * SCALED_TILE_WIDTH) as i64),
-        };
+        let zone_id = Coordinate::zone_space(
+            (transform.translation.x as i64) / ((ZONE_SIZE * SCALED_TILE_WIDTH) as i64),
+            (transform.translation.y as i64) / ((ZONE_SIZE * SCALED_TILE_HEIGHT) as i64),
+        );
 
-        let path = PathBuf::from(format!("background{}{}.png", zone_id.0, zone_id.1));
+        let path = PathBuf::from(format!("background{}{}.png", zone_id.x, zone_id.y));
         let aseprite_path =
             PathBuf::from("C:/Program Files (x86)/Steam/steamapps/common/Aseprite/Aseprite.exe");
 
@@ -343,10 +335,7 @@ fn handle_rectangle_tool_shortcuts(
         let Ok((_, t, _)) = crosshairs.single() else {
             return;
         };
-        let _ = Coordinate {
-            0: t.translation.x as i64,
-            1: t.translation.y as i64,
-        };
+        let _ = Coordinate::game(t.translation.x as i64, t.translation.y as i64);
     }
 }
 
@@ -483,6 +472,72 @@ fn apply_editor_movement(
     }
 }
 
+#[derive(Resource)]
+struct Dragging {
+    dragging_btn: Option<MouseButton>,
+    start_pos: Option<Vec2>,
+}
+impl Default for Dragging {
+    fn default() -> Self {
+        Self {
+            dragging_btn: None,
+            start_pos: None,
+        }
+    }
+}
+
+impl Dragging {
+    pub fn is_dragging(&self) -> bool {
+        self.dragging_btn.is_some()
+    }
+    
+    fn start_drag(&mut self, btn: MouseButton, pos: Vec2) {
+        self.dragging_btn = Some(btn);
+        self.start_pos = Some(pos);
+    }
+
+    fn end_drag(&mut self) {
+        self.dragging_btn = None;
+        self.start_pos = None;
+    }
+}
+
+fn listen_click_events(
+    input: Res<ButtonInput<MouseButton>>,
+    window: Single<&Window, With<PrimaryWindow>>,
+    mut dragging: ResMut<Dragging>,
+) {
+    if input.just_pressed(MouseButton::Left) {
+        dragging.start_drag(
+            MouseButton::Left,
+            window.cursor_position().unwrap_or_default(),
+        );
+    }
+    if input.just_released(MouseButton::Left) {
+        dragging.end_drag();
+    }
+
+    if input.just_pressed(MouseButton::Right) {
+        dragging.start_drag(
+            MouseButton::Right,
+            window.cursor_position().unwrap_or_default(),
+        );
+    }
+    if input.just_released(MouseButton::Right) {
+        dragging.end_drag();
+    }
+
+    if input.just_pressed(MouseButton::Middle) {
+        dragging.start_drag(
+            MouseButton::Middle,
+            window.cursor_position().unwrap_or_default(),
+        );
+    }
+    if input.just_released(MouseButton::Middle) {
+        dragging.end_drag();
+    }
+}
+
 fn stateful_keybinds(
     editor_state: ResMut<State<EditorState>>,
     mut next_editor_state: ResMut<NextState<EditorState>>,
@@ -586,6 +641,7 @@ pub fn editor_plugin(app: &mut App) {
         .init_resource::<PlaceholderHandle>()
         .init_resource::<TextureHandles>()
         .init_resource::<ActiveSelection>()
+        .init_resource::<Dragging>()
         // .init_resource::<ActiveSelection>()
         //plugins
         .add_plugins(ui::editor_ui_plugin)
@@ -599,6 +655,7 @@ pub fn editor_plugin(app: &mut App) {
             (
                 ui::hide_tooling_menu,
                 ui::update_placeholder::<SelectionRect>,
+                reset_scene,
             )
                 .chain(),
         )
@@ -607,7 +664,9 @@ pub fn editor_plugin(app: &mut App) {
         //universal update systems for all editing modes
         .add_systems(
             Update,
-            stateful_keybinds.run_if(not(in_state(EditorState::Inactive))),
+            (stateful_keybinds, listen_click_events)
+                .chain()
+                .run_if(not(in_state(EditorState::Inactive))),
         )
         .add_systems(Update, reset_scene.run_if(on_message::<ResetScene>));
 }

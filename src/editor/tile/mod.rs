@@ -47,6 +47,36 @@ fn load_spritesheet(
         .insert(EditorObjectKind::Tile, asset_server.load(tex_path));
 }
 
+fn tilemode_click(
+    mut commands: Commands,
+    window: Single<&Window, With<PrimaryWindow>>,
+    camera: Single<(&Camera, &Transform)>,
+    tiles: Query<(Entity, &EditorObject), With<Tile>>,
+    selected_tile_id: Res<SelectedTileID>,
+    mut message_queue: ResMut<EditorBottomBarQueuedMessages>,
+) {
+    if let Some(mouse_pos) = window.cursor_position() {
+        let sc_coord = Coordinate::screen(mouse_pos.x as i64, mouse_pos.y as i64);
+        let adj_position = sc_coord.convert(
+            CoordinateFormat::Game,
+            Some(&camera.1),
+            Some(&window.size()),
+        );
+
+        let snapped_coord: Coordinate = adj_position.snap_to_grid();
+
+        let to_place = build_editor_object(
+            EditorObjectKind::Tile,
+            selected_tile_id.id,
+            snapped_coord,
+            EditorObjectKind::Other,
+        );
+
+        Tile::place(&mut commands, to_place, &tiles);
+        send_place_eo_message(&mut message_queue, "tile", snapped_coord);
+    }
+}
+
 fn tilemode_keybinds(
     mut commands: Commands,
 
@@ -55,13 +85,12 @@ fn tilemode_keybinds(
 
     crosshair: Single<(&Transform, &Crosshair)>,
     tiles: Query<(Entity, &EditorObject), With<Tile>>,
-    gridsnap: Res<State<GridSnap>>,
     selected_tile_id: ResMut<SelectedTileID>,
 ) {
     //"P" handles placement of a tile and adding it to the scene
     //places the first tile in the selection rect
     if input.just_pressed(KeyCode::KeyP) {
-        let coord = snapped_coordinate_from_translation(crosshair.0.translation, &gridsnap);
+        let coord = Coordinate::from(crosshair.0.translation).snap_to_grid();
         let to_place = build_editor_object(
             EditorObjectKind::Tile,
             selected_tile_id.id,
@@ -75,7 +104,7 @@ fn tilemode_keybinds(
 
     // "L" handles removal of a tile from the scene, similar to placing one just doesnt need to worry about the tile creation part afterwards
     if input.just_pressed(KeyCode::KeyL) {
-        let coord = snap_coordinate_to_grid(Coordinate::from(crosshair.0.translation));
+        let coord = Coordinate::from(crosshair.0.translation).snap_to_grid();
 
         Tile::remove(&mut commands, coord, EditorObjectKind::Tile, &tiles);
         send_remove_eo_message(&mut message_queue, "tiles", coord);
@@ -125,6 +154,7 @@ impl Default for Tile {
         Self::new()
     }
 }
+
 impl SignificantComponent for Tile {
     fn place_rectangle(_rect: Rect, _commands: Commands) {
         //make a tile like normal in this rect, but use sliced tiles over the sprite sheet selection
@@ -151,6 +181,10 @@ fn add_tile_mode_kb(mut available_keybinds: ResMut<AvailableKeybinds>) {
 }
 fn remove_tile_mode_kb(mut available_keybinds: ResMut<AvailableKeybinds>) {
     available_keybinds.clear();
+}
+
+fn is_dragging(dragging: Res<Dragging>) -> bool {
+    dragging.is_dragging()
 }
 
 pub fn tilemode_plugin(app: &mut App) {
@@ -183,6 +217,7 @@ pub fn tilemode_plugin(app: &mut App) {
             Update,
             (
                 tilemode_keybinds,
+                (tilemode_click).run_if(is_dragging),
                 (update_placeholder::<Tile>, reset_update_needed).run_if(run_if_tile_update_needed),
             )
                 .chain()

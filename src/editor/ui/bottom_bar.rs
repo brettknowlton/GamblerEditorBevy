@@ -12,20 +12,13 @@ macro_rules! send_message {
 }
 pub(crate) use send_message;
 
-
 pub fn bottom_bar_plugin(app: &mut App) {
     app.init_resource::<EditorBottomBarDisplayed>()
         .init_resource::<EditorBottomBarMessage>()
         .init_resource::<EditorBottomBarQueuedMessages>()
-
-
         //begin update system to send debug messages (to bottom bar and to console)
-        .add_systems(Update, send_messages)
-
-        ;
+        .add_systems(Update, send_messages);
 }
-
-
 
 pub fn send_place_eo_message(
     message_queue: &mut EditorBottomBarQueuedMessages,
@@ -35,7 +28,7 @@ pub fn send_place_eo_message(
     send_message!(
         Some('i'),
         message_queue,
-        format!("Placed {label} at: ({}, {})", coord.0, coord.1)
+        format!("Placed {label} at: ({}, {})", coord.x, coord.y)
     );
 }
 
@@ -47,7 +40,7 @@ pub fn send_remove_eo_message(
     send_message!(
         Some('i'),
         message_queue,
-        format!("Removing {label} at: ({}, {})", coord.0, coord.1)
+        format!("Removing {label} at: ({}, {})", coord.x, coord.y)
     );
 }
 
@@ -58,7 +51,6 @@ pub fn send_mode_exit_message(message_queue: &mut EditorBottomBarQueuedMessages,
         format!("Exiting {label} Editing Mode")
     );
 }
-
 
 pub fn send_messages(
     mut queued_messages: ResMut<EditorBottomBarQueuedMessages>,
@@ -79,8 +71,6 @@ pub fn send_messages(
         }
     }
 }
-
-
 
 #[derive(Resource)]
 pub struct EditorBottomBarDisplayed {

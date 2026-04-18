@@ -5,14 +5,13 @@ pub use actor_ui::*;
 pub mod player;
 use player::Player;
 
-use bevy::prelude::*;
-use tools::SignificantComponent;
-use std::path::PathBuf;
+use super::*;
 use crate::bottom_bar::{send_mode_exit_message, send_place_eo_message, send_remove_eo_message};
 use crate::ui::ToolingMenuItem;
-use crate::{ utilities::*, EditorObject, TILE_SIZE };
-use crate::consts::*;
-use super::*;
+use crate::{EditorObject, TILE_SIZE};
+use bevy::prelude::*;
+use std::path::PathBuf;
+use tools::SignificantComponent;
 
 use bevy_rapier2d::prelude::*;
 
@@ -37,7 +36,7 @@ fn init(mut spritesheets: ResMut<TextureHandles>, asset_server: Res<AssetServer>
         .insert(EditorObjectKind::Actor, asset_server.load(texpath));
 }
 
-#[derive(Component, Reflect, Debug, Clone, PartialEq,)]
+#[derive(Component, Reflect, Debug, Clone, PartialEq)]
 #[require(EditorObject)]
 pub struct Actor {
     pub internal_type: u64,
@@ -48,8 +47,8 @@ pub struct Actor {
 impl Actor {
     pub fn new() -> Self {
         Self {
-           internal_type: 0,
-            coordinate: TCoordinate::new(EditorObjectKind::Actor, Coordinate{0: 0, 1: 0}),
+            internal_type: 0,
+            coordinate: TCoordinate::new(EditorObjectKind::Actor, Coordinate::game(0, 0)),
             rect: Rect::new(0.0, 0.0, 1.0, 1.0),
         }
     }
@@ -80,7 +79,6 @@ pub fn actor_mode_keybinds(
     // mut actors:Query<(Entity, &EditorObject), With<Actor>>,
     // gridsnap: Res<State<GridSnap>>,
     // mut commands: &mut Commands,
-    
 
     // mut message_queue: ResMut<EditorBottomBarQueuedMessages>
     mut commands: Commands,
@@ -90,13 +88,10 @@ pub fn actor_mode_keybinds(
 
     crosshairs: Query<(&Transform, &Crosshair)>,
     actors: Query<(Entity, &EditorObject), With<Actor>>,
-    gridsnap: Res<State<GridSnap>>,
     // mut selected_tile_id: ResMut<SelectedTileID>,
 
     // mut placeholder_update_ev: EventWriter<UpdatePlaceholderEvent>
-
 ) {
-
     //"P" handles placement of an actor and adding it to the scene
     //places the first actor in the selection rect
     if input.just_pressed(KeyCode::KeyP) {
@@ -104,7 +99,7 @@ pub fn actor_mode_keybinds(
             return;
         };
 
-        let coord = snapped_coordinate_from_translation(crosshair_location.translation, &gridsnap);
+        let coord = Coordinate::from(crosshair_location.translation).snap_to_grid();
         let to_place = build_editor_object(
             EditorObjectKind::Actor,
             Actor::new().internal_type,
@@ -121,7 +116,7 @@ pub fn actor_mode_keybinds(
         let Ok((t, _)) = crosshairs.single() else {
             return;
         };
-        let coord = snap_coordinate_to_grid(Coordinate::from(t.translation));
+        let coord = Coordinate::from(t.translation).snap_to_grid();
 
         Actor::remove(&mut commands, coord, EditorObjectKind::Actor, &actors);
         send_remove_eo_message(&mut message_queue, "actor", coord);
@@ -132,39 +127,34 @@ fn exit_actormode(mut message_queue: ResMut<EditorBottomBarQueuedMessages>) {
     send_mode_exit_message(&mut message_queue, "Actor");
 }
 
-
 pub fn actormode_plugin(app: &mut App) {
-    app
-        .register_type::<Actor>()
+    app.register_type::<Actor>()
         .register_type::<Player>()
         .register_type::<Coordinate>()
         .register_type::<TCoordinate>()
         .register_type::<actor_ui::ActorModeUI>()
-
         //startup systems (may need to be moved from here to maintain order)
         .add_systems(Startup, init)
-
         //OnEnter systems
         .add_systems(
             OnEnter(EditorState::Editing(EditorObjectKind::Actor)),
-            (populate_actor_tooling_menu, crate::ui::update_placeholder::<Actor>).chain(),
+            (
+                populate_actor_tooling_menu,
+                crate::ui::update_placeholder::<Actor>,
+            )
+                .chain(),
         )
-
         //Update systems, that run only while TileEditor is active
         .add_systems(
             Update,
-            (super::ui::update_placeholder::<Actor>, actor_mode_keybinds).chain()
-                .run_if(in_state(EditorState::Editing(EditorObjectKind::Actor)))
+            (super::ui::update_placeholder::<Actor>, actor_mode_keybinds)
+                .chain()
+                .run_if(in_state(EditorState::Editing(EditorObjectKind::Actor))),
         )
-
-
         //OnExit systems
         .add_systems(
-            OnExit(EditorState::Editing(EditorObjectKind::Actor)), 
-            (
-                despawn_all::<actor_ui::ActorModeUI>,
-                exit_actormode,
-            ).chain()
+            OnExit(EditorState::Editing(EditorObjectKind::Actor)),
+            (despawn_all::<actor_ui::ActorModeUI>, exit_actormode).chain(),
         );
 }
 //NOTHING BELOW THE PLUGINS

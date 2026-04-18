@@ -44,7 +44,6 @@ fn collidermode_keybinds(
 
     crosshairs: Query<(&Transform, &Crosshair)>,
     colliders: Query<(Entity, &EditorObject), With<ColliderObject>>,
-    gridsnap: Res<State<GridSnap>>,
 
     mut message_queue: ResMut<EditorBottomBarQueuedMessages>,
 ) {
@@ -54,7 +53,7 @@ fn collidermode_keybinds(
             return;
         };
 
-        let coord = snapped_coordinate_from_translation(t.translation, &gridsnap);
+        let coord = Coordinate::from(t.translation).snap_to_grid();
         let to_place = build_editor_object(
             EditorObjectKind::Collider,
             0,
@@ -71,7 +70,7 @@ fn collidermode_keybinds(
         let Ok((t, _)) = crosshairs.single() else {
             return;
         };
-        let coord = snap_coordinate_to_grid(Coordinate::from(t.translation));
+        let coord = Coordinate::from(t.translation).snap_to_grid();
 
         ColliderObject::remove(&mut commands, coord, EditorObjectKind::Collider, &colliders);
         send_remove_eo_message(&mut message_queue, "colliders", coord);
@@ -97,7 +96,7 @@ impl ColliderObject {
             internal_type: 0,
             coordinate: TCoordinate {
                 kind: EditorObjectKind::Collider,
-                coord: Coordinate { 0: 0, 1: 0 },
+                coord: Coordinate::game(0, 0),
             },
             rect: Rect::new(0.0, 0.0, 1.0, 1.0),
         }
@@ -143,9 +142,10 @@ pub fn collidermode_plugin(app: &mut App) {
             )
                 .chain(),
         )
-        .add_systems(OnExit(EditorState::Editing(EditorObjectKind::Collider)),
-        remove_collider_mode_kb
-    )
+        .add_systems(
+            OnExit(EditorState::Editing(EditorObjectKind::Collider)),
+            remove_collider_mode_kb,
+        )
         //Update systems, that run only while TileEditor is active
         .add_systems(
             Update,
