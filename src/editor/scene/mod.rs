@@ -89,17 +89,26 @@ fn load_scene(mut commands: Commands, asset_server: Res<AssetServer>) {
 
 fn add_missing_colliders(
     mut commands: Commands,
-    editor_objects: Query<(Entity, &EditorObject), Without<Collider>>,
+    editor_objects: Query<(
+        Entity,
+        &EditorObject,
+        Option<&super::collider::ColliderObject>,
+        Option<&Collider>,
+    )>,
 ) {
-    for (entity, editor_object) in editor_objects.iter() {
-        if editor_object.get_major_type() == EditorObjectKind::Collider {
+    for (entity, editor_object, collider_object, physics_collider) in editor_objects.iter() {
+        if editor_object.get_major_type() != EditorObjectKind::Collider {
+            continue;
+        }
+
+        let mut ecmd = commands.entity(entity);
+
+        if physics_collider.is_none() {
             println!(
-                "Adding missing collider for EditorObject ID: {:?}",
+                "Adding missing Rapier collider for EditorObject ID: {:?}",
                 editor_object.coordinate
             );
-
-            // Add a collider based on the EditorObject's properties
-            commands.entity(entity).insert((
+            ecmd.insert((
                 Collider::cuboid(
                     ((TILE_SIZE / 2) * TILE_SCALE) as f32,
                     ((TILE_SIZE / 2) * TILE_SCALE) as f32,
@@ -114,6 +123,22 @@ fn add_missing_colliders(
                     ..default()
                 },
             ));
+        }
+
+        if collider_object.is_none() {
+            let coord = editor_object.coordinate;
+            let rect = Rect::new(
+                coord.x as f32 * TILE_SCALE as f32,
+                coord.y as f32 * TILE_SCALE as f32,
+                (coord.x as f32 + 1.0) * TILE_SCALE as f32,
+                (coord.y as f32 + 1.0) * TILE_SCALE as f32,
+            );
+
+            println!(
+                "Adding missing ColliderObject marker for EditorObject ID: {:?}",
+                editor_object.coordinate
+            );
+            ecmd.insert(super::collider::ColliderObject::from_rect(rect, coord));
         }
     }
 }

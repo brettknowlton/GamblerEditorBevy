@@ -19,22 +19,19 @@ use crate::{EditorState, ShowGrid, TILE_SCALE, TILE_SIZE, ZONE_SIZE};
 
 pub fn editor_ui_plugin(app: &mut App) {
     app.init_resource::<ToolingMenuState>()
-
+        .init_resource::<LeftPanelEdge>()
+        .init_resource::<MouseToolState>()
         .init_resource::<AvailableKeybinds>()
         .init_resource::<menu::KBIcon>()
+        .init_resource::<menu::MouseToolIcons>()
         .add_message::<UpdatePlaceholderMessage>()
-
         .add_plugins(bottom_bar::bottom_bar_plugin)
-
         .add_systems(OnEnter(EditorState::Normal), (add_normal_mode_kb,).chain())
         .add_systems(OnExit(EditorState::Normal), (remove_normal_mode_kb,))
         .add_systems(Update, draw_grid.run_if(in_state(ShowGrid::Yes)))
         .add_systems(Update, placeholder::trigger_placeholder_update)
         .add_systems(Update, menu::sync_tooling_menu_visibility)
-        .add_systems(
-            EguiPrimaryContextPass,
-            (menu::egui_panel_render, menu::bottom_bar_ui).chain(),
-        );
+        .add_systems(EguiPrimaryContextPass, menu::render_egui_panels);
 }
 
 fn add_normal_mode_kb(mut available_keybinds: ResMut<AvailableKeybinds>) {
@@ -46,10 +43,7 @@ fn add_normal_mode_kb(mut available_keybinds: ResMut<AvailableKeybinds>) {
         CustomInput::Combo(vec![KeyCode::ControlLeft, KeyCode::KeyT]),
         "Test Scene".into(),
     );
-    available_keybinds.add_keycode(
-        CustomInput::Single(KeyCode::KeyQ),
-        "Quit Edit Mode".into(),
-    );
+    available_keybinds.add_keycode(CustomInput::Single(KeyCode::KeyQ), "Quit Edit Mode".into());
 }
 fn remove_normal_mode_kb(mut available_keybinds: ResMut<AvailableKeybinds>) {
     available_keybinds.clear();

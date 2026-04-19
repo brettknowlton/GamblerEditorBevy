@@ -66,6 +66,21 @@ pub struct ToolingMenuItemNode {
     pub id: u64,
 }
 
+#[derive(Resource, Default)]
+pub struct LeftPanelEdge(pub f32);
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq, Default)]
+pub enum MouseToolKind {
+    #[default]
+    Pointer,
+    Eyedropper,
+}
+
+#[derive(Resource, Debug, Default)]
+pub struct MouseToolState {
+    pub selected: MouseToolKind,
+}
+
 fn editor_panel_frame() -> egui::Frame {
     egui::Frame {
         fill: egui::Color32::from_rgba_unmultiplied(18, 22, 30, 165),
@@ -156,14 +171,14 @@ pub fn left_panel(
     textures: &Res<TextureHandles>,
     selected_tile_id: &mut ResMut<SelectedTileID>,
     placeholder_update_writer: &mut MessageWriter<UpdatePlaceholderMessage>,
-) -> Result {
+) -> Result<f32> {
     if !tooling_menu_state.visible || !matches!(editor_state.get(), EditorState::Editing(_)) {
-        return Ok(());
+        return Ok(0.0);
     }
 
     let items = tooling_menu_state.items.clone();
     if items.is_empty() {
-        return Ok(());
+        return Ok(0.0);
     }
 
     let is_tile_mode = matches!(
@@ -201,7 +216,7 @@ pub fn left_panel(
         220.0
     };
 
-    egui::SidePanel::left("tooling_menu_panel")
+    let res = egui::SidePanel::left("tooling_menu_panel")
         .frame(editor_panel_frame())
         .resizable(false)
         .default_width(panel_width)
@@ -315,20 +330,111 @@ pub fn left_panel(
             );
         }
     }
-
-    Ok(())
+    return Ok(res.response.rect.right());
 }
 
-pub fn egui_panel_render(
+fn mode_tabs_ui(
+    ctx: &egui::Context,
+    editor_state: &EditorState,
+    next_state: &mut NextState<EditorState>,
+    panel_right_x: f32,
+) {
+    if !matches!(editor_state, EditorState::Normal | EditorState::Editing(_)) {
+        return;
+    }
+
+    let tab_x = panel_right_x.max(0.0);
+    let tab_y = 0.0;
+
+    egui::Area::new("mode_tabs_area".into())
+        .fixed_pos(egui::pos2(tab_x, tab_y))
+        .interactable(true)
+        .show(ctx, |ui| {
+            egui::Frame {
+                fill: egui::Color32::from_rgba_unmultiplied(18, 22, 30, 165),
+                stroke: egui::Stroke::new(
+                    1.0,
+                    egui::Color32::from_rgba_unmultiplied(220, 230, 245, 120),
+                ),
+                inner_margin: egui::Margin::same(4),
+                ..Default::default()
+            }
+            .show(ui, |ui| {
+                ui.vertical(|ui| {
+                    let tile_active =
+                        matches!(editor_state, EditorState::Editing(EditorObjectKind::Tile));
+                    let collider_active = matches!(
+                        editor_state,
+                        EditorState::Editing(EditorObjectKind::Collider)
+                    );
+                    let actor_active =
+                        matches!(editor_state, EditorState::Editing(EditorObjectKind::Actor));
+
+                    let mut tab = |label: &str, active: bool| {
+                        let mut button = egui::Button::new(RichText::new(label).size(14.0));
+                        button = button.min_size(egui::vec2(80.0, 24.0));
+                        if active {
+                            button = button
+                                .fill(egui::Color32::from_rgba_unmultiplied(245, 230, 120, 40))
+                                .stroke(egui::Stroke::new(
+                                    1.0,
+                                    egui::Color32::from_rgb(245, 230, 120),
+                                ));
+                        }
+                        ui.add(button)
+                    };
+
+                    if tab("1: Tile", tile_active).clicked() {
+                        next_state.set(EditorState::Editing(EditorObjectKind::Tile));
+                    }
+                    if tab("2: Collider", collider_active).clicked() {
+                        next_state.set(EditorState::Editing(EditorObjectKind::Collider));
+                    }
+                    if tab("3: Actor", actor_active).clicked() {
+                        next_state.set(EditorState::Editing(EditorObjectKind::Actor));
+                    }
+                });
+            });
+        });
+}
+
+pub fn render_egui_panels(
     mut contexts: EguiContexts,
+    display_message: ResMut<bottom_bar::EditorBottomBarDisplayed>,
+    available_keybinds: Res<AvailableKeybinds>,
+    kb_icon: ResMut<KBIcon>,
+    asset_server: Res<AssetServer>,
+    mut mouse_tool_icons: ResMut<MouseToolIcons>,
+
     editor_state: Res<State<EditorState>>,
     input: Res<ButtonInput<KeyCode>>,
     mut tooling_menu_state: ResMut<ToolingMenuState>,
     textures: Res<TextureHandles>,
     mut selected_tile_id: ResMut<SelectedTileID>,
     mut placeholder_update_writer: MessageWriter<UpdatePlaceholderMessage>,
+    mut next_editor_state: ResMut<NextState<EditorState>>,
+    mut left_panel_edge: ResMut<LeftPanelEdge>,
+    mut mouse_tool_state: ResMut<MouseToolState>,
 ) -> Result {
-    left_panel(
+    bottom_bar_ui(
+        &mut contexts,
+        display_message,
+        available_keybinds,
+        kb_icon,
+        asset_server.as_ref(),
+    )?;
+
+    {
+        let ctx = contexts.ctx_mut()?;
+        mode_tabs_ui(
+            ctx,
+            editor_state.get(),
+            &mut next_editor_state,
+            left_panel_edge.0,
+        );
+    }
+
+    let panel_right_x = left_panel(
         &mut contexts,
         &editor_state,
         &input,
@@ -336,6 +442,16 @@ pub fn egui_panel_render(
         &textures,
         &mut selected_tile_id,
         &mut placeholder_update_writer,
+    )?;
+
+    left_panel_edge.0 = panel_right_x;
+
+    right_tool_sidebar_ui(
+        &mut contexts,
+        asset_server.as_ref(),
+        &mut mouse_tool_icons,
+        editor_state.get(),
+        &mut mouse_tool_state,
     )?;
 
     Ok(())
@@ -355,21 +471,130 @@ pub struct CameraLockedUI {
 #[derive(Resource, FromWorld)]
 pub struct KBIcon(pub Option<TextureId>);
 
-fn init_kb_icon(contexts: &mut EguiContexts, asset_server: Res<AssetServer>) -> TextureId {
+#[derive(Resource, Default)]
+pub struct MouseToolIcons {
+    pointer: Option<TextureId>,
+    eyedropper: Option<TextureId>,
+    highlight: Option<TextureId>,
+}
+
+fn init_kb_icon(contexts: &mut EguiContexts, asset_server: &AssetServer) -> TextureId {
     contexts.add_image(EguiTextureHandle::Strong(
         asset_server.load(PathBuf::from("textures/menus/keyboard_tip_icon.png")),
     ))
 }
 
+fn init_mouse_tool_icons(
+    contexts: &mut EguiContexts,
+    asset_server: &AssetServer,
+    icons: &mut MouseToolIcons,
+) {
+    if icons.pointer.is_none() {
+        icons.pointer = Some(contexts.add_image(EguiTextureHandle::Strong(
+            asset_server.load(PathBuf::from("textures/editor/icons/tool_pointer.png")),
+        )));
+    }
+
+    if icons.eyedropper.is_none() {
+        icons.eyedropper = Some(contexts.add_image(EguiTextureHandle::Strong(
+            asset_server.load(PathBuf::from("textures/editor/icons/tool_eyedrop.png")),
+        )));
+    }
+
+    if icons.highlight.is_none() {
+        icons.highlight = Some(contexts.add_image(EguiTextureHandle::Strong(
+            asset_server.load(PathBuf::from("textures/editor/icons/hl_toolpng.png")),
+        )));
+    }
+}
+
+fn right_tool_sidebar_ui(
+    contexts: &mut EguiContexts,
+    asset_server: &AssetServer,
+    icons: &mut MouseToolIcons,
+    editor_state: &EditorState,
+    mouse_tool_state: &mut MouseToolState,
+) -> Result {
+    if !matches!(editor_state, EditorState::Normal | EditorState::Editing(_)) {
+        return Ok(());
+    }
+
+    init_mouse_tool_icons(contexts, asset_server, icons);
+
+    let Some(pointer_icon) = icons.pointer else {
+        return Ok(());
+    };
+    let Some(eyedropper_icon) = icons.eyedropper else {
+        return Ok(());
+    };
+    let Some(highlight_icon) = icons.highlight else {
+        return Ok(());
+    };
+
+    let ctx = contexts.ctx_mut()?;
+
+    let mut draw_tool = |ui: &mut egui::Ui, tool_kind: MouseToolKind, icon: TextureId| {
+        let size = egui::vec2(40.0, 40.0);
+        let (rect, response) = ui.allocate_exact_size(size, egui::Sense::click());
+
+        ui.painter().rect_filled(
+            rect,
+            4.0,
+            egui::Color32::from_rgba_unmultiplied(255, 255, 255, 18),
+        );
+
+        ui.painter().image(
+            icon,
+            rect.shrink2(egui::vec2(4.0, 4.0)),
+            egui::Rect::from_min_max(egui::pos2(0.0, 0.0), egui::pos2(1.0, 1.0)),
+            egui::Color32::WHITE,
+        );
+
+        if mouse_tool_state.selected == tool_kind {
+            ui.painter().image(
+                highlight_icon,
+                rect,
+                egui::Rect::from_min_max(egui::pos2(0.0, 0.0), egui::pos2(1.0, 1.0)),
+                egui::Color32::WHITE,
+            );
+        }
+
+        if response.clicked() {
+            mouse_tool_state.selected = tool_kind;
+        }
+    };
+
+    egui::SidePanel::right("tool_sidebar")
+        .frame(editor_panel_frame())
+        .resizable(false)
+        .default_width(64.0)
+        .show(ctx, |ui| {
+            ui.vertical_centered(|ui| {
+                ui.heading(
+                    RichText::new("Tools")
+                        .strong()
+                        .size(16.0)
+                        .color(egui::Color32::from_rgba_unmultiplied(220, 230, 245, 255)),
+                );
+                ui.separator();
+                draw_tool(ui, MouseToolKind::Pointer, pointer_icon);
+                ui.add_space(6.0);
+                draw_tool(ui, MouseToolKind::Eyedropper, eyedropper_icon);
+            });
+        });
+
+    Ok(())
+}
+
 pub fn bottom_bar_ui(
-    mut contexts: EguiContexts,
+    contexts: &mut EguiContexts,
     display_message: ResMut<bottom_bar::EditorBottomBarDisplayed>,
     available_keybinds: Res<AvailableKeybinds>,
     kb_icon: ResMut<KBIcon>,
-    asset_server: Res<AssetServer>,
+    asset_server: &AssetServer,
 ) -> Result {
     let tex_id = if kb_icon.0.is_none() {
-        init_kb_icon(&mut contexts, asset_server)
+        init_kb_icon(contexts, asset_server)
     } else {
         kb_icon.0.unwrap()
     };

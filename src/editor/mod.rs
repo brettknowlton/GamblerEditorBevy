@@ -1,4 +1,5 @@
 use bevy::window::PrimaryWindow;
+use bevy_egui::EguiContexts;
 use serde::Deserialize;
 use serde::Serialize;
 
@@ -100,6 +101,7 @@ impl EditorObject {
 #[derive(Default, Reflect, Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize, Copy)]
 pub enum EditorObjectKind {
     #[default]
+    None,
     Other,
     Tile,
     Collider,
@@ -486,10 +488,17 @@ impl Default for Dragging {
         }
     }
 }
+fn is_dragging(dragging: Res<Dragging>) -> bool {
+    dragging.is_dragging()
+}
 
 impl Dragging {
     pub fn is_dragging(&self) -> bool {
         self.dragging_btn.is_some()
+    }
+
+    pub fn dragging_button(&self) -> Option<MouseButton> {
+        self.dragging_btn
     }
 
     fn start_drag(&mut self, btn: MouseButton, pos: Vec2) {
@@ -506,8 +515,24 @@ impl Dragging {
 fn listen_click_events(
     input: Res<ButtonInput<MouseButton>>,
     window: Single<&Window, With<PrimaryWindow>>,
+    mut egui_contexts: EguiContexts,
     mut dragging: ResMut<Dragging>,
 ) {
+    let ui_consumed_pointer = egui_contexts
+        .ctx_mut()
+        .map(|ctx| ctx.wants_pointer_input() || ctx.is_pointer_over_area())
+        .unwrap_or(false);
+
+    if ui_consumed_pointer {
+        if input.just_released(MouseButton::Left)
+            || input.just_released(MouseButton::Right)
+            || input.just_released(MouseButton::Middle)
+        {
+            dragging.end_drag();
+        }
+        return;
+    }
+
     if input.just_pressed(MouseButton::Left) {
         dragging.start_drag(
             MouseButton::Left,

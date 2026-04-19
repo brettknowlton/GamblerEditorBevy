@@ -1,21 +1,21 @@
 (
   resources: {},
   entities: {
-    4294967263: (
+    4294967198: (
       components: {
         "gambler_bevy::editor::EditorObject": (
           kind: Tile,
           internal_kind: 0,
           coordinate: (
-            x: 64,
-            y: 0,
+            x: 0,
+            y: 192,
             format: GridSpace,
           ),
           zone_id: (
             kind: Other,
             coord: (
-              x: 4,
-              y: 0,
+              x: 0,
+              y: 12,
               format: ZoneSpace,
             ),
           ),
@@ -23,11 +23,75 @@
         "gambler_bevy::editor::tile::Tile": (),
       },
     ),
-    4294967264: (
+    4294967213: (
       components: {
         "gambler_bevy::editor::EditorObject": (
           kind: Tile,
-          internal_kind: 5,
+          internal_kind: 0,
+          coordinate: (
+            x: 192,
+            y: 128,
+            format: GridSpace,
+          ),
+          zone_id: (
+            kind: Other,
+            coord: (
+              x: 12,
+              y: 8,
+              format: ZoneSpace,
+            ),
+          ),
+        ),
+        "gambler_bevy::editor::tile::Tile": (),
+      },
+    ),
+    4294967255: (
+      components: {
+        "gambler_bevy::editor::EditorObject": (
+          kind: Collider,
+          internal_kind: 0,
+          coordinate: (
+            x: 128,
+            y: -64,
+            format: GridSpace,
+          ),
+          zone_id: (
+            kind: Other,
+            coord: (
+              x: 8,
+              y: -4,
+              format: ZoneSpace,
+            ),
+          ),
+        ),
+      },
+    ),
+    4294967258: (
+      components: {
+        "gambler_bevy::editor::EditorObject": (
+          kind: Collider,
+          internal_kind: 0,
+          coordinate: (
+            x: 0,
+            y: -64,
+            format: GridSpace,
+          ),
+          zone_id: (
+            kind: Other,
+            coord: (
+              x: 0,
+              y: -4,
+              format: ZoneSpace,
+            ),
+          ),
+        ),
+      },
+    ),
+    4294967259: (
+      components: {
+        "gambler_bevy::editor::EditorObject": (
+          kind: Collider,
+          internal_kind: 0,
           coordinate: (
             x: 64,
             y: -64,
@@ -42,6 +106,112 @@
             ),
           ),
         ),
+      },
+    ),
+    4294967260: (
+      components: {
+        "gambler_bevy::editor::EditorObject": (
+          kind: Collider,
+          internal_kind: 0,
+          coordinate: (
+            x: -192,
+            y: -64,
+            format: GridSpace,
+          ),
+          zone_id: (
+            kind: Other,
+            coord: (
+              x: -12,
+              y: -4,
+              format: ZoneSpace,
+            ),
+          ),
+        ),
+      },
+    ),
+    4294967261: (
+      components: {
+        "gambler_bevy::editor::EditorObject": (
+          kind: Collider,
+          internal_kind: 0,
+          coordinate: (
+            x: -64,
+            y: -64,
+            format: GridSpace,
+          ),
+          zone_id: (
+            kind: Other,
+            coord: (
+              x: -4,
+              y: -4,
+              format: ZoneSpace,
+            ),
+          ),
+        ),
+      },
+    ),
+    4294967262: (
+      components: {
+        "gambler_bevy::editor::EditorObject": (
+          kind: Collider,
+          internal_kind: 0,
+          coordinate: (
+            x: -128,
+            y: -64,
+            format: GridSpace,
+          ),
+          zone_id: (
+            kind: Other,
+            coord: (
+              x: -8,
+              y: -4,
+              format: ZoneSpace,
+            ),
+          ),
+        ),
+      },
+    ),
+    4294967263: (
+      components: {
+        "gambler_bevy::editor::EditorObject": (
+          kind: Tile,
+          internal_kind: 0,
+          coordinate: (
+            x: 0,
+            y: 0,
+            format: GridSpace,
+          ),
+          zone_id: (
+            kind: Other,
+            coord: (
+              x: 0,
+              y: 0,
+              format: ZoneSpace,
+            ),
+          ),
+        ),
+        "gambler_bevy::editor::tile::Tile": (),
+      },
+    ),
+    4294967264: (
+      components: {
+        "gambler_bevy::editor::EditorObject": (
+          kind: Tile,
+          internal_kind: 0,
+          coordinate: (
+            x: -64,
+            y: 0,
+            format: GridSpace,
+          ),
+          zone_id: (
+            kind: Other,
+            coord: (
+              x: -4,
+              y: 0,
+              format: ZoneSpace,
+            ),
+          ),
+        ),
         "gambler_bevy::editor::tile::Tile": (),
       },
     ),
@@ -51,14 +221,14 @@
           kind: Tile,
           internal_kind: 5,
           coordinate: (
-            x: 0,
+            x: -128,
             y: -64,
             format: GridSpace,
           ),
           zone_id: (
             kind: Other,
             coord: (
-              x: 0,
+              x: -8,
               y: -4,
               format: ZoneSpace,
             ),
@@ -95,14 +265,14 @@
           kind: Tile,
           internal_kind: 5,
           coordinate: (
-            x: -128,
+            x: 0,
             y: -64,
             format: GridSpace,
           ),
           zone_id: (
             kind: Other,
             coord: (
-              x: -8,
+              x: 0,
               y: -4,
               format: ZoneSpace,
             ),
@@ -115,136 +285,7 @@
       components: {
         "gambler_bevy::editor::EditorObject": (
           kind: Tile,
-          internal_kind: 0,
-          coordinate: (
-            x: -128,
-            y: 0,
-            format: GridSpace,
-          ),
-          zone_id: (
-            kind: Other,
-            coord: (
-              x: -8,
-              y: 0,
-              format: ZoneSpace,
-            ),
-          ),
-        ),
-        "gambler_bevy::editor::tile::Tile": (),
-      },
-    ),
-    4294967269: (
-      components: {
-        "gambler_bevy::editor::EditorObject": (
-          kind: Tile,
-          internal_kind: 0,
-          coordinate: (
-            x: -64,
-            y: 0,
-            format: GridSpace,
-          ),
-          zone_id: (
-            kind: Other,
-            coord: (
-              x: -4,
-              y: 0,
-              format: ZoneSpace,
-            ),
-          ),
-        ),
-        "gambler_bevy::editor::tile::Tile": (),
-      },
-    ),
-    8589934567: (
-      components: {
-        "gambler_bevy::editor::EditorObject": (
-          kind: Tile,
-          internal_kind: 0,
-          coordinate: (
-            x: 0,
-            y: 0,
-            format: GridSpace,
-          ),
-          zone_id: (
-            kind: Other,
-            coord: (
-              x: 0,
-              y: 0,
-              format: ZoneSpace,
-            ),
-          ),
-        ),
-        "gambler_bevy::editor::tile::Tile": (),
-      },
-    ),
-    77309411291: (
-      components: {
-        "gambler_bevy::editor::EditorObject": (
-          kind: Collider,
-          internal_kind: 0,
-          coordinate: (
-            x: -128,
-            y: -64,
-            format: GridSpace,
-          ),
-          zone_id: (
-            kind: Other,
-            coord: (
-              x: -8,
-              y: -4,
-              format: ZoneSpace,
-            ),
-          ),
-        ),
-      },
-    ),
-    81604378588: (
-      components: {
-        "gambler_bevy::editor::EditorObject": (
-          kind: Collider,
-          internal_kind: 0,
-          coordinate: (
-            x: -64,
-            y: -64,
-            format: GridSpace,
-          ),
-          zone_id: (
-            kind: Other,
-            coord: (
-              x: -4,
-              y: -4,
-              format: ZoneSpace,
-            ),
-          ),
-        ),
-      },
-    ),
-    98784247770: (
-      components: {
-        "gambler_bevy::editor::EditorObject": (
-          kind: Collider,
-          internal_kind: 0,
-          coordinate: (
-            x: -192,
-            y: -64,
-            format: GridSpace,
-          ),
-          zone_id: (
-            kind: Other,
-            coord: (
-              x: -12,
-              y: -4,
-              format: ZoneSpace,
-            ),
-          ),
-        ),
-      },
-    ),
-    304942677990: (
-      components: {
-        "gambler_bevy::editor::EditorObject": (
-          kind: Collider,
-          internal_kind: 0,
+          internal_kind: 5,
           coordinate: (
             x: 64,
             y: -64,
@@ -259,33 +300,717 @@
             ),
           ),
         ),
+        "gambler_bevy::editor::tile::Tile": (),
       },
     ),
-    382252089310: (
+    4294967269: (
       components: {
         "gambler_bevy::editor::EditorObject": (
-          kind: Collider,
+          kind: Tile,
+          internal_kind: 0,
+          coordinate: (
+            x: 64,
+            y: 0,
+            format: GridSpace,
+          ),
+          zone_id: (
+            kind: Other,
+            coord: (
+              x: 4,
+              y: 0,
+              format: ZoneSpace,
+            ),
+          ),
+        ),
+        "gambler_bevy::editor::tile::Tile": (),
+      },
+    ),
+    4294967270: (
+      components: {
+        "gambler_bevy::editor::EditorObject": (
+          kind: Tile,
+          internal_kind: 0,
+          coordinate: (
+            x: -128,
+            y: 0,
+            format: GridSpace,
+          ),
+          zone_id: (
+            kind: Other,
+            coord: (
+              x: -8,
+              y: 0,
+              format: ZoneSpace,
+            ),
+          ),
+        ),
+        "gambler_bevy::editor::tile::Tile": (),
+      },
+    ),
+    8589934491: (
+      components: {
+        "gambler_bevy::editor::EditorObject": (
+          kind: Tile,
+          internal_kind: 0,
+          coordinate: (
+            x: 192,
+            y: 192,
+            format: GridSpace,
+          ),
+          zone_id: (
+            kind: Other,
+            coord: (
+              x: 12,
+              y: 12,
+              format: ZoneSpace,
+            ),
+          ),
+        ),
+        "gambler_bevy::editor::tile::Tile": (),
+      },
+    ),
+    8589934496: (
+      components: {
+        "gambler_bevy::editor::EditorObject": (
+          kind: Tile,
+          internal_kind: 0,
+          coordinate: (
+            x: -128,
+            y: 192,
+            format: GridSpace,
+          ),
+          zone_id: (
+            kind: Other,
+            coord: (
+              x: -8,
+              y: 12,
+              format: ZoneSpace,
+            ),
+          ),
+        ),
+        "gambler_bevy::editor::tile::Tile": (),
+      },
+    ),
+    8589934502: (
+      components: {
+        "gambler_bevy::editor::EditorObject": (
+          kind: Tile,
+          internal_kind: 0,
+          coordinate: (
+            x: -256,
+            y: 128,
+            format: GridSpace,
+          ),
+          zone_id: (
+            kind: Other,
+            coord: (
+              x: -16,
+              y: 8,
+              format: ZoneSpace,
+            ),
+          ),
+        ),
+        "gambler_bevy::editor::tile::Tile": (),
+      },
+    ),
+    8589934503: (
+      components: {
+        "gambler_bevy::editor::EditorObject": (
+          kind: Tile,
+          internal_kind: 0,
+          coordinate: (
+            x: -192,
+            y: 128,
+            format: GridSpace,
+          ),
+          zone_id: (
+            kind: Other,
+            coord: (
+              x: -12,
+              y: 8,
+              format: ZoneSpace,
+            ),
+          ),
+        ),
+        "gambler_bevy::editor::tile::Tile": (),
+      },
+    ),
+    8589934504: (
+      components: {
+        "gambler_bevy::editor::EditorObject": (
+          kind: Tile,
+          internal_kind: 0,
+          coordinate: (
+            x: -128,
+            y: 128,
+            format: GridSpace,
+          ),
+          zone_id: (
+            kind: Other,
+            coord: (
+              x: -8,
+              y: 8,
+              format: ZoneSpace,
+            ),
+          ),
+        ),
+        "gambler_bevy::editor::tile::Tile": (),
+      },
+    ),
+    8589934506: (
+      components: {
+        "gambler_bevy::editor::EditorObject": (
+          kind: Tile,
           internal_kind: 0,
           coordinate: (
             x: 0,
-            y: -64,
+            y: 128,
             format: GridSpace,
           ),
           zone_id: (
             kind: Other,
             coord: (
               x: 0,
-              y: -4,
+              y: 8,
               format: ZoneSpace,
             ),
           ),
         ),
+        "gambler_bevy::editor::tile::Tile": (),
       },
     ),
-    433791696861: (
+    8589934511: (
       components: {
         "gambler_bevy::editor::EditorObject": (
-          kind: Collider,
+          kind: Tile,
+          internal_kind: 0,
+          coordinate: (
+            x: 256,
+            y: 128,
+            format: GridSpace,
+          ),
+          zone_id: (
+            kind: Other,
+            coord: (
+              x: 16,
+              y: 8,
+              format: ZoneSpace,
+            ),
+          ),
+        ),
+        "gambler_bevy::editor::tile::Tile": (),
+      },
+    ),
+    8589934530: (
+      components: {
+        "gambler_bevy::editor::EditorObject": (
+          kind: Tile,
+          internal_kind: 0,
+          coordinate: (
+            x: -192,
+            y: 64,
+            format: GridSpace,
+          ),
+          zone_id: (
+            kind: Other,
+            coord: (
+              x: -12,
+              y: 4,
+              format: ZoneSpace,
+            ),
+          ),
+        ),
+        "gambler_bevy::editor::tile::Tile": (),
+      },
+    ),
+    8589934531: (
+      components: {
+        "gambler_bevy::editor::EditorObject": (
+          kind: Tile,
+          internal_kind: 0,
+          coordinate: (
+            x: -256,
+            y: 64,
+            format: GridSpace,
+          ),
+          zone_id: (
+            kind: Other,
+            coord: (
+              x: -16,
+              y: 4,
+              format: ZoneSpace,
+            ),
+          ),
+        ),
+        "gambler_bevy::editor::tile::Tile": (),
+      },
+    ),
+    12884901784: (
+      components: {
+        "gambler_bevy::editor::EditorObject": (
+          kind: Tile,
+          internal_kind: 0,
+          coordinate: (
+            x: 384,
+            y: 192,
+            format: GridSpace,
+          ),
+          zone_id: (
+            kind: Other,
+            coord: (
+              x: 24,
+              y: 12,
+              format: ZoneSpace,
+            ),
+          ),
+        ),
+        "gambler_bevy::editor::tile::Tile": (),
+      },
+    ),
+    12884901789: (
+      components: {
+        "gambler_bevy::editor::EditorObject": (
+          kind: Tile,
+          internal_kind: 0,
+          coordinate: (
+            x: 128,
+            y: 192,
+            format: GridSpace,
+          ),
+          zone_id: (
+            kind: Other,
+            coord: (
+              x: 8,
+              y: 12,
+              format: ZoneSpace,
+            ),
+          ),
+        ),
+        "gambler_bevy::editor::tile::Tile": (),
+      },
+    ),
+    12884901804: (
+      components: {
+        "gambler_bevy::editor::EditorObject": (
+          kind: Tile,
+          internal_kind: 0,
+          coordinate: (
+            x: 64,
+            y: 128,
+            format: GridSpace,
+          ),
+          zone_id: (
+            kind: Other,
+            coord: (
+              x: 4,
+              y: 8,
+              format: ZoneSpace,
+            ),
+          ),
+        ),
+        "gambler_bevy::editor::tile::Tile": (),
+      },
+    ),
+    12884901806: (
+      components: {
+        "gambler_bevy::editor::EditorObject": (
+          kind: Tile,
+          internal_kind: 0,
+          coordinate: (
+            x: 128,
+            y: 128,
+            format: GridSpace,
+          ),
+          zone_id: (
+            kind: Other,
+            coord: (
+              x: 8,
+              y: 8,
+              format: ZoneSpace,
+            ),
+          ),
+        ),
+        "gambler_bevy::editor::tile::Tile": (),
+      },
+    ),
+    12884901808: (
+      components: {
+        "gambler_bevy::editor::EditorObject": (
+          kind: Tile,
+          internal_kind: 0,
+          coordinate: (
+            x: 320,
+            y: 128,
+            format: GridSpace,
+          ),
+          zone_id: (
+            kind: Other,
+            coord: (
+              x: 20,
+              y: 8,
+              format: ZoneSpace,
+            ),
+          ),
+        ),
+        "gambler_bevy::editor::tile::Tile": (),
+      },
+    ),
+    12884901814: (
+      components: {
+        "gambler_bevy::editor::EditorObject": (
+          kind: Tile,
+          internal_kind: 0,
+          coordinate: (
+            x: 320,
+            y: 0,
+            format: GridSpace,
+          ),
+          zone_id: (
+            kind: Other,
+            coord: (
+              x: 20,
+              y: 0,
+              format: ZoneSpace,
+            ),
+          ),
+        ),
+        "gambler_bevy::editor::tile::Tile": (),
+      },
+    ),
+    17179869087: (
+      components: {
+        "gambler_bevy::editor::EditorObject": (
+          kind: Tile,
+          internal_kind: 0,
+          coordinate: (
+            x: 64,
+            y: 192,
+            format: GridSpace,
+          ),
+          zone_id: (
+            kind: Other,
+            coord: (
+              x: 4,
+              y: 12,
+              format: ZoneSpace,
+            ),
+          ),
+        ),
+        "gambler_bevy::editor::tile::Tile": (),
+      },
+    ),
+    21474836378: (
+      components: {
+        "gambler_bevy::editor::EditorObject": (
+          kind: Tile,
+          internal_kind: 0,
+          coordinate: (
+            x: 320,
+            y: 192,
+            format: GridSpace,
+          ),
+          zone_id: (
+            kind: Other,
+            coord: (
+              x: 20,
+              y: 12,
+              format: ZoneSpace,
+            ),
+          ),
+        ),
+        "gambler_bevy::editor::tile::Tile": (),
+      },
+    ),
+    21474836395: (
+      components: {
+        "gambler_bevy::editor::EditorObject": (
+          kind: Tile,
+          internal_kind: 0,
+          coordinate: (
+            x: -64,
+            y: 128,
+            format: GridSpace,
+          ),
+          zone_id: (
+            kind: Other,
+            coord: (
+              x: -4,
+              y: 8,
+              format: ZoneSpace,
+            ),
+          ),
+        ),
+        "gambler_bevy::editor::tile::Tile": (),
+      },
+    ),
+    21474836401: (
+      components: {
+        "gambler_bevy::editor::EditorObject": (
+          kind: Tile,
+          internal_kind: 0,
+          coordinate: (
+            x: 384,
+            y: 128,
+            format: GridSpace,
+          ),
+          zone_id: (
+            kind: Other,
+            coord: (
+              x: 24,
+              y: 8,
+              format: ZoneSpace,
+            ),
+          ),
+        ),
+        "gambler_bevy::editor::tile::Tile": (),
+      },
+    ),
+    21474836405: (
+      components: {
+        "gambler_bevy::editor::EditorObject": (
+          kind: Tile,
+          internal_kind: 0,
+          coordinate: (
+            x: 192,
+            y: 0,
+            format: GridSpace,
+          ),
+          zone_id: (
+            kind: Other,
+            coord: (
+              x: 12,
+              y: 0,
+              format: ZoneSpace,
+            ),
+          ),
+        ),
+        "gambler_bevy::editor::tile::Tile": (),
+      },
+    ),
+    21474836413: (
+      components: {
+        "gambler_bevy::editor::EditorObject": (
+          kind: Tile,
+          internal_kind: 0,
+          coordinate: (
+            x: 192,
+            y: 64,
+            format: GridSpace,
+          ),
+          zone_id: (
+            kind: Other,
+            coord: (
+              x: 12,
+              y: 4,
+              format: ZoneSpace,
+            ),
+          ),
+        ),
+        "gambler_bevy::editor::tile::Tile": (),
+      },
+    ),
+    21474836414: (
+      components: {
+        "gambler_bevy::editor::EditorObject": (
+          kind: Tile,
+          internal_kind: 0,
+          coordinate: (
+            x: 128,
+            y: 64,
+            format: GridSpace,
+          ),
+          zone_id: (
+            kind: Other,
+            coord: (
+              x: 8,
+              y: 4,
+              format: ZoneSpace,
+            ),
+          ),
+        ),
+        "gambler_bevy::editor::tile::Tile": (),
+      },
+    ),
+    21474836415: (
+      components: {
+        "gambler_bevy::editor::EditorObject": (
+          kind: Tile,
+          internal_kind: 0,
+          coordinate: (
+            x: 64,
+            y: 64,
+            format: GridSpace,
+          ),
+          zone_id: (
+            kind: Other,
+            coord: (
+              x: 4,
+              y: 4,
+              format: ZoneSpace,
+            ),
+          ),
+        ),
+        "gambler_bevy::editor::tile::Tile": (),
+      },
+    ),
+    21474836416: (
+      components: {
+        "gambler_bevy::editor::EditorObject": (
+          kind: Tile,
+          internal_kind: 0,
+          coordinate: (
+            x: 0,
+            y: 64,
+            format: GridSpace,
+          ),
+          zone_id: (
+            kind: Other,
+            coord: (
+              x: 0,
+              y: 4,
+              format: ZoneSpace,
+            ),
+          ),
+        ),
+        "gambler_bevy::editor::tile::Tile": (),
+      },
+    ),
+    21474836417: (
+      components: {
+        "gambler_bevy::editor::EditorObject": (
+          kind: Tile,
+          internal_kind: 0,
+          coordinate: (
+            x: -64,
+            y: 64,
+            format: GridSpace,
+          ),
+          zone_id: (
+            kind: Other,
+            coord: (
+              x: -4,
+              y: 4,
+              format: ZoneSpace,
+            ),
+          ),
+        ),
+        "gambler_bevy::editor::tile::Tile": (),
+      },
+    ),
+    21474836423: (
+      components: {
+        "gambler_bevy::editor::EditorObject": (
+          kind: Tile,
+          internal_kind: 0,
+          coordinate: (
+            x: -320,
+            y: 0,
+            format: GridSpace,
+          ),
+          zone_id: (
+            kind: Other,
+            coord: (
+              x: -20,
+              y: 0,
+              format: ZoneSpace,
+            ),
+          ),
+        ),
+        "gambler_bevy::editor::tile::Tile": (),
+      },
+    ),
+    25769803676: (
+      components: {
+        "gambler_bevy::editor::EditorObject": (
+          kind: Tile,
+          internal_kind: 0,
+          coordinate: (
+            x: 256,
+            y: 192,
+            format: GridSpace,
+          ),
+          zone_id: (
+            kind: Other,
+            coord: (
+              x: 16,
+              y: 12,
+              format: ZoneSpace,
+            ),
+          ),
+        ),
+        "gambler_bevy::editor::tile::Tile": (),
+      },
+    ),
+    25769803681: (
+      components: {
+        "gambler_bevy::editor::EditorObject": (
+          kind: Tile,
+          internal_kind: 0,
+          coordinate: (
+            x: -64,
+            y: 192,
+            format: GridSpace,
+          ),
+          zone_id: (
+            kind: Other,
+            coord: (
+              x: -4,
+              y: 12,
+              format: ZoneSpace,
+            ),
+          ),
+        ),
+        "gambler_bevy::editor::tile::Tile": (),
+      },
+    ),
+    25769803698: (
+      components: {
+        "gambler_bevy::editor::EditorObject": (
+          kind: Tile,
+          internal_kind: 0,
+          coordinate: (
+            x: 448,
+            y: 128,
+            format: GridSpace,
+          ),
+          zone_id: (
+            kind: Other,
+            coord: (
+              x: 28,
+              y: 8,
+              format: ZoneSpace,
+            ),
+          ),
+        ),
+        "gambler_bevy::editor::tile::Tile": (),
+      },
+    ),
+    25769803708: (
+      components: {
+        "gambler_bevy::editor::EditorObject": (
+          kind: Tile,
+          internal_kind: 0,
+          coordinate: (
+            x: 256,
+            y: 64,
+            format: GridSpace,
+          ),
+          zone_id: (
+            kind: Other,
+            coord: (
+              x: 16,
+              y: 4,
+              format: ZoneSpace,
+            ),
+          ),
+        ),
+        "gambler_bevy::editor::tile::Tile": (),
+      },
+    ),
+    25769803717: (
+      components: {
+        "gambler_bevy::editor::EditorObject": (
+          kind: Tile,
           internal_kind: 0,
           coordinate: (
             x: -192,
@@ -301,12 +1026,188 @@
             ),
           ),
         ),
+        "gambler_bevy::editor::tile::Tile": (),
       },
     ),
-    493921239000: (
+    25769803730: (
       components: {
         "gambler_bevy::editor::EditorObject": (
           kind: Collider,
+          internal_kind: 0,
+          coordinate: (
+            x: -256,
+            y: -64,
+            format: GridSpace,
+          ),
+          zone_id: (
+            kind: Other,
+            coord: (
+              x: -16,
+              y: -4,
+              format: ZoneSpace,
+            ),
+          ),
+        ),
+      },
+    ),
+    30064770978: (
+      components: {
+        "gambler_bevy::editor::EditorObject": (
+          kind: Tile,
+          internal_kind: 0,
+          coordinate: (
+            x: -192,
+            y: 192,
+            format: GridSpace,
+          ),
+          zone_id: (
+            kind: Other,
+            coord: (
+              x: -12,
+              y: 12,
+              format: ZoneSpace,
+            ),
+          ),
+        ),
+        "gambler_bevy::editor::tile::Tile": (),
+      },
+    ),
+    30064771003: (
+      components: {
+        "gambler_bevy::editor::EditorObject": (
+          kind: Tile,
+          internal_kind: 0,
+          coordinate: (
+            x: 320,
+            y: 64,
+            format: GridSpace,
+          ),
+          zone_id: (
+            kind: Other,
+            coord: (
+              x: 20,
+              y: 4,
+              format: ZoneSpace,
+            ),
+          ),
+        ),
+        "gambler_bevy::editor::tile::Tile": (),
+      },
+    ),
+    34359738295: (
+      components: {
+        "gambler_bevy::editor::EditorObject": (
+          kind: Tile,
+          internal_kind: 0,
+          coordinate: (
+            x: 256,
+            y: 0,
+            format: GridSpace,
+          ),
+          zone_id: (
+            kind: Other,
+            coord: (
+              x: 16,
+              y: 0,
+              format: ZoneSpace,
+            ),
+          ),
+        ),
+        "gambler_bevy::editor::tile::Tile": (),
+      },
+    ),
+    34359738297: (
+      components: {
+        "gambler_bevy::editor::EditorObject": (
+          kind: Tile,
+          internal_kind: 0,
+          coordinate: (
+            x: 384,
+            y: 0,
+            format: GridSpace,
+          ),
+          zone_id: (
+            kind: Other,
+            coord: (
+              x: 24,
+              y: 0,
+              format: ZoneSpace,
+            ),
+          ),
+        ),
+        "gambler_bevy::editor::tile::Tile": (),
+      },
+    ),
+    34359738314: (
+      components: {
+        "gambler_bevy::editor::EditorObject": (
+          kind: Tile,
+          internal_kind: 4,
+          coordinate: (
+            x: -320,
+            y: -64,
+            format: GridSpace,
+          ),
+          zone_id: (
+            kind: Other,
+            coord: (
+              x: -20,
+              y: -4,
+              format: ZoneSpace,
+            ),
+          ),
+        ),
+        "gambler_bevy::editor::tile::Tile": (),
+      },
+    ),
+    38654705592: (
+      components: {
+        "gambler_bevy::editor::EditorObject": (
+          kind: Tile,
+          internal_kind: 0,
+          coordinate: (
+            x: 384,
+            y: 64,
+            format: GridSpace,
+          ),
+          zone_id: (
+            kind: Other,
+            coord: (
+              x: 24,
+              y: 4,
+              format: ZoneSpace,
+            ),
+          ),
+        ),
+        "gambler_bevy::editor::tile::Tile": (),
+      },
+    ),
+    42949672883: (
+      components: {
+        "gambler_bevy::editor::EditorObject": (
+          kind: Tile,
+          internal_kind: 0,
+          coordinate: (
+            x: 448,
+            y: 0,
+            format: GridSpace,
+          ),
+          zone_id: (
+            kind: Other,
+            coord: (
+              x: 28,
+              y: 0,
+              format: ZoneSpace,
+            ),
+          ),
+        ),
+        "gambler_bevy::editor::tile::Tile": (),
+      },
+    ),
+    42949672884: (
+      components: {
+        "gambler_bevy::editor::EditorObject": (
+          kind: Tile,
           internal_kind: 0,
           coordinate: (
             x: 128,
@@ -322,13 +1223,254 @@
             ),
           ),
         ),
+        "gambler_bevy::editor::tile::Tile": (),
       },
     ),
-    502511173593: (
+    47244640163: (
+      components: {
+        "gambler_bevy::editor::EditorObject": (
+          kind: Tile,
+          internal_kind: 0,
+          coordinate: (
+            x: -256,
+            y: 192,
+            format: GridSpace,
+          ),
+          zone_id: (
+            kind: Other,
+            coord: (
+              x: -16,
+              y: 12,
+              format: ZoneSpace,
+            ),
+          ),
+        ),
+        "gambler_bevy::editor::tile::Tile": (),
+      },
+    ),
+    55834574761: (
+      components: {
+        "gambler_bevy::editor::EditorObject": (
+          kind: Tile,
+          internal_kind: 0,
+          coordinate: (
+            x: -320,
+            y: 128,
+            format: GridSpace,
+          ),
+          zone_id: (
+            kind: Other,
+            coord: (
+              x: -20,
+              y: 8,
+              format: ZoneSpace,
+            ),
+          ),
+        ),
+        "gambler_bevy::editor::tile::Tile": (),
+      },
+    ),
+    60129542086: (
+      components: {
+        "gambler_bevy::editor::EditorObject": (
+          kind: Tile,
+          internal_kind: 0,
+          coordinate: (
+            x: -320,
+            y: 64,
+            format: GridSpace,
+          ),
+          zone_id: (
+            kind: Other,
+            coord: (
+              x: -20,
+              y: 4,
+              format: ZoneSpace,
+            ),
+          ),
+        ),
+        "gambler_bevy::editor::tile::Tile": (),
+      },
+    ),
+    64424509337: (
+      components: {
+        "gambler_bevy::editor::EditorObject": (
+          kind: Tile,
+          internal_kind: 0,
+          coordinate: (
+            x: 448,
+            y: 192,
+            format: GridSpace,
+          ),
+          zone_id: (
+            kind: Other,
+            coord: (
+              x: 28,
+              y: 12,
+              format: ZoneSpace,
+            ),
+          ),
+        ),
+        "gambler_bevy::editor::tile::Tile": (),
+      },
+    ),
+    64424509348: (
+      components: {
+        "gambler_bevy::editor::EditorObject": (
+          kind: Tile,
+          internal_kind: 0,
+          coordinate: (
+            x: -320,
+            y: 192,
+            format: GridSpace,
+          ),
+          zone_id: (
+            kind: Other,
+            coord: (
+              x: -20,
+              y: 12,
+              format: ZoneSpace,
+            ),
+          ),
+        ),
+        "gambler_bevy::editor::tile::Tile": (),
+      },
+    ),
+    73014443962: (
+      components: {
+        "gambler_bevy::editor::EditorObject": (
+          kind: Tile,
+          internal_kind: 0,
+          coordinate: (
+            x: 448,
+            y: 64,
+            format: GridSpace,
+          ),
+          zone_id: (
+            kind: Other,
+            coord: (
+              x: 28,
+              y: 4,
+              format: ZoneSpace,
+            ),
+          ),
+        ),
+        "gambler_bevy::editor::tile::Tile": (),
+      },
+    ),
+    77309411275: (
+      components: {
+        "gambler_bevy::editor::EditorObject": (
+          kind: Tile,
+          internal_kind: 4,
+          coordinate: (
+            x: 256,
+            y: -64,
+            format: GridSpace,
+          ),
+          zone_id: (
+            kind: Other,
+            coord: (
+              x: 16,
+              y: -4,
+              format: ZoneSpace,
+            ),
+          ),
+        ),
+        "gambler_bevy::editor::tile::Tile": (),
+      },
+    ),
+    85899345860: (
+      components: {
+        "gambler_bevy::editor::EditorObject": (
+          kind: Tile,
+          internal_kind: 0,
+          coordinate: (
+            x: -256,
+            y: 0,
+            format: GridSpace,
+          ),
+          zone_id: (
+            kind: Other,
+            coord: (
+              x: -16,
+              y: 0,
+              format: ZoneSpace,
+            ),
+          ),
+        ),
+        "gambler_bevy::editor::tile::Tile": (),
+      },
+    ),
+    94489280456: (
+      components: {
+        "gambler_bevy::editor::EditorObject": (
+          kind: Tile,
+          internal_kind: 0,
+          coordinate: (
+            x: -128,
+            y: 64,
+            format: GridSpace,
+          ),
+          zone_id: (
+            kind: Other,
+            coord: (
+              x: -8,
+              y: 4,
+              format: ZoneSpace,
+            ),
+          ),
+        ),
+        "gambler_bevy::editor::tile::Tile": (),
+      },
+    ),
+    98784247785: (
       components: {
         "gambler_bevy::editor::EditorObject": (
           kind: Collider,
           internal_kind: 0,
+          coordinate: (
+            x: 320,
+            y: -64,
+            format: GridSpace,
+          ),
+          zone_id: (
+            kind: Other,
+            coord: (
+              x: 20,
+              y: -4,
+              format: ZoneSpace,
+            ),
+          ),
+        ),
+      },
+    ),
+    111669149656: (
+      components: {
+        "gambler_bevy::editor::EditorObject": (
+          kind: Collider,
+          internal_kind: 0,
+          coordinate: (
+            x: 256,
+            y: -64,
+            format: GridSpace,
+          ),
+          zone_id: (
+            kind: Other,
+            coord: (
+              x: 16,
+              y: -4,
+              format: ZoneSpace,
+            ),
+          ),
+        ),
+      },
+    ),
+    115964116944: (
+      components: {
+        "gambler_bevy::editor::EditorObject": (
+          kind: Tile,
+          internal_kind: 4,
           coordinate: (
             x: 128,
             y: -64,
@@ -343,6 +1485,223 @@
             ),
           ),
         ),
+        "gambler_bevy::editor::tile::Tile": (),
+      },
+    ),
+    133143986129: (
+      components: {
+        "gambler_bevy::editor::EditorObject": (
+          kind: Tile,
+          internal_kind: 4,
+          coordinate: (
+            x: 192,
+            y: -64,
+            format: GridSpace,
+          ),
+          zone_id: (
+            kind: Other,
+            coord: (
+              x: 12,
+              y: -4,
+              format: ZoneSpace,
+            ),
+          ),
+        ),
+        "gambler_bevy::editor::tile::Tile": (),
+      },
+    ),
+    184683593673: (
+      components: {
+        "gambler_bevy::editor::EditorObject": (
+          kind: Tile,
+          internal_kind: 4,
+          coordinate: (
+            x: 448,
+            y: -64,
+            format: GridSpace,
+          ),
+          zone_id: (
+            kind: Other,
+            coord: (
+              x: 28,
+              y: -4,
+              format: ZoneSpace,
+            ),
+          ),
+        ),
+        "gambler_bevy::editor::tile::Tile": (),
+      },
+    ),
+    244813135829: (
+      components: {
+        "gambler_bevy::editor::EditorObject": (
+          kind: Collider,
+          internal_kind: 0,
+          coordinate: (
+            x: 448,
+            y: -64,
+            format: GridSpace,
+          ),
+          zone_id: (
+            kind: Other,
+            coord: (
+              x: 28,
+              y: -4,
+              format: ZoneSpace,
+            ),
+          ),
+        ),
+      },
+    ),
+    304942677972: (
+      components: {
+        "gambler_bevy::editor::EditorObject": (
+          kind: Collider,
+          internal_kind: 0,
+          coordinate: (
+            x: -320,
+            y: -64,
+            format: GridSpace,
+          ),
+          zone_id: (
+            kind: Other,
+            coord: (
+              x: -20,
+              y: -4,
+              format: ZoneSpace,
+            ),
+          ),
+        ),
+      },
+    ),
+    360777252819: (
+      components: {
+        "gambler_bevy::editor::EditorObject": (
+          kind: Tile,
+          internal_kind: 4,
+          coordinate: (
+            x: 320,
+            y: -64,
+            format: GridSpace,
+          ),
+          zone_id: (
+            kind: Other,
+            coord: (
+              x: 20,
+              y: -4,
+              format: ZoneSpace,
+            ),
+          ),
+        ),
+        "gambler_bevy::editor::tile::Tile": (),
+      },
+    ),
+    399431958486: (
+      components: {
+        "gambler_bevy::editor::EditorObject": (
+          kind: Collider,
+          internal_kind: 0,
+          coordinate: (
+            x: 384,
+            y: -64,
+            format: GridSpace,
+          ),
+          zone_id: (
+            kind: Other,
+            coord: (
+              x: 24,
+              y: -4,
+              format: ZoneSpace,
+            ),
+          ),
+        ),
+      },
+    ),
+    455266533324: (
+      components: {
+        "gambler_bevy::editor::EditorObject": (
+          kind: Tile,
+          internal_kind: 4,
+          coordinate: (
+            x: -256,
+            y: -64,
+            format: GridSpace,
+          ),
+          zone_id: (
+            kind: Other,
+            coord: (
+              x: -16,
+              y: -4,
+              format: ZoneSpace,
+            ),
+          ),
+        ),
+        "gambler_bevy::editor::tile::Tile": (),
+      },
+    ),
+    532575944665: (
+      components: {
+        "gambler_bevy::editor::EditorObject": (
+          kind: Collider,
+          internal_kind: 0,
+          coordinate: (
+            x: 192,
+            y: -64,
+            format: GridSpace,
+          ),
+          zone_id: (
+            kind: Other,
+            coord: (
+              x: 12,
+              y: -4,
+              format: ZoneSpace,
+            ),
+          ),
+        ),
+      },
+    ),
+    541165879245: (
+      components: {
+        "gambler_bevy::editor::EditorObject": (
+          kind: Tile,
+          internal_kind: 4,
+          coordinate: (
+            x: 384,
+            y: -64,
+            format: GridSpace,
+          ),
+          zone_id: (
+            kind: Other,
+            coord: (
+              x: 24,
+              y: -4,
+              format: ZoneSpace,
+            ),
+          ),
+        ),
+        "gambler_bevy::editor::tile::Tile": (),
+      },
+    ),
+    545460846542: (
+      components: {
+        "gambler_bevy::editor::EditorObject": (
+          kind: Tile,
+          internal_kind: 4,
+          coordinate: (
+            x: -192,
+            y: -64,
+            format: GridSpace,
+          ),
+          zone_id: (
+            kind: Other,
+            coord: (
+              x: -12,
+              y: -4,
+              format: ZoneSpace,
+            ),
+          ),
+        ),
+        "gambler_bevy::editor::tile::Tile": (),
       },
     ),
   },

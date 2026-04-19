@@ -125,6 +125,43 @@ impl SignificantComponent for ColliderObject {
     }
 }
 
+fn collidermode_click(
+    mut commands: Commands,
+    window: Single<&Window, With<PrimaryWindow>>,
+    camera: Single<(&Camera, &GlobalTransform), With<Camera2d>>,
+    colliders: Query<(Entity, &EditorObject), With<ColliderObject>>,
+    selected_tile_id: Res<SelectedTileID>,
+    dragging: Res<Dragging>,
+    mut message_queue: ResMut<EditorBottomBarQueuedMessages>,
+) {
+    if let Some(mouse_pos) = window.cursor_position() {
+        let Ok(world_pos) = camera.0.viewport_to_world_2d(camera.1, mouse_pos) else {
+            return;
+        };
+
+        let snapped_coord: Coordinate =
+            Coordinate::game(world_pos.x as i64, world_pos.y as i64).snap_to_grid();
+
+        match dragging.dragging_button() {
+            Some(MouseButton::Left) => {
+                let to_place = build_editor_object(
+                    EditorObjectKind::Collider,
+                    selected_tile_id.id,
+                    snapped_coord,
+                    EditorObjectKind::Other,
+                );
+                ColliderObject::place(&mut commands, to_place, &colliders);
+                send_place_eo_message(&mut message_queue, "collider", snapped_coord);
+            }
+            Some(MouseButton::Right) => {
+                ColliderObject::remove(&mut commands, snapped_coord, EditorObjectKind::Collider, &colliders);
+                send_remove_eo_message(&mut message_queue, "colliders", snapped_coord);
+            }
+            _ => {}
+        }
+    }
+}
+
 pub fn collidermode_plugin(app: &mut App) {
     app.register_type::<ColliderObject>()
         .register_type::<Coordinate>()
@@ -151,6 +188,7 @@ pub fn collidermode_plugin(app: &mut App) {
             Update,
             (
                 collidermode_keybinds,
+                (collidermode_click).run_if(is_dragging),
                 super::ui::update_placeholder::<ColliderObject>,
             )
                 .chain()
