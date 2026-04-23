@@ -1,12 +1,16 @@
-pub mod tile_ui;
+use bevy::window::PrimaryWindow;
 
 use super::*;
-use crate::ui::{bottom_bar::*, update_placeholder, ToolingMenuItem};
+use crate::editor_object::significant_component::SignificantComponent;
+use crate::ui::{message_display::*, update_placeholder, ToolingMenuItem};
+use crate::{
+    AvailableKeybinds, Crosshair, CustomInput, Dragging, Editor, EditorState, MouseToolState,
+    TextureHandles, TileUpdateNeeded, MAX_SPRITESHEET_ITEMS, SPRITESHEET_WIDTH,
+};
 
-use crate::{EditorObject, TILE_SIZE};
-use bevy::prelude::*;
+use crate::{configure_tooling_menu, SelectedTileID, ToolingMenuState, TILE_SIZE};
+
 use std::path::PathBuf;
-use tools::SignificantComponent;
 
 fn populate_tile_tooling_menu(
     mut tooling_menu: ResMut<ToolingMenuState>,
@@ -29,7 +33,7 @@ fn populate_tile_tooling_menu(
 
 fn load_spritesheet(
     asset_server: Res<AssetServer>,
-    mut message_queue: ResMut<EditorBottomBarQueuedMessages>,
+    mut bottom_bar: ResMut<MessageDisplay>,
     mut texture_handles: ResMut<TextureHandles>,
 ) {
     //load the tilesheet for this mode
@@ -37,7 +41,7 @@ fn load_spritesheet(
 
     send_message!(
         Some('i'),
-        message_queue,
+        bottom_bar.queue,
         format!("Tilesheet Loaded: \"{}\"", &tex_path.clone().display())
     );
 
@@ -54,7 +58,8 @@ fn tilemode_click(
     tiles: Query<(Entity, &EditorObject), With<Tile>>,
     selected_tile_id: Res<SelectedTileID>,
     dragging: Res<Dragging>,
-    mut message_queue: ResMut<EditorBottomBarQueuedMessages>,
+    bottom_bar: ResMut<MessageDisplay>,
+    mouse_mode: ResMut<MouseToolState>,
 ) {
     if let Some(mouse_pos) = window.cursor_position() {
         let Ok(world_pos) = camera.0.viewport_to_world_2d(camera.1, mouse_pos) else {
@@ -64,30 +69,21 @@ fn tilemode_click(
         let snapped_coord: Coordinate =
             Coordinate::game(world_pos.x as i64, world_pos.y as i64).snap_to_grid();
 
-        match dragging.dragging_button() {
-            Some(MouseButton::Left) => {
-                let to_place = build_editor_object(
-                    EditorObjectKind::Tile,
-                    selected_tile_id.id,
-                    snapped_coord,
-                    EditorObjectKind::Other,
-                );
-                Tile::place(&mut commands, to_place, &tiles);
-                send_place_eo_message(&mut message_queue, "tile", snapped_coord);
-            }
-            Some(MouseButton::Right) => {
-                Tile::remove(&mut commands, snapped_coord, EditorObjectKind::Tile, &tiles);
-                send_remove_eo_message(&mut message_queue, "tiles", snapped_coord);
-            }
-            _ => {}
-        }
+        dragging.drag_action(
+            &mut commands,
+            mouse_mode.current,
+            snapped_coord,
+            selected_tile_id.id,
+            bottom_bar,
+            &tiles,
+        );
     }
 }
 
 fn tilemode_keybinds(
     mut commands: Commands,
 
-    mut message_queue: ResMut<EditorBottomBarQueuedMessages>,
+    mut bottom_bar: ResMut<MessageDisplay>,
     input: Res<ButtonInput<KeyCode>>,
 
     crosshair: Single<(&Transform, &Crosshair)>,
@@ -98,7 +94,7 @@ fn tilemode_keybinds(
     //places the first tile in the selection rect
     if input.just_pressed(KeyCode::KeyP) {
         let coord = Coordinate::from(crosshair.0.translation).snap_to_grid();
-        let to_place = build_editor_object(
+        let to_place = EditorObject::new(
             EditorObjectKind::Tile,
             selected_tile_id.id,
             coord,
@@ -106,7 +102,7 @@ fn tilemode_keybinds(
         );
 
         Tile::place(&mut commands, to_place, &tiles);
-        send_place_eo_message(&mut message_queue, "tile", coord);
+        bottom_bar.send_place_eo_message("tile", coord);
     }
 
     // "L" handles removal of a tile from the scene, similar to placing one just doesnt need to worry about the tile creation part afterwards
@@ -114,27 +110,20 @@ fn tilemode_keybinds(
         let coord = Coordinate::from(crosshair.0.translation).snap_to_grid();
 
         Tile::remove(&mut commands, coord, EditorObjectKind::Tile, &tiles);
-        send_remove_eo_message(&mut message_queue, "tiles", coord);
+        bottom_bar.send_remove_eo_message("tiles", coord);
     }
 
     // Selection changes are now handled by the egui tooling panel.
 }
 
-fn exit_tilemode(mut message_queue: ResMut<EditorBottomBarQueuedMessages>) {
-    send_mode_exit_message(&mut message_queue, "Tile");
+fn exit_tilemode(mut bottom_bar: ResMut<MessageDisplay>) {
+    bottom_bar.send_mode_exit_message("Tile");
 }
-
-/// A component that marks an entity as part of the tile editing UI.
-#[derive(Component, Reflect)]
-#[reflect(Component)]
-#[require(CameraLockedUI)]
-struct TileModeUI;
 
 /// A component to track some basic info about a tile (actually its just a tag right now but that might change)
 #[derive(Component, Reflect, Debug, Clone)]
 #[reflect(Component)]
 #[require(EditorObject)]
-
 pub struct Tile {}
 
 impl Tile {
@@ -190,12 +179,10 @@ fn remove_tile_mode_kb(mut available_keybinds: ResMut<AvailableKeybinds>) {
     available_keybinds.clear();
 }
 
-
 pub fn tilemode_plugin(app: &mut App) {
     app.register_type::<Tile>()
         .register_type::<Coordinate>()
         .register_type::<TCoordinate>()
-        .register_type::<TileModeUI>()
         .init_resource::<SelectedTileID>()
         .init_resource::<TileUpdateNeeded>()
         // .init_resource::<SpritesheetCrop>()
@@ -221,7 +208,7 @@ pub fn tilemode_plugin(app: &mut App) {
             Update,
             (
                 tilemode_keybinds,
-                (tilemode_click).run_if(is_dragging),
+                (tilemode_click).run_if(Editor::editor_is_dragging),
                 (update_placeholder::<Tile>, reset_update_needed).run_if(run_if_tile_update_needed),
             )
                 .chain()
@@ -230,7 +217,7 @@ pub fn tilemode_plugin(app: &mut App) {
         //OnExit systems
         .add_systems(
             OnExit(EditorState::Editing(EditorObjectKind::Tile)),
-            (despawn_all::<TileModeUI>, exit_tilemode).chain(),
+            (exit_tilemode).chain(),
         );
     //we could also take care of some post-exit cleanup here, like despawning all the UI elements by using the schedule OnEnter(EditorState::Inactive) and then despawning all the UI elements
 }

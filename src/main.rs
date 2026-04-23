@@ -40,7 +40,7 @@ fn main() {
         .add_plugins(EguiPlugin::default())
         .insert_resource(ClearColor(Color::from(WINDOW_DEFAULT_BACKGROUND_COLOR)))
         .insert_resource(Time::<Fixed>::from_hz(64.0))
-        .add_plugins(editor::editor_plugin)
+        .add_plugins(editor::Editor)
         .add_plugins(game::game_plugin)
         .run();
 }

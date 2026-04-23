@@ -3,14 +3,13 @@ use bevy::prelude::*;
 use super::menu::CameraLockedUI;
 
 use crate::{
-    coordinate::TCoordinate, Crosshair, EditorState, PlaceholderHandle, SignificantComponent,
-    TextureHandles, TILE_SIZE, UI_Z_LAYER,
+    coordinate::TCoordinate, editor_object::significant_component::SignificantComponent, Crosshair,
+    EditorState, PlaceholderHandle, TextureHandles, TILE_SIZE, UI_Z_LAYER,
 };
 
 #[derive(Message)]
 pub struct UpdatePlaceholderMessage {
     pub tcoord: TCoordinate,
-    pub rect: Rect,
 }
 
 #[derive(Component, Reflect)]
@@ -74,13 +73,12 @@ pub fn trigger_placeholder_update(
     // crosshairs: Query<(&Crosshair, &Transform)>,
     placeholders: Query<(Entity, &PlaceholderObjectTag)>,
 ) {
-    for e in ev.read() {
+    for _ in ev.read() {
         println!("Placeholder Update Event Triggered");
         //update the placeholder object's texture rect to align with the rect given by the event
         for ent in placeholders.iter() {
             commands.entity(ent.0).insert(Sprite {
                 image: placeholder.0.clone(),
-                rect: Some(e.rect),
                 ..default()
             });
         }

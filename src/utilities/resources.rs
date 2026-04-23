@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 use std::collections::HashMap;
 
-use crate::EditorObjectKind;
+use crate::editor_object::EditorObjectKind;
 
 #[derive(Resource, Default)]
 /// A placeholder object is a temporary object that is used to represent an object that will be created later,

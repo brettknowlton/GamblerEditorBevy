@@ -1,4 +1,4 @@
-use crate::actor::Actor;
+use crate::editor_object::{EditorObject, EditorObjectKind, actor::Actor, collider::{self, ColliderObject}, significant_component::SignificantComponent, tile::Tile};
 
 use super::*;
 use bevy::{prelude::*, tasks::IoTaskPool};
@@ -92,7 +92,7 @@ fn add_missing_colliders(
     editor_objects: Query<(
         Entity,
         &EditorObject,
-        Option<&super::collider::ColliderObject>,
+        Option<&ColliderObject>,
         Option<&Collider>,
     )>,
 ) {
@@ -138,7 +138,7 @@ fn add_missing_colliders(
                 "Adding missing ColliderObject marker for EditorObject ID: {:?}",
                 editor_object.coordinate
             );
-            ecmd.insert(super::collider::ColliderObject::from_rect(rect, coord));
+            ecmd.insert(collider::ColliderObject::from_rect(rect, coord));
         }
     }
 }
@@ -193,15 +193,17 @@ fn load_empty_scene(mut commands: Commands) {
 
 fn goto_normal_state(
     mut next_state: ResMut<NextState<EditorState>>,
-    mut message_queue: ResMut<EditorBottomBarQueuedMessages>,
+    mut bottom_bar: ResMut<MessageDisplay>,
+    mut reset_message_writer: MessageWriter<ResetScene>,
 ) {
     //change the state
     next_state.set(EditorState::Normal);
     send_message!(
         Some('i'),
-        message_queue,
+        bottom_bar.queue,
         "FileIO Operations completed, returning to Normal Mode".to_string()
     );
+    reset_message_writer.write(ResetScene);
 }
 
 fn serialize_editor_scene(world: &mut World, type_registry: &AppTypeRegistry) -> String {

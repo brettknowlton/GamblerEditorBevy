@@ -1,17 +1,12 @@
-#[macro_use]
-mod actor_ui;
-pub use actor_ui::*;
-
 pub mod player;
 use player::Player;
 
 use super::*;
-use crate::bottom_bar::{send_mode_exit_message, send_place_eo_message, send_remove_eo_message};
-use crate::ui::ToolingMenuItem;
-use crate::{EditorObject, TILE_SIZE};
-use bevy::prelude::*;
+use crate::editor_object::significant_component::SignificantComponent;
+use crate::message_display::MessageDisplay;
+use crate::ui::{self, ToolingMenuItem};
+use crate::{configure_tooling_menu, Crosshair, EditorState, TextureHandles, ToolingMenuState};
 use std::path::PathBuf;
-use tools::SignificantComponent;
 
 use bevy_rapier2d::prelude::*;
 
@@ -83,7 +78,7 @@ pub fn actor_mode_keybinds(
     // mut message_queue: ResMut<EditorBottomBarQueuedMessages>
     mut commands: Commands,
 
-    mut message_queue: ResMut<EditorBottomBarQueuedMessages>,
+    mut bottom_bar: ResMut<MessageDisplay>,
     input: Res<ButtonInput<KeyCode>>,
 
     crosshairs: Query<(&Transform, &Crosshair)>,
@@ -100,7 +95,7 @@ pub fn actor_mode_keybinds(
         };
 
         let coord = Coordinate::from(crosshair_location.translation).snap_to_grid();
-        let to_place = build_editor_object(
+        let to_place = EditorObject::new(
             EditorObjectKind::Actor,
             Actor::new().internal_type,
             coord,
@@ -108,7 +103,7 @@ pub fn actor_mode_keybinds(
         );
 
         Actor::place(&mut commands, to_place, &actors);
-        send_place_eo_message(&mut message_queue, "actor", coord);
+        bottom_bar.send_place_eo_message("actor", coord);
     }
 
     // "L" handles removal of a tile from the scene, similar to placing one just doesnt need to worry about the tile creation part afterwards
@@ -119,20 +114,18 @@ pub fn actor_mode_keybinds(
         let coord = Coordinate::from(t.translation).snap_to_grid();
 
         Actor::remove(&mut commands, coord, EditorObjectKind::Actor, &actors);
-        send_remove_eo_message(&mut message_queue, "actor", coord);
+        bottom_bar.send_remove_eo_message("actor", coord);
     }
 }
 
-fn exit_actormode(mut message_queue: ResMut<EditorBottomBarQueuedMessages>) {
-    send_mode_exit_message(&mut message_queue, "Actor");
+fn exit_actormode(mut bottom_bar: ResMut<MessageDisplay>) {
+    bottom_bar.send_mode_exit_message("Actor");
 }
 
 pub fn actormode_plugin(app: &mut App) {
-    app.register_type::<Actor>()
-        .register_type::<Player>()
+    app.register_type::<Player>()
         .register_type::<Coordinate>()
         .register_type::<TCoordinate>()
-        .register_type::<actor_ui::ActorModeUI>()
         //startup systems (may need to be moved from here to maintain order)
         .add_systems(Startup, init)
         //OnEnter systems
@@ -147,14 +140,14 @@ pub fn actormode_plugin(app: &mut App) {
         //Update systems, that run only while TileEditor is active
         .add_systems(
             Update,
-            (super::ui::update_placeholder::<Actor>, actor_mode_keybinds)
+            (ui::update_placeholder::<Actor>, actor_mode_keybinds)
                 .chain()
                 .run_if(in_state(EditorState::Editing(EditorObjectKind::Actor))),
         )
         //OnExit systems
         .add_systems(
             OnExit(EditorState::Editing(EditorObjectKind::Actor)),
-            (despawn_all::<actor_ui::ActorModeUI>, exit_actormode).chain(),
+            (exit_actormode).chain(),
         );
 }
 //NOTHING BELOW THE PLUGINS

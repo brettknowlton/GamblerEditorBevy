@@ -1,8 +1,6 @@
-use crate::{EditorObject, SCALED_TILE_HEIGHT, SCALED_TILE_WIDTH, TILE_SCALE};
+use crate::{SCALED_TILE_HEIGHT, SCALED_TILE_WIDTH, TILE_SCALE};
 
 use super::*;
-
-use super::coordinate::*;
 
 pub trait SignificantComponent {
     fn place_rectangle(rect: Rect, commands: Commands);
@@ -72,12 +70,4 @@ pub trait SignificantComponent {
             commands.entity(item.0).despawn();
         }
     }
-}
-
-#[derive(Reflect, Debug, Clone, PartialEq, Eq)]
-pub enum Direction {
-    Up,
-    Down,
-    Left,
-    Right,
 }

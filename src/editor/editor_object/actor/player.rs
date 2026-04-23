@@ -1,6 +1,11 @@
 use std::ops::DerefMut;
 
-use crate::tools::Direction;
+use crate::{
+    direction::Direction, EPSILON, FRICTION, GRAVITY, MAX_PLAYER_WALK_SPEED, PLAYER_HB_X_OFFSET,
+    PLAYER_HB_Y_OFFSET, PLAYER_JUMP_FORCE, PLAYER_JUMP_GRACE_PERIOD, PLAYER_SCALE, PLAYER_SIZE_X,
+    PLAYER_SIZE_Y, PLAYER_WALK_FORCE,
+};
+use bevy::sprite::Anchor;
 use bevy_rapier2d::prelude::{Collider, RigidBody};
 
 use super::*;

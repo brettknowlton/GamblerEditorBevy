@@ -1,3 +1,5 @@
+use crate::editor_object::actor;
+
 use super::editor::*;
 
 use bevy::prelude::*;

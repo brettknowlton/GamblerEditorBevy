@@ -1,10 +1,6 @@
-use tools::SignificantComponent;
-
-use crate::{EditorObject, TILE_SCALE};
+use crate::{editor_object::significant_component::SignificantComponent, TILE_SCALE};
 
 use super::*;
-
-use super::coordinate::*;
 
 #[derive(Component, Default, Debug, Clone)]
 pub struct SelectionRect {
@@ -14,14 +10,14 @@ pub struct SelectionRect {
 
 impl SelectionRect {
     pub fn new(start: Coordinate) -> Self {
-        Self { start, end: Some(start) }
+        Self {
+            start,
+            end: Some(start),
+        }
     }
 
     pub fn start(start: Coordinate) -> Self {
-        SelectionRect {
-            start,
-            end: None,
-        }
+        SelectionRect { start, end: None }
     }
 
     pub fn end(&mut self, end: Coordinate) {
@@ -30,8 +26,11 @@ impl SelectionRect {
 }
 
 impl SignificantComponent for SelectionRect {
-
-    fn place<T: SignificantComponent + Component>(commands: &mut Commands, item: crate::EditorObject, _from: &Query<(Entity, &EditorObject), With<T>>) {
+    fn place<T: SignificantComponent + Component>(
+        commands: &mut Commands,
+        item: EditorObject,
+        _from: &Query<(Entity, &EditorObject), With<T>>,
+    ) {
         commands.spawn((
             SelectionRect {
                 start: item.coordinate,
@@ -45,8 +44,8 @@ impl SignificantComponent for SelectionRect {
             item,
         ));
     }
-    
-    fn place_rectangle(_rect: Rect,_commands: Commands) {
+
+    fn place_rectangle(_rect: Rect, _commands: Commands) {
         todo!();
     }
 
@@ -55,15 +54,12 @@ impl SignificantComponent for SelectionRect {
     }
 }
 
-
-
 #[derive(Resource, Default, Debug, Clone)]
 pub struct ActiveSelection {
     pub selection_rect: Option<SelectionRect>,
 }
 
 impl ActiveSelection {
-
     pub fn set_start(mut self, start: Coordinate) {
         self.selection_rect = Some(SelectionRect::start(start));
     }
@@ -78,22 +74,4 @@ impl ActiveSelection {
             selection_rect: Some(rect),
         }
     }
-
-    // //optionally, we can call end_and_make to create a bevy component
-    // pub fn end_and_make<T: Component + SignificantComponent>(self, end: Coordinate, commands: Commands){
-    //     let end = end;
-    //     let start = self.selection_rect.unwrap().start;
-
-    //     let rect = Rect::from_corners(start.into(), end.into());
-    //     T::use_rectangle_tool(rect, commands);
-
-    // }
-
-    // pub fn create_bevy_component<T: Component + SignificantComponent>(self, commands: Commands){
-    //     if let Some(end) = self.selection_rect.clone().unwrap().end {
-    //         let rect = Rect::from_corners(self.selection_rect.unwrap().start.into(), end.into());
-    //         T::use_rectangle_tool(rect, commands);
-    //     }
-    // }
-
 }

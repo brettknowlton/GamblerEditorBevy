@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 
 use bevy::prelude::*;
 
-use crate::editor::EditorObjectKind;
+use crate::editor_object::EditorObjectKind;
 use crate::{SCALED_TILE_WIDTH, TILE_SCALE, TILE_SIZE, ZONE_SIZE};
 
 pub fn snap_value_to_grid(value: i64, grid_size: i64) -> i64 {
