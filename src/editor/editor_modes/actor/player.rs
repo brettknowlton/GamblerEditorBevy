@@ -1,14 +1,41 @@
 use std::ops::DerefMut;
 
-use crate::{
-    direction::Direction, EPSILON, FRICTION, GRAVITY, MAX_PLAYER_WALK_SPEED, PLAYER_HB_X_OFFSET,
-    PLAYER_HB_Y_OFFSET, PLAYER_JUMP_FORCE, PLAYER_JUMP_GRACE_PERIOD, PLAYER_SCALE, PLAYER_SIZE_X,
-    PLAYER_SIZE_Y, PLAYER_WALK_FORCE,
-};
+use crate::{direction::Direction, DEFAULT_GENERAL_SCALE_FACTOR, EPSILON, FRICTION, GRAVITY};
+
 use bevy::sprite::Anchor;
 use bevy_rapier2d::prelude::{Collider, RigidBody};
 
 use super::*;
+/// Width of the player source image in pixels
+pub const PLAYER_SIZE_X: u32 = 72;
+
+/// Height of the player source image in pixels
+pub const PLAYER_SIZE_Y: u32 = 90;
+
+/// Scale factor for the player
+pub const PLAYER_SCALE: u32 = DEFAULT_GENERAL_SCALE_FACTOR; //by default player has normal scaling
+
+/// Total pixel size the player width takes up IN GAME
+pub const SCALED_PLAYER_WIDTH: u32 = PLAYER_SIZE_X * PLAYER_SCALE;
+/// Total pixel size the player height takes up IN GAME
+pub const SCALED_PLAYER_HEIGHT: u32 = PLAYER_SIZE_Y * PLAYER_SCALE;
+
+/// Horizontal offset for the player's hitbox
+pub const PLAYER_HB_X_OFFSET: u32 = SCALED_PLAYER_WIDTH / 3;
+
+/// Vertical offset for the player's hitbox
+pub const PLAYER_HB_Y_OFFSET: u32 = SCALED_PLAYER_HEIGHT / 3;
+
+/// Force applied to the player when walking
+pub const PLAYER_WALK_FORCE: u32 = 200;
+/// Maximum walking speed for the player
+pub const MAX_PLAYER_WALK_SPEED: u32 = 300;
+
+/// Force applied to the player when jumping
+pub const PLAYER_JUMP_FORCE: f32 = 550.;
+/// How long a vertical jump force can be applied to a player
+pub const PLAYER_JUMP_GRACE_PERIOD: f32 = 0.3;
+
 
 pub fn player_controls(
     keyboard_input: Res<ButtonInput<KeyCode>>,

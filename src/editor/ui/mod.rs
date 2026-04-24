@@ -20,6 +20,16 @@ pub mod grid;
 
 use crate::EditorState;
 
+
+/// Scale factor for UI elements
+pub const UI_SCALE: f32 = 10.0;
+
+/// value to control Z-layering of UI items. May not be necessary anymore due to EGUI 
+pub const UI_Z_LAYER: f32 = 10.0; //z layer for UI elements, we can use this to make to relatively place UI elements correctly
+
+pub const DEFAULT_TEXT_HEIGHT: f32 = 20.0; //default height of text in pixels
+
+
 pub fn editor_ui_plugin(app: &mut App) {
     app.init_resource::<ToolingMenuState>()
         .init_resource::<LeftPanelEdge>()

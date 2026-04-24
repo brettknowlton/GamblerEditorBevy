@@ -3,7 +3,7 @@ use bevy::prelude::*;
 use super::menu::CameraLockedUI;
 
 use crate::{
-    coordinate::TCoordinate, editor_object::significant_component::SignificantComponent, Crosshair,
+    coordinate::TCoordinate, editor_modes::significant_component::SignificantComponent, Crosshair,
     EditorState, PlaceholderHandle, TextureHandles, TILE_SIZE, UI_Z_LAYER,
 };
 
@@ -22,23 +22,21 @@ pub fn update_placeholder<T: SignificantComponent + Component + Default>(
     mut commands: Commands,
 
     state: ResMut<State<EditorState>>,
-    mut placeholder: ResMut<PlaceholderHandle>,
-    textures: Res<TextureHandles>,
-
     crosshairs: Query<(&Crosshair, &Transform)>,
-    placeholders: Query<(Entity, &PlaceholderObjectTag)>,
+
+    placeholder_entity: Single<(Entity, &PlaceholderObjectTag)>,
+    mut placeholder_image: ResMut<PlaceholderHandle>,
+    textures: Res<TextureHandles>,
 ) {
     //delete any existing placeholder objects
-    for (e, _) in placeholders.iter() {
-        commands.entity(e).despawn();
-    }
+    commands.entity(placeholder_entity.0).despawn();
 
     if let Some(m) = state.get().get_editing_kind() {
         //update the placeholder object to be the major type of the current editing mode
         let Some(texture) = textures.0.get(&m) else {
             return;
         };
-        placeholder.0 = texture.clone();
+        placeholder_image.0 = texture.clone();
     }
 
     let Ok((_, t)) = crosshairs.single() else {
@@ -48,7 +46,7 @@ pub fn update_placeholder<T: SignificantComponent + Component + Default>(
     commands.spawn((
         T::default(),
         Sprite {
-            image: placeholder.0.clone(),
+            image: placeholder_image.0.clone(),
             rect: Some(Rect {
                 min: Vec2::new(0.0, 0.0),
                 max: Vec2::new(TILE_SIZE as f32, TILE_SIZE as f32),
@@ -62,6 +60,10 @@ pub fn update_placeholder<T: SignificantComponent + Component + Default>(
         CameraLockedUI { ..default() },
         PlaceholderObjectTag, //tag it as a placeholder object so we can delete it when we switch from this mode.
     ));
+    println!(
+        "spawned new placeholder object with texture: {:?}",
+        placeholder_image.0
+    );
 }
 
 pub fn trigger_placeholder_update(

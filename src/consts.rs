@@ -15,35 +15,7 @@ pub const DEFAULT_GENERAL_SCALE_FACTOR: u32 = 2;
 
 /// width/height of a zone in tiles
 pub const ZONE_SIZE: u32 = 16; 
-/// Width of the player source image in pixels
-pub const PLAYER_SIZE_X: u32 = 72;
 
-/// Height of the player source image in pixels
-pub const PLAYER_SIZE_Y: u32 = 90;
-
-/// Scale factor for the player
-pub const PLAYER_SCALE: u32 = DEFAULT_GENERAL_SCALE_FACTOR;//by default player has normal scaling
-
-/// Total pixel size the player width takes up IN GAME
-pub const SCALED_PLAYER_WIDTH: u32 = PLAYER_SIZE_X * PLAYER_SCALE;
-/// Total pixel size the player height takes up IN GAME
-pub const SCALED_PLAYER_HEIGHT: u32 = PLAYER_SIZE_Y * PLAYER_SCALE;
-
-/// Horizontal offset for the player's hitbox
-pub const PLAYER_HB_X_OFFSET: u32 = SCALED_PLAYER_WIDTH / 3;
-
-/// Vertical offset for the player's hitbox
-pub const PLAYER_HB_Y_OFFSET: u32 = SCALED_PLAYER_HEIGHT / 3;
-
-/// Force applied to the player when walking
-pub const PLAYER_WALK_FORCE: u32 = 200;
-/// Maximum walking speed for the player
-pub const MAX_PLAYER_WALK_SPEED: u32 = 300;
-
-/// Force applied to the player when jumping
-pub const PLAYER_JUMP_FORCE: f32 = 550.;
-/// How long a vertical jump force can be applied to a player
-pub const PLAYER_JUMP_GRACE_PERIOD: f32 = 0.3;
 
 /// Scale factor of tiles
 pub const TILE_SCALE: u32 = DEFAULT_GENERAL_SCALE_FACTOR;
@@ -55,11 +27,6 @@ pub const SCALED_TILE_WIDTH: u32 = TILE_SIZE * TILE_SCALE;
 /// Total pixel size the tile height takes up IN GAME
 pub const SCALED_TILE_HEIGHT: u32 = TILE_SIZE * TILE_SCALE;
 
-/// Scale factor for UI elements
-pub const UI_SCALE: f32 = 10.0; //a scale value we can use to scale UI elements
-pub const UI_Z_LAYER: f32 = 10.0; //z layer for UI elements, we can use this to make to relatively place UI elements correctly
-
-pub const DEFAULT_TEXT_HEIGHT: f32 = 20.0; //default height of text in pixels
 
 pub const DEFAULT_WINDOW_WIDTH: u32 = 1200;
 pub const DEFAULT_WINDOW_HEIGHT: u32 = 800;
@@ -70,9 +37,6 @@ pub const DEFAULT_SCENE_PATH: &str = "scenes/scene";
 
 pub const SPRITESHEET_WIDTH: u64 = 8; //how many tiles wide our spritesheet is allowed to be
 pub const MAX_SPRITESHEET_ITEMS: u64 = 32;
-
-pub const UI_BORDER_PX: f32 = 2.0; //border around the UI elements
-pub const UI_BORDER_REAL: f32 = UI_BORDER_PX * UI_SCALE; //border around the UI elements as a fraction of the window height
 
 
 

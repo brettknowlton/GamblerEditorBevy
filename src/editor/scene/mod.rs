@@ -1,4 +1,10 @@
-use crate::editor_object::{EditorObject, EditorObjectKind, actor::Actor, collider::{self, ColliderObject}, significant_component::SignificantComponent, tile::Tile};
+use crate::editor_modes::{
+    actor::Actor,
+    collider::ColliderObject,
+    significant_component::SignificantComponent,
+    tile::{TileID, TileObject},
+    EditorObject, EditorObjectKind,
+};
 
 use super::*;
 use bevy::{prelude::*, tasks::IoTaskPool};
@@ -8,7 +14,7 @@ use std::{fs::File, io::Write};
 pub fn scene_plugin(app: &mut App) {
     app.register_type::<EditorObject>()
         .register_type::<Actor>()
-        .register_type::<Tile>()
+        .register_type::<TileObject>()
         .register_type::<TCoordinate>()
         .register_type::<Coordinate>()
         .add_systems(
@@ -127,40 +133,41 @@ fn add_missing_colliders(
 
         if collider_object.is_none() {
             let coord = editor_object.coordinate;
-            let rect = Rect::new(
-                coord.x as f32 * TILE_SCALE as f32,
-                coord.y as f32 * TILE_SCALE as f32,
-                (coord.x as f32 + 1.0) * TILE_SCALE as f32,
-                (coord.y as f32 + 1.0) * TILE_SCALE as f32,
-            );
 
             println!(
                 "Adding missing ColliderObject marker for EditorObject ID: {:?}",
                 editor_object.coordinate
             );
-            ecmd.insert(collider::ColliderObject::from_rect(rect, coord));
+            ecmd.insert(ColliderObject::at_coordinate(coord));
         }
     }
 }
 
 fn spawn_sprites(
-    mut tiles: Query<(Entity, &mut EditorObject), (With<Tile>, Without<Sprite>)>,
+    mut tiles: Query<(Entity, &mut EditorObject), (With<TileObject>, Without<Sprite>)>,
     mut commands: Commands,
     spritesheets: Res<TextureHandles>,
 ) {
     //spawn the sprites for each tile, use the editorObject's kind and coordinate to determine the sprite's position
     //if the EditorObject has a kind of Tile
     for (entity, eo) in tiles.iter_mut() {
-        if eo.kind == EditorObjectKind::Tile {
-            let rect = Some(Tile::get_tex_rect(eo.get_internal_type() as u64));
+        if let EditorObjectKind::Tile(TileID::Some(id)) = eo.kind {
+            let rect = Some(TileObject::get_uv_rect(id));
 
-            let sprite = Sprite {
-                image: spritesheets.0.get(&EditorObjectKind::Tile).unwrap().clone(),
-                //the UVs are the same for every tile, just change the offset by using the tiletype as a multiplier
-                rect,
-                custom_size: Some(Vec2::splat(TILE_SIZE as f32 * TILE_SCALE as f32)),
-
-                ..default()
+            let sprite = if let Some(image) =
+                spritesheets.0.get(&EditorObjectKind::Tile(TileID::Any))
+            {
+                Sprite {
+                    image: image.clone(),
+                    rect,
+                    custom_size: Some(Vec2::splat(TILE_SIZE as f32 * TILE_SCALE as f32)),
+                    ..default()
+                }
+            } else {
+                panic!(
+                    "Texture for EditorObjectKind::Tile(TileID::Some({})) not found in TextureHandles",
+                    id
+                );
             };
 
             // calculate the position for the Transform component, this will be in the center of the item's hitbox locked to the grid
@@ -173,7 +180,7 @@ fn spawn_sprites(
 
             commands.entity(entity).insert((
                 sprite,
-                Tile::from_rect(rect.unwrap(), eo.coordinate),
+                TileObject::at_coordinate(eo.coordinate).with_id(eo.kind),
                 Visibility::default(),
                 Transform {
                     translation: pos,
@@ -212,7 +219,7 @@ fn serialize_editor_scene(world: &mut World, type_registry: &AppTypeRegistry) ->
     let scene = DynamicSceneBuilder::from_world(world)
         .deny_all()
         .allow_component::<EditorObject>()
-        .allow_component::<Tile>()
+        .allow_component::<TileObject>()
         .allow_component::<Collider>()
         .allow_component::<Actor>()
         .extract_entities(query.iter(world))

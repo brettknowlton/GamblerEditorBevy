@@ -2,7 +2,7 @@ pub mod player;
 use player::Player;
 
 use super::*;
-use crate::editor_object::significant_component::SignificantComponent;
+use crate::editor_modes::significant_component::SignificantComponent;
 use crate::message_display::MessageDisplay;
 use crate::ui::{self, ToolingMenuItem};
 use crate::{configure_tooling_menu, Crosshair, EditorState, TextureHandles, ToolingMenuState};
@@ -43,7 +43,7 @@ impl Actor {
     pub fn new() -> Self {
         Self {
             internal_type: 0,
-            coordinate: TCoordinate::new(EditorObjectKind::Actor, Coordinate::game(0, 0)),
+            coordinate: TCoordinate::new(EditorObjectKind::Actor, Coordinate::new_world_space(0, 0)),
             rect: Rect::new(0.0, 0.0, 1.0, 1.0),
         }
     }
@@ -60,7 +60,7 @@ impl SignificantComponent for Actor {
         todo!();
     }
 
-    fn from_rect(_rect: Rect, _coord: Coordinate) -> Self {
+    fn at_coordinate(_coord: Coordinate) -> Self {
         Self::new()
     }
 }
@@ -95,12 +95,7 @@ pub fn actor_mode_keybinds(
         };
 
         let coord = Coordinate::from(crosshair_location.translation).snap_to_grid();
-        let to_place = EditorObject::new(
-            EditorObjectKind::Actor,
-            Actor::new().internal_type,
-            coord,
-            EditorObjectKind::Actor,
-        );
+        let to_place = EditorObject::new(EditorObjectKind::Actor, coord, EditorObjectKind::Actor);
 
         Actor::place(&mut commands, to_place, &actors);
         bottom_bar.send_place_eo_message("actor", coord);

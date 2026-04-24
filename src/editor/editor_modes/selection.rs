@@ -1,4 +1,4 @@
-use crate::{editor_object::significant_component::SignificantComponent, TILE_SCALE};
+use crate::{editor_modes::significant_component::SignificantComponent, TILE_SCALE};
 
 use super::*;
 
@@ -49,7 +49,7 @@ impl SignificantComponent for SelectionRect {
         todo!();
     }
 
-    fn from_rect(_rect: Rect, _coord: Coordinate) -> Self {
+    fn at_coordinate(_coord: Coordinate) -> Self {
         todo!();
     }
 }

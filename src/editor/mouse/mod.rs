@@ -2,7 +2,13 @@ use bevy::{input::mouse::MouseButton, prelude::*, window::PrimaryWindow};
 use bevy_egui::EguiContexts;
 
 use crate::{
-    MouseToolKind, coordinate::Coordinate, editor_object::{EditorObject, EditorObjectKind, significant_component::SignificantComponent, tile::Tile}, message_display::MessageDisplay
+    coordinate::Coordinate,
+    editor_modes::{
+        significant_component::SignificantComponent, tile::TileObject, EditorObject,
+        EditorObjectKind,
+    },
+    message_display::MessageDisplay,
+    MouseToolKind,
 };
 
 #[derive(Resource)]
@@ -68,29 +74,25 @@ impl Dragging {
     /// - If in pointer mode and dragging with the left mouse button, it may place a new tile at the specified coordinate.
     /// - If in pointer mode and dragging with the right mouse button, it may remove an existing tile at the specified coordinate.
     /// - If in eyedropper mode, it may sample information from an existing object at the specified coordinate without modifying the scene.
-    pub fn drag_action(
+    pub fn drag_action<T: SignificantComponent + Component + Default>(
         &self,
         mut commands: &mut Commands,
         mouse_mode: MouseToolKind,
         snapped_coord: Coordinate,
-        to_place: u64,
+        placing_kind: EditorObjectKind,
         mut bottom_bar: ResMut<MessageDisplay>,
-        tiles: &Query<(Entity, &EditorObject), With<Tile>>,
+        tiles: &Query<(Entity, &EditorObject), With<T>>,
     ) {
         match mouse_mode {
             MouseToolKind::Pointer => match self.dragging_btn {
                 Some(MouseButton::Left) => {
-                    let to_place = EditorObject::new(
-                        EditorObjectKind::Tile,
-                        to_place,
-                        snapped_coord,
-                        EditorObjectKind::Other,
-                    );
-                    Tile::place(&mut commands, to_place, &tiles);
+                    let to_place =
+                        EditorObject::new(placing_kind, snapped_coord, EditorObjectKind::Other);
+                    TileObject::place(&mut commands, to_place, &tiles);
                     bottom_bar.send_place_eo_message("tile", snapped_coord);
                 }
                 Some(MouseButton::Right) => {
-                    Tile::remove(&mut commands, snapped_coord, EditorObjectKind::Tile, &tiles);
+                    TileObject::remove(&mut commands, snapped_coord, placing_kind, &tiles);
                     bottom_bar.send_remove_eo_message("tiles", snapped_coord);
                 }
                 _ => {}

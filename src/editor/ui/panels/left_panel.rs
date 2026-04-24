@@ -6,8 +6,8 @@ use bevy_egui::EguiTextureHandle;
 
 use crate::ui::panels::editor_panel_frame;
 use crate::{
-    editor_object::EditorObjectKind, EditorState, TextureHandles, ToolingMenuItem, ToolingMenuState,
-    MAX_SPRITESHEET_ITEMS, SPRITESHEET_WIDTH, TILE_SIZE,
+    editor_modes::EditorObjectKind, EditorState, TextureHandles, ToolingMenuItem,
+    ToolingMenuState, MAX_SPRITESHEET_ITEMS, SPRITESHEET_WIDTH, TILE_SIZE,
 };
 
 #[derive(Resource)]
@@ -101,7 +101,9 @@ impl LeftPanel {
         input: &ButtonInput<KeyCode>,
         textures: &Res<TextureHandles>,
     ) -> Result<f32> {
-        self.configure_left_panel(contexts, editor_state, &tooling_menu_state, textures, input);
+        if let EditorState::Editing(eo_kind) = editor_state.get() {
+            self.configure_left_panel(contexts, eo_kind, &tooling_menu_state, textures, input);
+        }
         let width = self.draw_left_panel(tooling_menu_state, editor_state, contexts)?;
         return Ok(width);
     }
@@ -109,23 +111,19 @@ impl LeftPanel {
     fn configure_left_panel(
         &mut self,
         contexts: &mut EguiContexts,
-        editor_state: &Res<State<EditorState>>,
+        eo_kind: &EditorObjectKind,
         tooling_menu_state: &ResMut<ToolingMenuState>,
         textures: &Res<TextureHandles>,
         input: &ButtonInput<KeyCode>,
     ) {
         self.items = tooling_menu_state.items.clone();
 
-        let is_tile_mode = matches!(
-            editor_state.get(),
-            EditorState::Editing(EditorObjectKind::Tile)
-        );
+        let is_tile_mode = matches!(eo_kind, EditorObjectKind::Tile(_));
 
         self.tile_texture_id = if is_tile_mode {
-            textures
-                .0
-                .get(&EditorObjectKind::Tile)
-                .map(|handle: &Handle<Image>| contexts.add_image(EguiTextureHandle::Strong(handle.clone())))
+            textures.0.get(&eo_kind).map(|handle: &Handle<Image>| {
+                contexts.add_image(EguiTextureHandle::Strong(handle.clone()))
+            })
         } else {
             None
         };
@@ -179,7 +177,7 @@ impl LeftPanel {
 
         let is_tile_mode = matches!(
             editor_state.get(),
-            EditorState::Editing(EditorObjectKind::Tile)
+            EditorState::Editing(EditorObjectKind::Tile(_))
         );
 
         let res = egui::SidePanel::left("tooling_menu_panel")
@@ -213,7 +211,7 @@ impl LeftPanel {
                                     );
 
                                     let bg = if item_is_selected {
-                                        egui::Color32::from_rgba_unmultiplied(245, 230, 120, 40)
+                                        egui::Color32::from_rgba_unmultiplied(245, 230, 120, 100)
                                     } else {
                                         egui::Color32::from_rgba_unmultiplied(255, 255, 255, 20)
                                     };

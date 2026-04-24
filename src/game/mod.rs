@@ -1,4 +1,4 @@
-use crate::editor_object::actor;
+use crate::editor_modes::actor;
 
 use super::editor::*;
 

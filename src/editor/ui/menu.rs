@@ -1,7 +1,7 @@
 use bevy_egui::EguiContexts;
 
 use crate::{
-    SCALED_TILE_HEIGHT, SCALED_TILE_WIDTH, TextureHandles, editor_object::EditorObjectKind
+    editor_modes::EditorObjectKind, TextureHandles, SCALED_TILE_HEIGHT, SCALED_TILE_WIDTH,
 };
 
 use super::*;
@@ -79,6 +79,7 @@ pub struct MouseToolState {
 
 pub fn render_egui_panels(
     mut contexts: EguiContexts,
+
     bottom_bar: Res<message_display::MessageDisplay>,
     available_keybinds: Res<AvailableKeybinds>,
     asset_server: Res<AssetServer>,

@@ -1,12 +1,13 @@
-pub mod editor_object;
-use crate::editor_object::EditorObject;
-use crate::editor_object::EditorObjectKind;
-use crate::editor_object::actor;
-use crate::editor_object::actor::player::Player;
-use crate::editor_object::collider;
-use crate::editor_object::selection::ActiveSelection;
-use crate::editor_object::selection::SelectionRect;
-use crate::editor_object::tile;
+pub mod editor_modes;
+use crate::editor_modes::actor;
+use crate::editor_modes::actor::player::Player;
+use crate::editor_modes::collider::ColliderModePlugin;
+use crate::editor_modes::selection::ActiveSelection;
+use crate::editor_modes::selection::SelectionRect;
+use crate::editor_modes::tile::TileID;
+use crate::editor_modes::tile::TileModePlugin;
+use crate::editor_modes::EditorObject;
+use crate::editor_modes::EditorObjectKind;
 use crate::grid::GridSnap;
 use crate::grid::ShowGrid;
 use crate::message_display::BottomBarUpdate;
@@ -93,8 +94,8 @@ impl Editor {
             // .init_resource::<ActiveSelection>()
             //plugins
             .add_plugins(ui::editor_ui_plugin)
-            .add_plugins(tile::tilemode_plugin)
-            .add_plugins(collider::collidermode_plugin)
+            .add_plugins(TileModePlugin)
+            .add_plugins(ColliderModePlugin)
             .add_plugins(scene::scene_plugin)
             .add_plugins(actor::actormode_plugin)
             //on entrance to this state, we give our placeholder object a handle to the default SignificantComponent of this mode- in normal mode this is a SelectionRect
@@ -267,7 +268,7 @@ impl Editor {
             let Ok((_, t, _)) = crosshairs.single() else {
                 return;
             };
-            let _ = Coordinate::game(t.translation.x as i64, t.translation.y as i64);
+            let _ = Coordinate::new_world_space(t.translation.x as i64, t.translation.y as i64);
         }
     }
 
@@ -278,7 +279,7 @@ impl Editor {
     ) {
         if input.just_pressed(KeyCode::Digit1) || input.just_pressed(KeyCode::Numpad1) {
             bottom_bar.send_mode_enter_message("Tile Mode");
-            next_editor_state.set(EditorState::Editing(EditorObjectKind::Tile));
+            next_editor_state.set(EditorState::Editing(EditorObjectKind::Tile(TileID::Any)));
         }
 
         if input.just_pressed(KeyCode::Digit2) || input.just_pressed(KeyCode::Numpad2) {
@@ -435,10 +436,12 @@ impl Editor {
                 return;
             };
 
-            let zone_id = Coordinate::zone_space(
-                (transform.translation.x as i64) / ((ZONE_SIZE * SCALED_TILE_WIDTH) as i64),
-                (transform.translation.y as i64) / ((ZONE_SIZE * SCALED_TILE_HEIGHT) as i64),
-            );
+            let zone_id = Coordinate::new(
+                transform.translation.x as i64,
+                transform.translation.y as i64,
+                CoordinateSpace::WorldSpace,
+            )
+            .as_zone_space(None, None);
 
             let path = PathBuf::from(format!("background{}{}.png", zone_id.x, zone_id.y));
             let aseprite_path = PathBuf::from(

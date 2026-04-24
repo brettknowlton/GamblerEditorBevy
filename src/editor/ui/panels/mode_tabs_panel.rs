@@ -1,7 +1,10 @@
 use bevy::prelude::*;
 use bevy_egui::egui::{self, RichText};
 
-use crate::{EditorState, editor_object::EditorObjectKind};
+use crate::{
+    editor_modes::{tile::TileID, EditorObjectKind},
+    EditorState,
+};
 
 #[derive(Resource, Default)]
 pub struct ModeTabsPanel;
@@ -36,10 +39,14 @@ impl ModeTabsPanel {
                 }
                 .show(ui, |ui| {
                     ui.vertical(|ui| {
-                        let tile_active =
-                            matches!(editor_state, EditorState::Editing(EditorObjectKind::Tile));
-                        let collider_active =
-                            matches!(editor_state, EditorState::Editing(EditorObjectKind::Collider));
+                        let tile_active = matches!(
+                            editor_state,
+                            EditorState::Editing(EditorObjectKind::Tile(_))
+                        );
+                        let collider_active = matches!(
+                            editor_state,
+                            EditorState::Editing(EditorObjectKind::Collider)
+                        );
                         let actor_active =
                             matches!(editor_state, EditorState::Editing(EditorObjectKind::Actor));
 
@@ -58,7 +65,9 @@ impl ModeTabsPanel {
                         };
 
                         if tab(ui, "1: Tile", tile_active).clicked() {
-                            next_state.set(EditorState::Editing(EditorObjectKind::Tile));
+                            next_state.set(EditorState::Editing(EditorObjectKind::Tile(
+                                TileID::Some(0),
+                            )));
                         }
                         if tab(ui, "2: Collider", collider_active).clicked() {
                             next_state.set(EditorState::Editing(EditorObjectKind::Collider));
