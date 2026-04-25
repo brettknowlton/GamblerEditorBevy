@@ -1,17 +1,10 @@
 pub mod editor_modes;
-use crate::editor_modes::actor;
-use crate::editor_modes::actor::player::Player;
-use crate::editor_modes::collider::ColliderModePlugin;
-use crate::editor_modes::selection::ActiveSelection;
-use crate::editor_modes::selection::SelectionRect;
-use crate::editor_modes::tile::TileID;
-use crate::editor_modes::tile::TileModePlugin;
-use crate::editor_modes::EditorObject;
-use crate::editor_modes::EditorObjectKind;
-use crate::grid::GridSnap;
-use crate::grid::ShowGrid;
-use crate::message_display::BottomBarUpdate;
-use crate::message_display::MessageDisplay;
+
+pub use crate::editor_modes::*;
+
+use crate::grid::{GridSnap, ShowGrid};
+
+use crate::message_display::{BottomBarUpdate, MessageDisplay};
 
 pub mod mouse;
 pub use mouse::*;
@@ -22,8 +15,9 @@ use crate::coordinate::*;
 pub use crate::game::*;
 pub use crate::resources::*;
 
-use crate::coordinate::Coordinate;
 pub use crate::utilities::*;
+
+
 
 #[macro_use]
 pub mod ui;
@@ -94,25 +88,14 @@ impl Editor {
             // .init_resource::<ActiveSelection>()
             //plugins
             .add_plugins(ui::editor_ui_plugin)
+            .add_plugins(NormalModePlugin)
             .add_plugins(TileModePlugin)
             .add_plugins(ColliderModePlugin)
             .add_plugins(scene::scene_plugin)
-            .add_plugins(actor::actormode_plugin)
-            //on entrance to this state, we give our placeholder object a handle to the default SignificantComponent of this mode- in normal mode this is a SelectionRect
-            .add_systems(
-                OnEnter(EditorState::Normal),
-                (
-                    ui::hide_tooling_menu,
-                    ui::update_placeholder::<SelectionRect>,
-                )
-                    .chain(),
-            )
+            .add_plugins(actor_mode::actormode_plugin)
             //The only true startup systems here:
-            .add_systems(
-                Startup,
-                (Editor::initialize, Editor::create_crosshair).chain(),
-            )
-            //universal update systems for all editing modes
+            .add_systems(Startup, Editor::initialize_editor)
+            //universal update systems for all editor modes
             .add_systems(
                 Update,
                 (Editor::editor_keybinds, listen_click_events)
@@ -122,14 +105,14 @@ impl Editor {
             .add_systems(Update, Editor::reset_scene.run_if(on_message::<ResetScene>));
     }
 
-    fn initialize(
+    fn initialize_editor(
         mut commands: Commands,
 
         mut next_state: ResMut<NextState<EditorState>>,
         mut bottom_bar: ResMut<MessageDisplay>,
         mut texture_handles: ResMut<TextureHandles>,
 
-        asset_server: ResMut<AssetServer>,
+        asset_server: Res<AssetServer>,
     ) {
         //load the rect_debug texture into the RectHandle resource
         let tex_path = PathBuf::from("textures/tiles/tile_debug.png");
@@ -142,6 +125,8 @@ impl Editor {
 
         //set the state to ask about loading a scene
         next_state.set(EditorState::LoadAsk);
+
+        Self::create_crosshair(commands, asset_server);
 
         //push a message to the bottom bar that asks the user if they would like to load a scene
         send_message!(
@@ -158,7 +143,7 @@ impl Editor {
             Single<
                 (
                     Entity,
-                    &mut actor::player::Player,
+                    &mut actor_mode::player::Player,
                     &mut KinematicCharacterController,
                 ),
                 (Without<Crosshair>, Without<Camera2d>),

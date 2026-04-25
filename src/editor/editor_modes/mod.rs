@@ -5,16 +5,28 @@ use serde::{Deserialize, Serialize};
 
 use crate::{
     coordinate::{Coordinate, CoordinateFormatConversion, CoordinateSpace, TCoordinate},
-    editor_modes::tile::TileID,
 };
 
 pub mod selection;
+pub use selection::ActiveSelection;
+
 pub mod significant_component;
 
-pub mod actor;
-pub mod collider;
-pub mod editor_mode;
+pub mod actor_mode;
+pub use actor_mode::player::Player;
+
+pub mod collider_mode;
+pub use collider_mode::ColliderModePlugin;
+
 pub mod tile;
+pub use tile::{TileModePlugin, TileID};
+
+
+pub mod normal_mode;
+pub use normal_mode::NormalModePlugin;
+
+pub mod editor_mode;
+pub use editor_mode::*;
 
 #[derive(Default, Reflect, Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize, Copy)]
 pub enum EditorObjectKind {

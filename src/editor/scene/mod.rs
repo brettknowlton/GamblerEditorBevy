@@ -1,6 +1,6 @@
 use crate::editor_modes::{
-    actor::Actor,
-    collider::ColliderObject,
+    actor_mode::Actor,
+    collider_mode::ColliderObject,
     significant_component::SignificantComponent,
     tile::{TileID, TileObject},
     EditorObject, EditorObjectKind,

@@ -107,6 +107,10 @@ impl EditorModePlugin for ColliderModePlugin {
             );
     }
 
+    fn mode() -> EditorState {
+        EditorState::Editing(EditorObjectKind::Collider)
+    }
+    
     fn init(
         mut spritesheets: ResMut<TextureHandles>,
         mut bottom_bar: ResMut<MessageDisplay>,

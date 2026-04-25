@@ -13,12 +13,12 @@ use crate::{configure_tooling_menu, SelectedTileID, ToolingMenuState};
 
 use std::path::PathBuf;
 
+
 pub mod tile_id;
 pub use tile_id::TileID;
 
 pub mod tile;
 pub use tile::TileObject;
-
 
 pub struct TileModePlugin;
 
@@ -101,6 +101,10 @@ impl EditorModePlugin for TileModePlugin {
                 OnExit(EditorState::Editing(EditorObjectKind::Tile(TileID::Any))),
                 (Self::exit_mode).chain(),
             );
+    }
+
+    fn mode() -> EditorState {
+        EditorState::Editing(EditorObjectKind::Tile(TileID::Any))
     }
 
     fn init(

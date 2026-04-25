@@ -1,4 +1,4 @@
-use crate::editor_modes::actor;
+use crate::editor_modes::actor_mode;
 
 use super::editor::*;
 
@@ -25,8 +25,8 @@ pub fn game_plugin(app: &mut App) {
             Update,
             (
                 game_keybinds,
-                actor::player::player_controls,
-                actor::player::player_physics,
+                actor_mode::player::player_controls,
+                actor_mode::player::player_physics,
                 // player::do_player_collision,
             )
                 .chain()
@@ -54,7 +54,7 @@ fn game_keybinds(
 }
 
 fn player_camera(
-    player: Single<(&actor::player::Player, &Transform), Without<Camera>>,
+    player: Single<(&actor_mode::player::Player, &Transform), Without<Camera>>,
     mut camera_query: Query<(&mut Camera, &mut Transform)>,
 ) {
     let player_t = player.1.translation;

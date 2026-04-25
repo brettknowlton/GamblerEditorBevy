@@ -1,12 +1,12 @@
 use bevy::{prelude::*, window::PrimaryWindow};
 
 use crate::{
-    editor_modes::{significant_component::SignificantComponent, EditorObject},
-    message_display::MessageDisplay,
-    AvailableKeybinds, Crosshair, Dragging, MouseToolState, SelectedTileID, TextureHandles,
+    AvailableKeybinds, Crosshair, Dragging, EditorState, MouseToolState, SelectedTileID, TextureHandles, editor_modes::{EditorObject, significant_component::SignificantComponent}, message_display::MessageDisplay
 };
 
 pub trait EditorModePlugin: Plugin {
+    fn mode() -> EditorState;
+
     fn build(&self, app: &mut App) {
         Self::build_plugin(app);
     }
