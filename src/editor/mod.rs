@@ -1,10 +1,12 @@
 pub mod editor_modes;
 
+use crate::actor_mode::ActorModePlugin;
 pub use crate::editor_modes::*;
 
 use crate::grid::{GridSnap, ShowGrid};
 
 use crate::message_display::{BottomBarUpdate, MessageDisplay};
+use crate::mouse_state::MouseState;
 
 pub mod mouse;
 pub use mouse::*;
@@ -16,8 +18,6 @@ pub use crate::game::*;
 pub use crate::resources::*;
 
 pub use crate::utilities::*;
-
-
 
 #[macro_use]
 pub mod ui;
@@ -78,21 +78,27 @@ impl Editor {
             .init_state::<grid::ShowGrid>()
             //registrations
             .register_type::<EditorObject>()
-            .add_message::<BottomBarUpdate>()
-            .add_message::<ResetScene>()
+            .register_type::<Coordinate>()
+            .register_type::<crate::editor_modes::tile_mode::TileObject>()
+            .register_type::<crate::editor_modes::collider_mode::ColliderObject>()
+            .register_type::<crate::editor_modes::actor_mode::actor::Actor>()
+            .register_type::<crate::editor_modes::normal_mode::NormalObject>()
+            .register_type::<crate::editor_modes::selection::SelectionRect>()
             //resources
             .init_resource::<PlaceholderHandle>()
             .init_resource::<TextureHandles>()
             .init_resource::<ActiveSelection>()
-            .init_resource::<Dragging>()
-            // .init_resource::<ActiveSelection>()
+            .init_resource::<MouseState>()
+            //messages to queue systems
+            .add_message::<BottomBarUpdate>()
+            .add_message::<ResetScene>()
             //plugins
-            .add_plugins(ui::editor_ui_plugin)
+            .add_plugins(UIPlugin)
             .add_plugins(NormalModePlugin)
             .add_plugins(TileModePlugin)
             .add_plugins(ColliderModePlugin)
+            .add_plugins(ActorModePlugin)
             .add_plugins(scene::scene_plugin)
-            .add_plugins(actor_mode::actormode_plugin)
             //The only true startup systems here:
             .add_systems(Startup, Editor::initialize_editor)
             //universal update systems for all editor modes
@@ -129,13 +135,14 @@ impl Editor {
         Self::create_crosshair(commands, asset_server);
 
         //push a message to the bottom bar that asks the user if they would like to load a scene
-        send_message!(
-            Some('i'),
-            bottom_bar.queue,
-            "Would you like to load a scene?"
-        );
+        // TODO: Make this message only display if a scene is actually available to load,
+        // and make it so that if there is a scene available it also shows some details about the scene like a thumbnail or the date it was last modified eventually
+        bottom_bar.send_message("Would you like to load a scene?");
     }
 
+    /// Resets the current editor scene by respawning the player at the crosshair position and resetting the camera to focus on the player. \
+    /// If no player exists, a new one is spawned at the crosshair position.
+    ///
     fn reset_scene(
         commands: Commands,
         asset_server: Res<AssetServer>,
@@ -151,8 +158,9 @@ impl Editor {
         >,
         mut cameras: Query<(&mut Transform, &mut Camera2d), Without<Crosshair>>,
         crosshair: Single<&Transform, (With<Crosshair>, Without<Camera2d>)>, // mut ui_items: Query<(&mut UIItem, &mut Transform), Without<Crosshair>>,
+        mut bottom_bar: ResMut<MessageDisplay>,
     ) {
-        println!("Resetting scene...");
+        bottom_bar.send_message("Resetting scene...");
         //reset the player to the crosshair position
         let crosshair_position = crosshair.clone().translation;
 
@@ -160,10 +168,10 @@ impl Editor {
             let (e, _, controller) = player_q.deref_mut();
             controller.translation = None;
 
-            println!("Respawning player...");
+            bottom_bar.send_message("Respawning player...");
             Player::respawn(commands, *e, asset_server, crosshair);
         } else {
-            println!("No player found, spawning new player...");
+            bottom_bar.send_message("No player found, spawning new player...");
             Player::spawn_player(commands, asset_server, crosshair);
         }
 
@@ -213,8 +221,6 @@ impl Editor {
         );
         Self::handle_rectangle_tool_shortcuts(&input, &mut bottom_bar, &mut crosshairs);
 
-        Self::handle_mode_switch_shortcuts(&input, &mut next_editor_state, &mut bottom_bar);
-
         Self::handle_saving_controls(
             editor_state.as_ref(),
             &mut next_editor_state,
@@ -244,37 +250,12 @@ impl Editor {
                 return;
             };
 
-            send_message!(
-                Some('i'),
-                bottom_bar.queue,
-                "This feature is not yet implemented"
-            );
+            bottom_bar.send_message("This feature is not yet implemented");
         } else if input.just_released(KeyCode::KeyO) {
             let Ok((_, t, _)) = crosshairs.single() else {
                 return;
             };
             let _ = Coordinate::new_world_space(t.translation.x as i64, t.translation.y as i64);
-        }
-    }
-
-    fn handle_mode_switch_shortcuts(
-        input: &ButtonInput<KeyCode>,
-        next_editor_state: &mut NextState<EditorState>,
-        bottom_bar: &mut MessageDisplay,
-    ) {
-        if input.just_pressed(KeyCode::Digit1) || input.just_pressed(KeyCode::Numpad1) {
-            bottom_bar.send_mode_enter_message("Tile Mode");
-            next_editor_state.set(EditorState::Editing(EditorObjectKind::Tile(TileID::Any)));
-        }
-
-        if input.just_pressed(KeyCode::Digit2) || input.just_pressed(KeyCode::Numpad2) {
-            bottom_bar.send_mode_enter_message("Collider Mode");
-            next_editor_state.set(EditorState::Editing(EditorObjectKind::Collider));
-        }
-
-        if input.just_pressed(KeyCode::Digit3) || input.just_pressed(KeyCode::Numpad3) {
-            bottom_bar.send_mode_enter_message("Actor Mode");
-            next_editor_state.set(EditorState::Editing(EditorObjectKind::Actor));
         }
     }
 
@@ -290,43 +271,43 @@ impl Editor {
                     || input.all_pressed(vec![KeyCode::ControlLeft, KeyCode::KeyS])
                 {
                     next_editor_state.set(EditorState::Normal);
-                    send_message!(Some('i'), bottom_bar.queue, "Returning to Normal Mode");
+                    bottom_bar.send_message("Returning to Normal Mode");
                 }
             }
             EditorState::LoadAsk => {
                 if input.just_pressed(KeyCode::KeyY) || input.just_pressed(KeyCode::Enter) {
                     next_editor_state.set(EditorState::Loading);
-                    send_message!(Some('i'), bottom_bar.queue, "Attempting to load scene");
+                    bottom_bar.send_message("Attempting to load scene");
                 }
                 if input.just_pressed(KeyCode::KeyN) || input.just_pressed(KeyCode::Escape) {
                     next_editor_state.set(EditorState::LoadingEmpty);
-                    send_message!(Some('w'), bottom_bar.queue, "No scene loaded");
+                    bottom_bar.send_message("No scene loaded");
                 }
             }
             EditorState::SaveAsk => {
                 if input.just_pressed(KeyCode::KeyY) || input.just_pressed(KeyCode::Enter) {
                     next_editor_state.set(EditorState::Saving);
-                    send_message!(Some('i'), bottom_bar.queue, "Saving scene.");
+                    bottom_bar.send_message("Saving scene.");
                 } else if input.just_pressed(KeyCode::KeyN) || input.just_pressed(KeyCode::Escape) {
                     next_editor_state.set(EditorState::Normal);
-                    send_message!(Some('w'), bottom_bar.queue, "Saving aborted.");
+                    bottom_bar.send_message("Saving aborted.");
                 }
             }
             EditorState::QuitAsk => {
                 if input.just_pressed(KeyCode::KeyY) || input.just_pressed(KeyCode::Enter) {
                     next_editor_state.set(EditorState::Inactive);
-                    send_message!(Some('i'), bottom_bar.queue, "Exiting the editor...");
+                    bottom_bar.send_message("Exiting the editor...");
                 } else if input.just_pressed(KeyCode::KeyN) || input.just_pressed(KeyCode::Escape) {
                     next_editor_state.set(EditorState::Normal);
-                    send_message!(Some('w'), bottom_bar.queue, "Exiting aborted.");
+                    bottom_bar.send_message("Exiting aborted.");
                 }
             }
             _ => {}
         }
     }
 
-    pub fn editor_is_dragging(dragging: Res<Dragging>) -> bool {
-        dragging.is_dragging()
+    pub fn editor_is_dragging(mouse_state: Res<MouseState>) -> bool {
+        mouse_state.is_dragging()
     }
 
     fn handle_global_editor_shortcuts(
@@ -345,110 +326,101 @@ impl Editor {
         crosshairs: &mut Query<(&mut Crosshair, &mut Transform, &mut Sprite), Without<Camera2d>>,
         message_writer: &mut MessageWriter<ResetScene>,
     ) {
-        if input.just_pressed(KeyCode::KeyQ) {
-            next_editor_state.set(EditorState::Normal);
-            bottom_bar.send_mode_exit_message("Normal Mode");
-        } else if input.pressed(KeyCode::ControlLeft)
-            && input.just_pressed(KeyCode::KeyS)
-            && !input.just_pressed(KeyCode::ShiftLeft)
-            && editor_state.get() != &EditorState::SaveAsk
-        {
-            next_editor_state.set(EditorState::SaveAsk);
-            bottom_bar.send_mode_exit_message("Save Ask Mode");
-        } else if input.pressed(KeyCode::ControlLeft)
-            && input.just_pressed(KeyCode::KeyL)
-            && editor_state.get() != &EditorState::LoadAsk
-        {
-            next_editor_state.set(EditorState::LoadAsk);
-            bottom_bar.send_mode_exit_message("Load Ask Mode");
-        } else if input.pressed(KeyCode::ControlLeft)
-            && input.just_pressed(KeyCode::KeyQ)
-            && editor_state.get() != &EditorState::QuitAsk
-        {
-            next_editor_state.set(EditorState::QuitAsk);
-            bottom_bar.send_mode_exit_message("Quit Ask Mode");
-        } else if input.pressed(KeyCode::ControlLeft)
-            && input.just_pressed(KeyCode::KeyT)
-            && editor_state.get() != &EditorState::Inactive
-        {
-            if game_state.get() != &GameState::Inactive
-                && editor_state.get() == &EditorState::Inactive
+        if input.pressed(KeyCode::ControlLeft) {
+            if input.just_pressed(KeyCode::KeyS)
+                && !input.just_pressed(KeyCode::ShiftLeft)
+                && editor_state.get() != &EditorState::SaveAsk
             {
+                next_editor_state.set(EditorState::SaveAsk);
+                bottom_bar.send_mode_exit_message("Save Ask Mode");
+            } else if input.just_pressed(KeyCode::KeyL)
+                && editor_state.get() != &EditorState::LoadAsk
+            {
+                next_editor_state.set(EditorState::LoadAsk);
+                bottom_bar.send_mode_exit_message("Load Ask Mode");
+            } else if input.just_pressed(KeyCode::KeyQ)
+                && editor_state.get() != &EditorState::QuitAsk
+            {
+                next_editor_state.set(EditorState::QuitAsk);
+                bottom_bar.send_mode_exit_message("Quit Ask Mode");
+            } else if input.just_pressed(KeyCode::KeyT)
+                && editor_state.get() != &EditorState::Inactive
+            {
+                if game_state.get() != &GameState::Inactive
+                    && editor_state.get() == &EditorState::Inactive
+                {
+                    next_editor_state.set(EditorState::Normal);
+                    next_game_state.set(GameState::Inactive);
+                    bottom_bar.send_mode_enter_message("Editor Mode");
+                } else {
+                    next_editor_state.set(EditorState::Inactive);
+                    next_game_state.set(GameState::Running);
+                    bottom_bar.send_mode_enter_message("Test Mode");
+                }
+            } else if input.just_pressed(KeyCode::KeyR)
+                && editor_state.get() != &EditorState::Inactive
+            {
+                bottom_bar.send_message("Resetting scene...");
                 next_editor_state.set(EditorState::Normal);
-                next_game_state.set(GameState::Inactive);
-                bottom_bar.send_mode_exit_message("Test Mode");
-            } else {
-                next_editor_state.set(EditorState::Inactive);
-                next_game_state.set(GameState::Running);
-                bottom_bar.send_mode_exit_message("Test Mode");
-            }
-        } else if input.pressed(KeyCode::ControlLeft)
-            && input.just_pressed(KeyCode::KeyR)
-            && editor_state.get() != &EditorState::Inactive
-        {
-            bottom_bar.send_mode_exit_message("Reset Scene");
-            next_editor_state.set(EditorState::Normal);
-            message_writer.write(ResetScene);
-        } else if input.pressed(KeyCode::ControlLeft)
-            && input.just_pressed(KeyCode::KeyG)
-            && !input.pressed(KeyCode::ShiftLeft)
-            && editor_state.get() != &EditorState::Inactive
-        {
-            if showgrid_state.get() == &ShowGrid::Yes {
-                next_showgrid_state.set(ShowGrid::No);
-                bottom_bar.send_mode_exit_message("Hiding Grid");
-            } else {
-                next_showgrid_state.set(ShowGrid::Yes);
-                bottom_bar.send_mode_exit_message("Showing Grid");
-            }
-        } else if input.pressed(KeyCode::ControlLeft)
-            && input.just_pressed(KeyCode::KeyG)
-            && input.pressed(KeyCode::ShiftLeft)
-            && editor_state.get() != &EditorState::Inactive
-        {
-            if gridsnap_state.get() == &GridSnap::Enabled {
-                next_gridsnap_state.set(GridSnap::Disabled);
-                bottom_bar.send_setting_update_message("Grid Snap");
-            } else {
-                next_gridsnap_state.set(GridSnap::Enabled);
-                bottom_bar.send_setting_update_message("Grid Snap");
-            }
-        } else if input.pressed(KeyCode::ControlLeft)
-            && input.just_pressed(KeyCode::KeyB)
-            && editor_state.get() != &EditorState::Inactive
-        {
-            let Ok((_, transform, _)) = crosshairs.single() else {
-                return;
-            };
+                message_writer.write(ResetScene);
+            } else if input.just_pressed(KeyCode::KeyG)
+                && !input.pressed(KeyCode::ShiftLeft)
+                && editor_state.get() != &EditorState::Inactive
+            {
+                if showgrid_state.get() == &ShowGrid::Yes {
+                    next_showgrid_state.set(ShowGrid::No);
+                    bottom_bar.send_message("Hiding Grid");
+                } else {
+                    next_showgrid_state.set(ShowGrid::Yes);
+                    bottom_bar.send_message("Showing Grid");
+                }
+            } else if input.just_pressed(KeyCode::KeyG)
+                && input.pressed(KeyCode::ShiftLeft)
+                && editor_state.get() != &EditorState::Inactive
+            {
+                if gridsnap_state.get() == &GridSnap::Enabled {
+                    next_gridsnap_state.set(GridSnap::Disabled);
+                    bottom_bar.send_setting_update_message("Grid Snap");
+                } else {
+                    next_gridsnap_state.set(GridSnap::Enabled);
+                    bottom_bar.send_setting_update_message("Grid Snap");
+                }
+            } else if input.just_pressed(KeyCode::KeyB)
+                && editor_state.get() != &EditorState::Inactive
+            {
+                let Ok((_, transform, _)) = crosshairs.single() else {
+                    return;
+                };
 
-            let zone_id = Coordinate::new(
-                transform.translation.x as i64,
-                transform.translation.y as i64,
-                CoordinateSpace::WorldSpace,
-            )
-            .as_zone_space(None, None);
+                let zone_id = Coordinate::new(
+                    transform.translation.x as i64,
+                    transform.translation.y as i64,
+                    CoordinateSpace::WorldSpace,
+                )
+                .as_zone_space(None, None);
 
-            let path = PathBuf::from(format!("background{}{}.png", zone_id.x, zone_id.y));
-            let aseprite_path = PathBuf::from(
-                "C:/Program Files (x86)/Steam/steamapps/common/Aseprite/Aseprite.exe",
-            );
+                let path = PathBuf::from(format!("background{}{}.png", zone_id.x, zone_id.y));
+                let aseprite_path =
+                    PathBuf::from("G:/SteamLibrary/steamapps/common/Aseprite/Aseprite.exe");
 
-            if path.exists() {
-                send_message!(Some('i'), bottom_bar.queue, "Opening background.png");
-                std::process::Command::new(aseprite_path)
-                    .arg(path)
-                    .spawn()
-                    .expect("Failed to open aseprite");
-            } else {
-                send_message!(Some('i'), bottom_bar.queue, "Creating background.png");
-                std::fs::File::create(&path).expect("Failed to create background.png");
-                std::process::Command::new("aseprite")
-                    .arg(path)
-                    .spawn()
-                    .expect("Failed to open aseprite");
+                if path.exists() {
+                    bottom_bar.send_message("Opening background.png");
+                    std::process::Command::new(aseprite_path)
+                        .arg(path)
+                        .spawn()
+                        .expect("Failed to open aseprite");
+                } else {
+                    bottom_bar.send_message("Creating background.png");
+                    std::fs::File::create(&path).expect("Failed to create background.png");
+                    std::process::Command::new(aseprite_path)
+                        .arg(path)
+                        .spawn()
+                        .expect("Failed to open aseprite");
+                }
             }
         }
     }
+
     fn create_crosshair(mut commands: Commands, asset_server: Res<AssetServer>) {
         //create crosshair
         let tex_path = PathBuf::from("textures/crosshairs/crosshair1.png");

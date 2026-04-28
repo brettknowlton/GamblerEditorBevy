@@ -1,4 +1,4 @@
-use bevy::{prelude::*, window::WindowResolution};
+use bevy::{dev_tools::fps_overlay::FpsOverlayPlugin, prelude::*, window::WindowResolution};
 use bevy_egui::EguiPlugin;
 
 pub mod consts;
@@ -16,7 +16,7 @@ pub use editor::*;
 
 fn main() {
     App::new()
-        .add_plugins(
+        .add_plugins((
             DefaultPlugins
                 .set(ImagePlugin::default_nearest())
                 .set(WindowPlugin {
@@ -34,12 +34,13 @@ fn main() {
                     ..default()
                 })
                 .build(),
-        )
+            FpsOverlayPlugin::default(),
+        ))
         .add_plugins(RapierPhysicsPlugin::<NoUserData>::pixels_per_meter(32.0))
         .add_plugins(RapierDebugRenderPlugin::default())
         .add_plugins(EguiPlugin::default())
         .insert_resource(ClearColor(Color::from(WINDOW_DEFAULT_BACKGROUND_COLOR)))
-        .insert_resource(Time::<Fixed>::from_hz(64.0))
+        .insert_resource(Time::<Fixed>::from_hz(120.0))
         .add_plugins(editor::Editor)
         .add_plugins(game::game_plugin)
         .run();

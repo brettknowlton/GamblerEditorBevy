@@ -1,148 +1,121 @@
+pub mod actor;
+use actor::Actor;
+
+pub mod animation;
+
 pub mod player;
 use player::Player;
 
 use super::*;
 use crate::editor_modes::significant_component::SignificantComponent;
 use crate::message_display::MessageDisplay;
-use crate::ui::{self, ToolingMenuItem};
-use crate::{configure_tooling_menu, Crosshair, EditorState, TextureHandles, ToolingMenuState};
+use crate::ui::ToolingMenuItem;
+use crate::{
+    configure_tooling_menu, AvailableKeybinds, Crosshair, CustomInput, EditorState,
+    SelectedTileID, TextureHandles, ToolingMenuState,
+};
 use std::path::PathBuf;
 
 use bevy_rapier2d::prelude::*;
 
-fn populate_actor_tooling_menu(mut tooling_menu: ResMut<ToolingMenuState>) {
-    configure_tooling_menu(
-        &mut tooling_menu,
-        "Actor Parts",
-        Some(0),
-        vec![ToolingMenuItem {
-            id: 0,
-            label: "Default Actor".to_string(),
-            texture_key: Some(EditorObjectKind::Actor),
-            rect: None,
-        }],
-    );
+pub struct ActorModePlugin;
+
+impl Plugin for ActorModePlugin {
+    fn build(&self, app: &mut App) {
+        Self::build_plugin::<Actor>(app);
+    }
 }
 
-fn init(mut spritesheets: ResMut<TextureHandles>, asset_server: Res<AssetServer>) {
-    let texpath = PathBuf::from("textures/player/PlayerHD.png");
-    spritesheets
-        .0
-        .insert(EditorObjectKind::Actor, asset_server.load(texpath));
-}
+impl EditorModePlugin for ActorModePlugin {
+    fn mode() -> EditorState {
+        EditorState::Editing(EditorObjectKind::Actor)
+    }
 
-#[derive(Component, Reflect, Debug, Clone, PartialEq)]
-#[require(EditorObject)]
-pub struct Actor {
-    pub internal_type: u64,
-    pub coordinate: TCoordinate,
-    pub rect: Rect,
-}
+    fn modify_app(app: &mut App) -> &mut App {
+        app.register_type::<Player>()
+    }
 
-impl Actor {
-    pub fn new() -> Self {
-        Self {
-            internal_type: 0,
-            coordinate: TCoordinate::new(EditorObjectKind::Actor, Coordinate::new_world_space(0, 0)),
-            rect: Rect::new(0.0, 0.0, 1.0, 1.0),
+    fn init(
+        mut spritesheets: ResMut<TextureHandles>,
+        mut bottom_bar: ResMut<MessageDisplay>,
+        asset_server: Res<AssetServer>,
+    ) {
+        //load the tilesheet for this mode
+        let texpath = PathBuf::from("textures/player/PlayerHD.png");
+
+        bottom_bar.send_message(format!(
+            "Actor Spritesheet Loaded: \"{}\"",
+            &texpath.clone().display()
+        ));
+
+        //load happens here
+        spritesheets
+            .0
+            .insert(EditorObjectKind::Actor, asset_server.load(texpath));
+    }
+
+    fn add_mode_kb(mut available_keybinds: ResMut<AvailableKeybinds>) {
+        available_keybinds.add_keycode(CustomInput::Single(KeyCode::KeyL), "Remove Actor".into());
+        available_keybinds.add_keycode(CustomInput::Single(KeyCode::KeyP), "Place Actor".into());
+        available_keybinds.add_keycode(CustomInput::Single(KeyCode::KeyQ), "Quit Edit Mode".into());
+        println!("populated actor keybinds");
+    }
+
+    fn enter_mode(
+        mut tooling_menu: ResMut<ToolingMenuState>,
+        _selected_item_id: Res<crate::SelectedTileID>,
+    ) {
+        configure_tooling_menu(
+            &mut tooling_menu,
+            "Actor Parts",
+            Some(0),
+            vec![ToolingMenuItem {
+                id: 0,
+                label: "Default Actor".to_string(),
+                texture_key: Some(EditorObjectKind::Actor),
+                rect: None,
+            }],
+        );
+    }
+
+    fn mode_keybinds<T: Component + SignificantComponent>(
+        mut commands: Commands,
+        input: Res<ButtonInput<KeyCode>>,
+
+        crosshair: Single<(&Transform, &Crosshair)>,
+        items: Query<(Entity, &EditorObject), With<T>>,
+        _selected_tile_id: ResMut<SelectedTileID>,
+
+        mut bottom_bar: ResMut<MessageDisplay>,
+        _next_editor_state: ResMut<NextState<EditorState>>,
+    ) {
+        //"P" handles placement of an actor and adding it to the scene
+        //places the first actor in the selection rect
+        if input.just_pressed(KeyCode::KeyP) {
+            let coord = Coordinate::from_vec3(crosshair.0.translation).snap_to_grid();
+            let to_place = EditorObject::new(EditorObjectKind::Actor, coord);
+
+            Actor::place(&mut commands, to_place, &items);
+            bottom_bar.send_place_eo_message("actor", coord);
+        }
+
+        // "L" handles removal of a tile from the scene, similar to placing one just doesnt need to worry about the tile creation part afterwards
+        if input.just_pressed(KeyCode::KeyL) {
+            let coord = Coordinate::from_vec3(crosshair.0.translation).snap_to_grid();
+
+            Actor::remove(&mut commands, coord, EditorObjectKind::Actor, &items);
+            bottom_bar.send_remove_eo_message("actor", coord);
         }
     }
-}
-
-impl Default for Actor {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-impl SignificantComponent for Actor {
-    fn place_rectangle(_rect: Rect, _commands: Commands) {
-        //make a tile like normal in this rect, but use sliced tiles over the sprite sheet selection
-        todo!();
+    fn exit_mode(mut bottom_bar: ResMut<MessageDisplay>) {
+        bottom_bar.send_mode_exit_message("Actor");
     }
 
-    fn at_coordinate(_coord: Coordinate) -> Self {
-        Self::new()
+    fn get_mode_kb() -> Vec<(CustomInput, String)> {
+        vec![
+            (CustomInput::Single(KeyCode::KeyP), "Place Actor".into()),
+            (CustomInput::Single(KeyCode::KeyL), "Remove Actor".into()),
+            (CustomInput::Single(KeyCode::KeyQ), "Quit Edit Mode".into()),
+        ]
     }
 }
-
-pub fn actor_mode_keybinds(
-    // editor_state: ResMut<State<EditorState>>,
-    // mut next_editor_state: ResMut<NextState<EditorState>>,
-    // mut next_game_state: ResMut<NextState<GameState>>,
-    // input: Res<ButtonInput<KeyCode>>,
-    // crosshairs: Query<(&Transform, &Crosshair)>,
-    // mut actors:Query<(Entity, &EditorObject), With<Actor>>,
-    // gridsnap: Res<State<GridSnap>>,
-    // mut commands: &mut Commands,
-
-    // mut message_queue: ResMut<EditorBottomBarQueuedMessages>
-    mut commands: Commands,
-
-    mut bottom_bar: ResMut<MessageDisplay>,
-    input: Res<ButtonInput<KeyCode>>,
-
-    crosshairs: Query<(&Transform, &Crosshair)>,
-    actors: Query<(Entity, &EditorObject), With<Actor>>,
-    // mut selected_tile_id: ResMut<SelectedTileID>,
-
-    // mut placeholder_update_ev: EventWriter<UpdatePlaceholderEvent>
-) {
-    //"P" handles placement of an actor and adding it to the scene
-    //places the first actor in the selection rect
-    if input.just_pressed(KeyCode::KeyP) {
-        let Ok((crosshair_location, _)) = crosshairs.single() else {
-            return;
-        };
-
-        let coord = Coordinate::from(crosshair_location.translation).snap_to_grid();
-        let to_place = EditorObject::new(EditorObjectKind::Actor, coord, EditorObjectKind::Actor);
-
-        Actor::place(&mut commands, to_place, &actors);
-        bottom_bar.send_place_eo_message("actor", coord);
-    }
-
-    // "L" handles removal of a tile from the scene, similar to placing one just doesnt need to worry about the tile creation part afterwards
-    if input.just_pressed(KeyCode::KeyL) {
-        let Ok((t, _)) = crosshairs.single() else {
-            return;
-        };
-        let coord = Coordinate::from(t.translation).snap_to_grid();
-
-        Actor::remove(&mut commands, coord, EditorObjectKind::Actor, &actors);
-        bottom_bar.send_remove_eo_message("actor", coord);
-    }
-}
-
-fn exit_actormode(mut bottom_bar: ResMut<MessageDisplay>) {
-    bottom_bar.send_mode_exit_message("Actor");
-}
-
-pub fn actormode_plugin(app: &mut App) {
-    app.register_type::<Player>()
-        .register_type::<Coordinate>()
-        .register_type::<TCoordinate>()
-        //startup systems (may need to be moved from here to maintain order)
-        .add_systems(Startup, init)
-        //OnEnter systems
-        .add_systems(
-            OnEnter(EditorState::Editing(EditorObjectKind::Actor)),
-            (
-                populate_actor_tooling_menu,
-                crate::ui::update_placeholder::<Actor>,
-            )
-                .chain(),
-        )
-        //Update systems, that run only while TileEditor is active
-        .add_systems(
-            Update,
-            (ui::update_placeholder::<Actor>, actor_mode_keybinds)
-                .chain()
-                .run_if(in_state(EditorState::Editing(EditorObjectKind::Actor))),
-        )
-        //OnExit systems
-        .add_systems(
-            OnExit(EditorState::Editing(EditorObjectKind::Actor)),
-            (exit_actormode).chain(),
-        );
-}
-//NOTHING BELOW THE PLUGINS

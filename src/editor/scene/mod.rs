@@ -1,21 +1,23 @@
 use crate::editor_modes::{
-    actor_mode::Actor,
+    actor_mode::actor::Actor,
     collider_mode::ColliderObject,
     significant_component::SignificantComponent,
-    tile::{TileID, TileObject},
+    tile_mode::{TileID, TileObject},
     EditorObject, EditorObjectKind,
 };
 
 use super::*;
 use bevy::{prelude::*, tasks::IoTaskPool};
 use resources::*;
-use std::{fs::File, io::Write};
+use std::{fs::File, io::Write, path::Path};
 
 pub fn scene_plugin(app: &mut App) {
     app.register_type::<EditorObject>()
         .register_type::<Actor>()
         .register_type::<TileObject>()
-        .register_type::<TCoordinate>()
+        .register_type::<ColliderObject>()
+        .register_type::<crate::editor_modes::normal_mode::NormalObject>()
+        .register_type::<crate::editor_modes::selection::SelectionRect>()
         .register_type::<Coordinate>()
         .add_systems(
             OnEnter(EditorState::LoadingEmpty),
@@ -86,8 +88,29 @@ fn remove_io_ask_mode_kb(mut available_keybinds: ResMut<AvailableKeybinds>) {
 }
 
 // struct MyGenericType<T>(PhantomData<T>);
-fn load_scene(mut commands: Commands, asset_server: Res<AssetServer>) {
+fn load_scene(
+    mut commands: Commands,
+    asset_server: Res<AssetServer>,
+    mut bottom_bar: ResMut<MessageDisplay>,
+) {
     //create scene manager component that will read/write our scene data between the enviornment and a json file
+    let scene_path = format!("assets/{DEFAULT_SCENE_PATH}.ron");
+    if !Path::new(&scene_path).exists() {
+        bottom_bar.send_message(format!(
+            "Scene file not found at \"{}\". Loading current world instead.",
+            scene_path
+        ));
+        return;
+    }
+
+    if let Err(err) = std::fs::read_to_string(&scene_path) {
+        bottom_bar.send_message(format!(
+            "Failed to read scene file \"{}\": {}",
+            scene_path, err
+        ));
+        return;
+    }
+
     commands.spawn(DynamicSceneRoot(
         asset_server.load(format!("{DEFAULT_SCENE_PATH}.ron")),
     ));
@@ -205,11 +228,7 @@ fn goto_normal_state(
 ) {
     //change the state
     next_state.set(EditorState::Normal);
-    send_message!(
-        Some('i'),
-        bottom_bar.queue,
-        "FileIO Operations completed, returning to Normal Mode".to_string()
-    );
+    bottom_bar.send_message("FileIO Operations completed, returning to Normal Mode");
     reset_message_writer.write(ResetScene);
 }
 
@@ -220,6 +239,7 @@ fn serialize_editor_scene(world: &mut World, type_registry: &AppTypeRegistry) ->
         .deny_all()
         .allow_component::<EditorObject>()
         .allow_component::<TileObject>()
+        .allow_component::<ColliderObject>()
         .allow_component::<Collider>()
         .allow_component::<Actor>()
         .extract_entities(query.iter(world))

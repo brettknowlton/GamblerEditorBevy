@@ -3,13 +3,13 @@ use bevy::prelude::*;
 use super::menu::CameraLockedUI;
 
 use crate::{
-    coordinate::TCoordinate, editor_modes::significant_component::SignificantComponent, Crosshair,
+    coordinate::Coordinate, editor_modes::significant_component::SignificantComponent, Crosshair,
     EditorState, PlaceholderHandle, TextureHandles, TILE_SIZE, UI_Z_LAYER,
 };
 
 #[derive(Message)]
 pub struct UpdatePlaceholderMessage {
-    pub tcoord: TCoordinate,
+    pub tcoord: Coordinate,
 }
 
 #[derive(Component, Reflect)]

@@ -1,7 +1,9 @@
+use bevy::input::mouse::MouseWheel;
 use bevy_egui::EguiContexts;
 
 use crate::{
-    editor_modes::EditorObjectKind, TextureHandles, SCALED_TILE_HEIGHT, SCALED_TILE_WIDTH,
+    editor_modes::EditorObjectKind, mouse_state::MouseState, EditorState, SelectedTileID,
+    TextureHandles, SCALED_TILE_HEIGHT, SCALED_TILE_WIDTH,
 };
 
 use super::*;
@@ -65,37 +67,13 @@ pub struct ToolingMenuItemNode {
 #[derive(Resource, Default)]
 pub struct LeftPanelEdge(pub f32);
 
-#[derive(Clone, Copy, Debug, Eq, PartialEq, Default)]
-pub enum MouseToolKind {
-    #[default]
-    Pointer,
-    Eyedropper,
-}
-
-#[derive(Resource, Debug, Default)]
-pub struct MouseToolState {
-    pub current: MouseToolKind,
-}
-
-pub fn render_egui_panels(
+pub fn render_bottom_panel(
     mut contexts: EguiContexts,
-
     bottom_bar: Res<message_display::MessageDisplay>,
     available_keybinds: Res<AvailableKeybinds>,
     asset_server: Res<AssetServer>,
 
-    editor_state: Res<State<EditorState>>,
-    input: Res<ButtonInput<KeyCode>>,
-    tooling_menu_state: ResMut<ToolingMenuState>,
-    textures: Res<TextureHandles>,
-    mut next_editor_state: ResMut<NextState<EditorState>>,
-    mut left_panel_edge: ResMut<LeftPanelEdge>,
-    mut mouse_tool_state: ResMut<MouseToolState>,
-
     mut bottom_panel: ResMut<BottomPanel>,
-    mut left_panel: ResMut<LeftPanel>,
-    mut mode_tabs_panel: ResMut<ModeTabsPanel>,
-    mut right_tools_panel: ResMut<RightToolsPanel>,
 ) -> Result {
     bottom_panel.show(
         &mut contexts,
@@ -103,7 +81,17 @@ pub fn render_egui_panels(
         available_keybinds.as_ref(),
         asset_server.as_ref(),
     )?;
+    Ok(())
+}
 
+pub fn render_mode_tabs_panel(
+    mut contexts: EguiContexts,
+    editor_state: Res<State<EditorState>>,
+    mut next_editor_state: ResMut<NextState<EditorState>>,
+    left_panel_edge: Res<LeftPanelEdge>,
+
+    mut mode_tabs_panel: ResMut<ModeTabsPanel>,
+) -> Result {
     let ctx = contexts.ctx_mut()?;
     mode_tabs_panel.show(
         ctx,
@@ -112,21 +100,61 @@ pub fn render_egui_panels(
         left_panel_edge.0,
     );
 
+    Ok(())
+}
+
+pub fn render_left_panel(
+    mut contexts: EguiContexts,
+
+    editor_state: Res<State<EditorState>>,
+    textures: Res<TextureHandles>,
+    mut left_panel_edge: ResMut<LeftPanelEdge>,
+    mut tooling_menu_state: ResMut<ToolingMenuState>,
+
+    mut left_panel: ResMut<LeftPanel>,
+
+    input: Res<ButtonInput<KeyCode>>,
+    mut mwheel: MessageReader<MouseWheel>,
+) -> Result {
+    // Check egui keyboard focus so panel navigation doesn't steal input from egui text fields
+    let egui_wants_keyboard = {
+        match contexts.ctx_mut() {
+            Ok(ctx) => ctx.wants_keyboard_input(),
+            Err(_) => false,
+        }
+    };
     let panel_right_x = left_panel.show(
         &mut contexts,
         &editor_state,
-        tooling_menu_state,
+        &mut *tooling_menu_state,
         &input,
+        &mut mwheel,
         &textures,
+        egui_wants_keyboard,
     )?;
+
+    // Sync the panel's selected item to the canonical SelectedTileID resource used by tile placement
+    // (done in sync_tile_selection which runs immediately after this system)
 
     left_panel_edge.0 = panel_right_x;
 
+    Ok(())
+}
+
+pub fn render_right_panel(
+    mut contexts: EguiContexts,
+
+    asset_server: Res<AssetServer>,
+    editor_state: Res<State<EditorState>>,
+    mouse_state: ResMut<MouseState>,
+
+    mut right_tools_panel: ResMut<RightToolsPanel>,
+) -> Result {
     right_tools_panel.show(
         &mut contexts,
         asset_server.as_ref(),
         editor_state.get(),
-        &mut mouse_tool_state,
+        mouse_state,
     )?;
 
     Ok(())
@@ -239,4 +267,21 @@ pub fn render_tooling_menu(
 
 pub fn hide_tooling_menu(mut tooling_menu: ResMut<ToolingMenuState>) {
     tooling_menu.visible = false;
+}
+
+/// Syncs the left panel's selected item to `SelectedTileID` (used by tile placement systems).
+/// Must run after `render_egui_panels` so the panel has already applied click/navigation input.
+pub fn sync_tile_selection(
+    tooling_menu_state: Res<ToolingMenuState>,
+    editor_state: Res<State<EditorState>>,
+    mut selected_tile_id: ResMut<SelectedTileID>,
+) {
+    if matches!(
+        editor_state.get(),
+        EditorState::Editing(EditorObjectKind::Tile(_))
+    ) {
+        if let Some(id) = tooling_menu_state.selected_item_id {
+            selected_tile_id.0 = id;
+        }
+    }
 }

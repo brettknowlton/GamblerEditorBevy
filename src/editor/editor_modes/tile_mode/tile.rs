@@ -58,6 +58,19 @@ impl Default for TileObject {
 }
 
 impl SignificantComponent for TileObject {
+    fn relevant_editor_object(&self) -> crate::EditorObjectKind {
+        return self.kind;
+    }
+    fn to_type_string(&self) -> String{
+        match self.kind {
+            EditorObjectKind::Tile(internal_kind) => match internal_kind {
+                TileID::Some(id) => format!("tile_{}", id),
+                _ => "tile_none".to_string(),
+            },
+            _ => "tile_none".to_string(),
+        }
+    }
+    
     fn place_rectangle(_rect: Rect, _commands: Commands) {
         //make a tile like normal in this rect, but use sliced tiles over the sprite sheet selection
         todo!();

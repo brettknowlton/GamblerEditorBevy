@@ -25,18 +25,21 @@ pub fn game_plugin(app: &mut App) {
             Update,
             (
                 game_keybinds,
-                actor_mode::player::player_controls,
-                actor_mode::player::player_physics,
-                // player::do_player_collision,
+                Player::player_controls,
+                Player::animate_player,
             )
                 .chain()
                 .run_if(in_state(GameState::Running)),
         )
-        .add_systems(Update, player_camera.run_if(in_state(GameState::Running)));
-    // .add_systems(
-    //     OnEnter(GameState::Loading),
-    //     ().chain()
-    // );
+        .add_systems(
+            FixedUpdate,
+            (Player::player_physics).run_if(in_state(GameState::Running)),
+        )
+        .add_systems(Update, player_camera.run_if(in_state(GameState::Running)))
+        .add_systems(
+            Update,
+            Player::sync_player_sprite.run_if(in_state(GameState::Running)),
+        );
 }
 
 fn game_keybinds(
@@ -56,10 +59,13 @@ fn game_keybinds(
 fn player_camera(
     player: Single<(&actor_mode::player::Player, &Transform), Without<Camera>>,
     mut camera_query: Query<(&mut Camera, &mut Transform)>,
+    time: Res<Time>,
 ) {
     let player_t = player.1.translation;
+    let alpha = (time.delta_secs() * 18.0).clamp(0.0, 1.0);
     for (_, mut t) in camera_query.iter_mut() {
-        t.translation = Vec3::new(player_t.x, player_t.y, t.translation.z);
+        t.translation.x = t.translation.x.lerp(player_t.x, alpha);
+        t.translation.y = t.translation.y.lerp(player_t.y, alpha);
     }
 }
 

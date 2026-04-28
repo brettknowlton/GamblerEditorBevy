@@ -4,13 +4,18 @@ use bevy_egui::{
     EguiContexts, EguiTextureHandle,
 };
 
-use crate::{EditorState, MouseToolKind, MouseToolState, PathBuf};
+use crate::{
+    mouse_state::{MouseState, MouseToolKind},
+    EditorState, PathBuf,
+};
 
 use super::editor_panel_frame;
 
 #[derive(Resource, Default)]
 pub struct RightToolsPanel {
     pointer_icon: Option<TextureId>,
+    pencil_icon: Option<TextureId>,
+    eraser_icon: Option<TextureId>,
     eyedropper_icon: Option<TextureId>,
     highlight_icon: Option<TextureId>,
 }
@@ -23,6 +28,18 @@ impl RightToolsPanel {
             )));
         }
 
+        if self.pencil_icon.is_none() {
+            self.pencil_icon = Some(contexts.add_image(EguiTextureHandle::Strong(
+                asset_server.load(PathBuf::from("textures/editor/icons/tool_pencil.png")),
+            )));
+        }
+
+        if self.eraser_icon.is_none() {
+            self.eraser_icon = Some(contexts.add_image(EguiTextureHandle::Strong(
+                asset_server.load(PathBuf::from("textures/editor/icons/tool_eraser.png")),
+            )));
+        }
+
         if self.eyedropper_icon.is_none() {
             self.eyedropper_icon = Some(contexts.add_image(EguiTextureHandle::Strong(
                 asset_server.load(PathBuf::from("textures/editor/icons/tool_eyedrop.png")),
@@ -31,7 +48,7 @@ impl RightToolsPanel {
 
         if self.highlight_icon.is_none() {
             self.highlight_icon = Some(contexts.add_image(EguiTextureHandle::Strong(
-                asset_server.load(PathBuf::from("textures/editor/icons/hl_toolpng.png")),
+                asset_server.load(PathBuf::from("textures/editor/icons/hl_tool.png")),
             )));
         }
     }
@@ -41,7 +58,7 @@ impl RightToolsPanel {
         contexts: &mut EguiContexts,
         asset_server: &AssetServer,
         editor_state: &EditorState,
-        mouse_tool_state: &mut MouseToolState,
+        mut mouse_state: ResMut<MouseState>,
     ) -> Result {
         if !matches!(editor_state, EditorState::Normal | EditorState::Editing(_)) {
             return Ok(());
@@ -50,6 +67,12 @@ impl RightToolsPanel {
         self.init_icons(contexts, asset_server);
 
         let Some(pointer_icon) = self.pointer_icon else {
+            return Ok(());
+        };
+        let Some(pencil_icon) = self.pencil_icon else {
+            return Ok(());
+        };
+        let Some(eraser_icon) = self.eraser_icon else {
             return Ok(());
         };
         let Some(eyedropper_icon) = self.eyedropper_icon else {
@@ -71,14 +94,7 @@ impl RightToolsPanel {
                 egui::Color32::from_rgba_unmultiplied(255, 255, 255, 18),
             );
 
-            ui.painter().image(
-                icon,
-                rect.shrink2(egui::vec2(4.0, 4.0)),
-                egui::Rect::from_min_max(egui::pos2(0.0, 0.0), egui::pos2(1.0, 1.0)),
-                egui::Color32::WHITE,
-            );
-
-            if mouse_tool_state.current == tool_kind {
+            if mouse_state.mode == tool_kind {
                 ui.painter().image(
                     highlight_icon,
                     rect,
@@ -87,8 +103,15 @@ impl RightToolsPanel {
                 );
             }
 
+            ui.painter().image(
+                icon,
+                rect.shrink2(egui::vec2(4.0, 4.0)),
+                egui::Rect::from_min_max(egui::pos2(0.0, 0.0), egui::pos2(1.0, 1.0)),
+                egui::Color32::WHITE,
+            );
+
             if response.clicked() {
-                mouse_tool_state.current = tool_kind;
+                mouse_state.mode = tool_kind;
             }
         };
 
@@ -106,6 +129,10 @@ impl RightToolsPanel {
                     );
                     ui.separator();
                     draw_tool(ui, MouseToolKind::Pointer, pointer_icon);
+                    ui.add_space(6.0);
+                    draw_tool(ui, MouseToolKind::Pencil, pencil_icon);
+                    ui.add_space(6.0);
+                    draw_tool(ui, MouseToolKind::Eraser, eraser_icon);
                     ui.add_space(6.0);
                     draw_tool(ui, MouseToolKind::Eyedropper, eyedropper_icon);
                 });

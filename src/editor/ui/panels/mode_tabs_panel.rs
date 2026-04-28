@@ -2,7 +2,7 @@ use bevy::prelude::*;
 use bevy_egui::egui::{self, RichText};
 
 use crate::{
-    editor_modes::{tile::TileID, EditorObjectKind},
+    editor_modes::{tile_mode::TileID, EditorObjectKind},
     EditorState,
 };
 
@@ -15,13 +15,13 @@ impl ModeTabsPanel {
         ctx: &egui::Context,
         editor_state: &EditorState,
         next_state: &mut NextState<EditorState>,
-        panel_right_x: f32,
+        left_panel_right_x: f32,
     ) {
         if !matches!(editor_state, EditorState::Normal | EditorState::Editing(_)) {
             return;
         }
 
-        let tab_x = panel_right_x.max(0.0);
+        let tab_x = left_panel_right_x.max(0.0);
         let tab_y = 0.0;
 
         egui::Area::new("mode_tabs_area".into())
@@ -65,9 +65,8 @@ impl ModeTabsPanel {
                         };
 
                         if tab(ui, "1: Tile", tile_active).clicked() {
-                            next_state.set(EditorState::Editing(EditorObjectKind::Tile(
-                                TileID::Some(0),
-                            )));
+                            next_state
+                                .set(EditorState::Editing(EditorObjectKind::Tile(TileID::Any)));
                         }
                         if tab(ui, "2: Collider", collider_active).clicked() {
                             next_state.set(EditorState::Editing(EditorObjectKind::Collider));

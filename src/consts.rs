@@ -41,7 +41,7 @@ pub const MAX_SPRITESHEET_ITEMS: u64 = 32;
 
 
 //PHYSICS CONSTS
-pub const GRAVITY: f32 = 30.;
+pub const GRAVITY: f32 = 12.; // applied per FixedUpdate tick (64hz) → effective ~768 units/sec²
 pub const FRICTION: f32 = 0.1; //Friction of the ground, this is a value between 0 and 1, 0 is no friction, 1 is full friction
 
 //Epsilon

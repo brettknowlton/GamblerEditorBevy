@@ -1,11 +1,7 @@
-use std::error::Error;
-
 use bevy::prelude::*;
 use serde::{Deserialize, Serialize};
 
-use crate::{
-    coordinate::{Coordinate, CoordinateFormatConversion, CoordinateSpace, TCoordinate},
-};
+use crate::coordinate::{Coordinate, CoordinateFormatConversion, CoordinateSpace};
 
 pub mod selection;
 pub use selection::ActiveSelection;
@@ -18,9 +14,8 @@ pub use actor_mode::player::Player;
 pub mod collider_mode;
 pub use collider_mode::ColliderModePlugin;
 
-pub mod tile;
-pub use tile::{TileModePlugin, TileID};
-
+pub mod tile_mode;
+pub use tile_mode::{TileID, TileModePlugin};
 
 pub mod normal_mode;
 pub use normal_mode::NormalModePlugin;
@@ -38,17 +33,26 @@ pub enum EditorObjectKind {
     Actor,
     Selector,
 }
-
-#[derive(Debug, Clone)]
-pub struct ErrorInvalidEditorObjectKind;
-
-impl std::fmt::Display for ErrorInvalidEditorObjectKind {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "Invalid EditorObjectKind")
+impl EditorObjectKind {
+    pub fn major_type(&self) -> EditorObjectKind {
+        match self {
+            EditorObjectKind::Tile(_) => EditorObjectKind::Tile(TileID::None),
+            EditorObjectKind::Collider => EditorObjectKind::Collider,
+            EditorObjectKind::Actor => EditorObjectKind::Actor,
+            _ => EditorObjectKind::None,
+        }
+    }
+    pub fn to_string(&self) -> String {
+        match self {
+            EditorObjectKind::None => "none".to_string(),
+            EditorObjectKind::Other => "other".to_string(),
+            EditorObjectKind::Tile(tile_id) => format!("tile_{:?}", tile_id),
+            EditorObjectKind::Collider => "collider".to_string(),
+            EditorObjectKind::Actor => "actor".to_string(),
+            EditorObjectKind::Selector => "selector".to_string(),
+        }
     }
 }
-
-impl Error for ErrorInvalidEditorObjectKind {}
 
 /// A component that marks an entity as a savable editor item, from this we have systems that load Tiles, Colliders, and other objects based on preset-defaults and the other saved components we may have.
 /// The main ones we need are the position of this object in the world, and the type of thing it is, and one more layer of optional specification on what "Kind of thing of thing" it is.
@@ -63,7 +67,7 @@ pub struct EditorObject {
     //the coordinate of the object as well as the major type of the object combined into a neat little package
     pub coordinate: Coordinate,
     //this zone ID will track which zone the object is in, this is used to determine which zone to load the object into and to help with performance by only loading objects in the current/neighrboring zones
-    pub zone_id: TCoordinate,
+    pub zone_id: Coordinate,
 }
 
 impl EditorObject {
@@ -82,18 +86,11 @@ impl EditorObject {
     pub fn get_coordinate(&self) -> Coordinate {
         self.coordinate.clone()
     }
-    pub fn new(
-        kind: EditorObjectKind,
-        coordinate: Coordinate,
-        zone_kind: EditorObjectKind,
-    ) -> EditorObject {
+    pub fn new(kind: EditorObjectKind, coordinate: Coordinate) -> EditorObject {
         EditorObject {
             kind,
             coordinate,
-            zone_id: TCoordinate::new(
-                zone_kind,
-                coordinate.convert(CoordinateSpace::ZoneSpace, None, None),
-            ),
+            zone_id: coordinate.convert(CoordinateSpace::ZoneSpace, None, None),
         }
     }
 }

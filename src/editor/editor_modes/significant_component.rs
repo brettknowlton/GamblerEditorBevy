@@ -2,15 +2,19 @@ use crate::{SCALED_TILE_HEIGHT, SCALED_TILE_WIDTH, TILE_SCALE};
 
 use super::*;
 
-pub trait SignificantComponent: Default {
+pub trait SignificantComponent: Component + Default + Reflect {
+    fn relevant_editor_object(&self) ->EditorObjectKind;
+    fn to_type_string(&self) -> String;
+    
     fn place_rectangle(rect: Rect, commands: Commands);
     fn at_coordinate(coord: Coordinate) -> Self;
 
-    fn place<T: SignificantComponent + Component + Default>(
+    fn place<T: SignificantComponent>(
         commands: &mut Commands,
         item: EditorObject,
         editor_objects: &Query<(Entity, &EditorObject), With<T>>,
     ) {
+
         println!(
             "Placing item of type {:?} at coordinate {:?}",
             item.get_major_type(),

@@ -4,7 +4,6 @@ use std::ops::Add;
 
 use bevy::prelude::*;
 
-use crate::editor_modes::EditorObjectKind;
 use crate::{SCALED_TILE_WIDTH, TILE_SCALE, TILE_SIZE, ZONE_SIZE};
 
 /// this function takes a value and a grid size, and snaps the value to the nearest multiple of the grid size, rounding down,
@@ -42,7 +41,7 @@ pub trait CoordinateFormatConversion {
     fn convert(
         &self,
         target_format: CoordinateSpace,
-        camera_transform: Option<&Transform>,
+        camera_transform: Option<&GlobalTransform>,
         window_size: Option<&Vec2>,
     ) -> Self
     where
@@ -127,7 +126,7 @@ pub trait CoordinateFormatConversion {
     fn as_zone_space(
         &self,
         window_size: Option<&Vec2>,
-        camera_transform: Option<&Transform>,
+        camera_transform: Option<&GlobalTransform>,
     ) -> Self
     where
         Self: Sized,
@@ -142,11 +141,11 @@ pub trait CoordinateFormatConversion {
                 CoordinateSpace::WorldSpace => point.game_to_grid_space().grid_to_zone_space(),
                 CoordinateSpace::Screen => point
                     .screen_to_centered(&window_size.unwrap())
-                    .centered_to_game(&camera_transform.unwrap())
+                    .centered_to_game(camera_transform.unwrap())
                     .game_to_grid_space()
                     .grid_to_zone_space(),
                 CoordinateSpace::ScreenCentered => point
-                    .centered_to_game(&camera_transform.unwrap())
+                    .centered_to_game(camera_transform.unwrap())
                     .game_to_grid_space()
                     .grid_to_zone_space(),
                 CoordinateSpace::Undefined => {
@@ -162,7 +161,7 @@ pub trait CoordinateFormatConversion {
     fn as_grid_space(
         &self,
         window_size: Option<&Vec2>,
-        camera_transform: Option<&Transform>,
+        camera_transform: Option<&GlobalTransform>,
     ) -> Self
     where
         Self: Sized,
@@ -196,7 +195,7 @@ pub trait CoordinateFormatConversion {
     fn as_world_space(
         &self,
         window_size: Option<&Vec2>,
-        camera_transform: Option<&Transform>,
+        camera_transform: Option<&GlobalTransform>,
     ) -> Self
     where
         Self: Sized,
@@ -229,7 +228,7 @@ pub trait CoordinateFormatConversion {
     fn as_centered_space(
         &self,
         window_size: Option<&Vec2>,
-        camera_transform: Option<&Transform>,
+        camera_transform: Option<&GlobalTransform>,
     ) -> Self
     where
         Self: Sized,
@@ -263,7 +262,7 @@ pub trait CoordinateFormatConversion {
     fn as_screen_space(
         &self,
         window_size: Option<&Vec2>,
-        camera_transform: Option<&Transform>,
+        camera_transform: Option<&GlobalTransform>,
     ) -> Self
     where
         Self: Sized,
@@ -448,7 +447,11 @@ impl Coordinate {
     }
 
     /// Creates a new Coordinate from a Vec3, with the format set to Undefined
-    pub fn from(v: Vec3) -> Self {
+    pub fn from_vec3(v: Vec3) -> Self {
+        Self::new(v.x as i64, v.y as i64, CoordinateSpace::Undefined)
+    }
+
+    pub fn from_vec2(v: Vec2) -> Self {
         Self::new(v.x as i64, v.y as i64, CoordinateSpace::Undefined)
     }
 
@@ -465,14 +468,14 @@ impl Coordinate {
         }
     }
 
-    fn centered_to_game(&self, camera_transform: &Transform) -> Coordinate {
+    fn centered_to_game(&self, camera_transform: &GlobalTransform) -> Coordinate {
         assert!(
             self.format == CoordinateSpace::ScreenCentered,
             "This function can only convert centered screen coordinates to game coordinates"
         );
         Coordinate {
-            x: self.x + camera_transform.translation.x as i64,
-            y: -(self.y + camera_transform.translation.y as i64),
+            x: self.x + camera_transform.translation().x as i64,
+            y: -(self.y + camera_transform.translation().y as i64),
             format: CoordinateSpace::WorldSpace,
         }
     }
@@ -525,15 +528,15 @@ impl Coordinate {
         }
     }
 
-    fn game_to_centered(&self, camera_transform: &Transform) -> Coordinate {
+    fn game_to_centered(&self, camera_transform: &GlobalTransform) -> Coordinate {
         assert!(
             self.format == CoordinateSpace::WorldSpace,
             "This function can only convert game coordinates to centered screen coordinates"
         );
         //will need to take into account the camera's position in game space, as well as the fact that game space has the y axis flipped compared to screen space
         Coordinate {
-            x: self.x - camera_transform.translation.x as i64,
-            y: -(self.y - camera_transform.translation.y as i64),
+            x: self.x - camera_transform.translation().x as i64,
+            y: -(self.y - camera_transform.translation().y as i64),
             format: CoordinateSpace::ScreenCentered,
         }
     }
@@ -579,56 +582,5 @@ impl Coordinate {
 impl Into<bevy::prelude::Vec2> for Coordinate {
     fn into(self) -> Vec2 {
         self.as_vec2()
-    }
-}
-
-///A TCoordinate, or a "typed coordinate" is a coordinate that also includes an identifying character,
-///this way the coordinate is unique, as no two objects of the same type can occupy the same space,
-/// and makes for an efficient Unique Identifier both objects AND zones
-///
-/// Objects Example:
-///     TCoordinate { type_char: 'T', coord: Coordinate(0, 0) }
-/// Object Types:
-/// T: Tile
-/// C: Collider
-/// R: Editor Rect
-/// P: Placeholder
-///
-///
-/// Zones Example:
-///    TCoordinate { type_char: 'F', coord: Coordinate(0, 0) }
-/// Zone Types:
-/// F: Foreground
-/// B: Background
-///
-#[derive(Component, Reflect, Deserialize, Serialize, Debug, Clone, PartialEq, Eq, Hash)]
-#[reflect(Component)]
-pub struct TCoordinate {
-    pub kind: EditorObjectKind,
-    pub coord: Coordinate,
-}
-impl TCoordinate {
-    pub fn new(kind: EditorObjectKind, coord: Coordinate) -> Self {
-        Self { kind, coord }
-    }
-
-    pub fn print(&self) {
-        println!(
-            "TCoordinate {{ kind: {:?}, coord: {:?} }}",
-            self.kind, self.coord
-        );
-    }
-}
-
-impl Default for TCoordinate {
-    fn default() -> Self {
-        Self {
-            kind: EditorObjectKind::default(),
-            coord: Coordinate {
-                x: 0,
-                y: 0,
-                format: CoordinateSpace::WorldSpace,
-            },
-        }
     }
 }

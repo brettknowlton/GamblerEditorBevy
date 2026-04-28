@@ -2,7 +2,7 @@ use crate::{editor_modes::significant_component::SignificantComponent, TILE_SCAL
 
 use super::*;
 
-#[derive(Component, Default, Debug, Clone)]
+#[derive(Component, Default, Debug, Clone, Reflect)]
 pub struct SelectionRect {
     pub start: Coordinate,
     pub end: Option<Coordinate>,
@@ -26,6 +26,13 @@ impl SelectionRect {
 }
 
 impl SignificantComponent for SelectionRect {
+    fn relevant_editor_object(&self) -> crate::EditorObjectKind {
+        return crate::EditorObjectKind::Other;
+    }
+    fn to_type_string(&self) -> String {
+        "selection_rect".to_string()
+    }
+
     fn place<T: SignificantComponent + Component>(
         commands: &mut Commands,
         item: EditorObject,
