@@ -90,7 +90,7 @@ impl EditorModePlugin for TileModePlugin {
         //"P" handles placement of a tile and adding it to the scene
         //places the first tile in the selection rect
         if input.just_pressed(KeyCode::KeyP) {
-            let coord = Coordinate::from_vec3(crosshair.0.translation).snap_to_grid();
+            let coord = Coordinate::new_world_space(crosshair.0.translation.x as i64, crosshair.0.translation.y as i64).snap_to_grid();
             let to_place = EditorObject::new(
                 EditorObjectKind::Tile(TileID::Some(selected_tile_id.0)),
                 coord,
@@ -102,7 +102,7 @@ impl EditorModePlugin for TileModePlugin {
 
         // "L" handles removal of a tile from the scene, similar to placing one just doesnt need to worry about the tile creation part afterwards
         if input.just_pressed(KeyCode::KeyL) {
-            let coord = Coordinate::from_vec3(crosshair.0.translation).snap_to_grid();
+            let coord = Coordinate::new_world_space(crosshair.0.translation.x as i64, crosshair.0.translation.y as i64).snap_to_grid();
 
             TileObject::remove(
                 &mut commands,

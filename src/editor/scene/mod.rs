@@ -216,8 +216,20 @@ fn spawn_sprites(
     }
 }
 
-fn load_empty_scene(mut commands: Commands) {
-    //create scene manager component that will read/write our scene data between the enviornment and a json file
+fn load_empty_scene(
+    mut commands: Commands,
+    editor_entities: Query<Entity, With<EditorObject>>,
+    scene_roots: Query<Entity, With<DynamicSceneRoot>>,
+) {
+    // Clear prior placed content so "empty" is actually empty (MCP / reload would otherwise stack tiles).
+    let editors: Vec<Entity> = editor_entities.iter().collect();
+    for e in editors {
+        commands.entity(e).despawn();
+    }
+    let roots: Vec<Entity> = scene_roots.iter().collect();
+    for e in roots {
+        commands.entity(e).despawn();
+    }
     commands.spawn(DynamicSceneRoot(Handle::default()));
 }
 

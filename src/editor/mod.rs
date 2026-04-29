@@ -99,6 +99,7 @@ impl Editor {
             .add_plugins(ColliderModePlugin)
             .add_plugins(ActorModePlugin)
             .add_plugins(scene::scene_plugin)
+            .add_plugins(crate::mcp::McpPlugin)
             //The only true startup systems here:
             .add_systems(Startup, Editor::initialize_editor)
             //universal update systems for all editor modes
@@ -434,6 +435,7 @@ impl Editor {
                 ..default()
             },
             Transform {
+                translation: Vec3::new(0.0, 320.0, 0.0),
                 scale: Vec3::new(TILE_SCALE as f32, TILE_SCALE as f32, 0.0),
                 ..default()
             },

@@ -4,6 +4,7 @@ use bevy_egui::EguiPlugin;
 pub mod consts;
 pub mod editor;
 pub mod game;
+pub mod mcp;
 pub mod utilities;
 
 use bevy_rapier2d::{
