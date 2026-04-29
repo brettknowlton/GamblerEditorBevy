@@ -1,14 +1,14 @@
 use bevy::prelude::*;
 use bevy::reflect::Reflect;
 
-use super::AnimBehavior;
 use super::anim_frame::AnimationFrame;
+use super::AnimBehavior;
 
 #[derive(Component, Debug, Reflect, Clone)]
 pub struct AnimationDefenition {
     /// A vector of frames, each frame is an option in case we create an animation map before we have all the frames ready,
     /// this allows us to set the current animation to one that is not fully defined yet and fill in the frames later
-    pub frames: Vec<Option<AnimationFrame>>,
+    pub frames: Vec<AnimationFrame>,
     pub spritesheet: Handle<Image>,
     /// The animation's position in the greater spritesheet,
     pub start_end: Vec2,
@@ -26,17 +26,13 @@ pub struct AnimationDefenition {
 impl AnimationDefenition {
     pub fn get_current_frame(&self) -> &AnimationFrame {
         if let Some(frame) = self.frames.get(self.current_frame_index as usize) {
-            frame.as_ref().unwrap()
+            frame
         } else {
-            panic!("Current frame index out of bounds");
-        }
-    }
-    pub fn get_current_sprite(&self) -> Sprite {
-        let frame = self.get_current_frame();
-        Sprite {
-            image: self.spritesheet.clone(),
-            rect: Some(frame.uv_rect),
-            ..Default::default()
+            panic!(
+                "Current frame index out of bounds. Current index: {}, frames length: {}",
+                self.current_frame_index,
+                self.frames.len()
+            );
         }
     }
 }

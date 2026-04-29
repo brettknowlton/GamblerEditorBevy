@@ -14,10 +14,10 @@ use bevy_rapier2d::prelude::{Collider, RigidBody};
 
 use super::*;
 /// Width of the player source image in pixels
-pub const PLAYER_SIZE_X: u32 = 38;
+pub const PLAYER_SIZE_X: u32 = 27;
 
 /// Height of the player source image in pixels
-pub const PLAYER_SIZE_Y: u32 = 61;
+pub const PLAYER_SIZE_Y: u32 = 38;
 
 /// Scale factor for the player
 pub const PLAYER_SCALE: u32 = DEFAULT_GENERAL_SCALE_FACTOR; //by default player has normal scaling
@@ -220,12 +220,13 @@ impl Player {
         }
     }
 
-    pub fn get_sprite(&self) -> Sprite {
+    fn get_first_sprite(&self) -> Sprite {
+        //placeholder until we implement the animation map
         self.animation_map
             .get_current()
-            .unwrap_or_else(|| panic!("Player animation map has no current animation!"))
-            .get_current_sprite()
-            .clone()
+            .expect("Player animation map has no current animation")
+            .get_current_frame()
+            .get_sprite(&self.animation_map.spritesheet)
     }
 
     pub fn respawn(
@@ -239,18 +240,28 @@ impl Player {
     }
 
     fn create_animation_map(asset_server: &AssetServer) -> AnimationMap {
-        let path = PathBuf::from("textures/player/player_run.png");
+        let path = PathBuf::from("textures/player/player_anims-sheet.png");
         let map = AnimationMapBuidler::new()
             .with_spritesheet_path(asset_server, path.to_str().unwrap().to_string())
             .standard_cut(
-                "run_right",
+                "idle",
                 Vec2::new(PLAYER_SIZE_X as f32, PLAYER_SIZE_Y as f32),
                 0,
-                Vec2::new(8.0, 1.0),
+                9,
+                Vec2::new(18.0, 1.0),
                 0.1,
                 AnimBehavior::Loop,
             )
-            .set_initial_animation("run_right")
+            .standard_cut(
+                "run",
+                Vec2::new(PLAYER_SIZE_X as f32, PLAYER_SIZE_Y as f32),
+                10,
+                18,
+                Vec2::new(18.0, 1.0),
+                0.1,
+                AnimBehavior::Loop,
+            )
+            .set_initial_animation("idle")
             .build()
             .unwrap();
 
@@ -268,7 +279,7 @@ impl Player {
 
         let player = Player::new(&asset_server);
 
-        let player_sprite = player.get_sprite();
+        let player_sprite = player.get_first_sprite();
 
         let mut ec = commands.spawn((
             Transform {

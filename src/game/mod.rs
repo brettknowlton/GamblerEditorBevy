@@ -27,6 +27,7 @@ pub fn game_plugin(app: &mut App) {
                 game_keybinds,
                 Player::player_controls,
                 Player::animate_player,
+                Player::sync_player_sprite,
             )
                 .chain()
                 .run_if(in_state(GameState::Running)),
@@ -35,11 +36,7 @@ pub fn game_plugin(app: &mut App) {
             FixedUpdate,
             (Player::player_physics).run_if(in_state(GameState::Running)),
         )
-        .add_systems(Update, player_camera.run_if(in_state(GameState::Running)))
-        .add_systems(
-            Update,
-            Player::sync_player_sprite.run_if(in_state(GameState::Running)),
-        );
+        .add_systems(Update, player_camera.run_if(in_state(GameState::Running)));
 }
 
 fn game_keybinds(

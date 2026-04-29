@@ -11,8 +11,8 @@ use crate::editor_modes::significant_component::SignificantComponent;
 use crate::message_display::MessageDisplay;
 use crate::ui::ToolingMenuItem;
 use crate::{
-    configure_tooling_menu, AvailableKeybinds, Crosshair, CustomInput, EditorState,
-    SelectedTileID, TextureHandles, ToolingMenuState,
+    configure_tooling_menu, AvailableKeybinds, Crosshair, CustomInput, EditorState, SelectedTileID,
+    TextureHandles, ToolingMenuState,
 };
 use std::path::PathBuf;
 

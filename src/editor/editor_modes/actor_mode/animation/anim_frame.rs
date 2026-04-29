@@ -19,6 +19,16 @@ impl AnimationFrame {
             frame_size: Vec2::new(1.0, 1.0),
         }
     }
+
+    pub fn get_sprite(&self, spritesheet: &Handle<Image>) -> Sprite {
+        //placeholder until we implement the animation map
+        Sprite {
+            image: spritesheet.clone(),
+            rect: Some(self.uv_rect),
+            ..Default::default()
+        }
+    }
+
     pub fn cut_from(sheet_layout: Vec2, index: u64, frame_size: Vec2, duration: f32) -> Self {
         let x = (index % sheet_layout.x as u64) as f32 * frame_size.x;
         let y = (index / sheet_layout.x as u64) as f32 * frame_size.y;

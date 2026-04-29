@@ -35,12 +35,12 @@ impl AnimationMapBuidler {
         name: &str,
         frame_size: Vec2,
         start_frame_index: u32,
+        stop_frame_index: u32,
         sheet_layout: Vec2,
         duration: f32,
         behavior: AnimBehavior,
     ) -> Self {
         let mut frames = vec![];
-        let frame_count = sheet_layout.x as u32 * sheet_layout.y as u32;
 
         for y in 0..sheet_layout.y as u32 {
             for x in 0..sheet_layout.x as u32 {
@@ -50,13 +50,19 @@ impl AnimationMapBuidler {
                     frame_size,
                     duration,
                 );
-                frames.push(Some(new_frame));
+                if (y * sheet_layout.x as u32 + x) as u32 + start_frame_index <= stop_frame_index {
+                    frames.push(new_frame);
+                } else {
+                    continue;
+                }
             }
         }
+        let actual_frame_count = frames.len() as u32;
+
         let new_anim = AnimationDefenition {
             frames,
-            start_end: Vec2::new(0.0, 0.0),
-            frame_count,
+            start_end: Vec2::new(start_frame_index as f32, stop_frame_index as f32),
+            frame_count: actual_frame_count,
             current_frame_index: 0,
             frame_timer: 0.0,
             behavior,
@@ -66,7 +72,10 @@ impl AnimationMapBuidler {
                 .expect("Must set a spritesheet before cutting frames"),
         };
 
-        println!("cut {} frames for animation \"{}\"", frame_count, name);
+        println!(
+            "cut {} frames for animation \"{}\"",
+            actual_frame_count, name
+        );
         self.map.insert(name.to_string(), new_anim);
         self
     }
@@ -77,7 +86,7 @@ impl AnimationMapBuidler {
     }
 
     pub fn set_initial_animation(mut self, name: &str) -> Self {
-        if self.initial_animation.is_none() {
+        if self.initial_animation.is_some() {
             warn!("Initial animation is already set");
         }
         self.initial_animation = Some(
@@ -123,46 +132,41 @@ impl AnimationMapBuidler {
 pub struct AnimationMap {
     current: Option<AnimationDefenition>,
     map: HashMap<String, AnimationDefenition>,
-    spritesheet: Handle<Image>,
+    pub spritesheet: Handle<Image>,
 }
 
 impl AnimationMap {
-    pub fn drive(&mut self, dt: Res<Time>) -> Option<Sprite> {
-        let new_sprite = if let Some(current) = &mut self.current {
+    pub fn drive(&mut self, dt: Res<Time>) {
+        if let Some(current) = &mut self.current {
             current.frame_timer += dt.delta_secs();
             if current.frame_timer >= current.get_current_frame().duration {
-                Some(self.next_sprite())
-            } else {
-                None
+                self.next_sprite()
             }
-        } else {
-            None
-        };
-        new_sprite
+        }
     }
 
-    fn next_sprite(&mut self) -> Sprite {
+    fn next_sprite(&mut self) {
         if let Some(current) = &mut self.current {
+            let frame_count = current.frames.len() as u32;
+            if frame_count == 0 {
+                return;
+            }
+
             current.frame_timer = 0.0;
             current.current_frame_index += 1;
 
-            if current.current_frame_index >= current.frame_count {
+            if current.current_frame_index >= frame_count {
                 match current.behavior {
                     AnimBehavior::Loop => {
                         current.current_frame_index = 0;
-                        self.get_current().unwrap().get_current_sprite()
                     }
                     AnimBehavior::Once => {
-                        current.current_frame_index = current.frame_count - 1;
-                        self.get_current().unwrap().get_current_sprite()
+                        current.current_frame_index = frame_count - 1;
                     }
                     AnimBehavior::PingPong => {
                         current.current_frame_index = 0;
-                        self.get_current().unwrap().get_current_sprite()
                     }
                 }
-            } else {
-                self.get_current().unwrap().get_current_sprite()
             }
         } else {
             panic!("No current animation set for this AnimationMap");
