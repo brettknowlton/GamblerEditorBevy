@@ -33,12 +33,26 @@ pub enum McpCmd {
         rows: Vec<String>,
     },
     PlaceCollider { world_x: i64, world_y: i64 },
+    /// Remove only the collider at a cell (tile is kept). Use to fix orphan colliders.
+    RemoveCollider { world_x: i64, world_y: i64 },
     /// Adds a solid collider on every snapped grid cell that has a tile but no collider yet.
     EnsureCollidersForAllTiles,
     RemoveTile {
         world_x: i64,
         world_y: i64,
     },
+    /// Fill a rectangle of grid cells with tiles. x1/y1 and x2/y2 are opposite world-space corners.
+    FillRect {
+        x1: i64,
+        y1: i64,
+        x2: i64,
+        y2: i64,
+        tile_id: u64,
+    },
+    /// Place an actor at the snapped grid cell.
+    PlaceActor { world_x: i64, world_y: i64 },
+    /// Remove the actor at the snapped grid cell.
+    RemoveActor { world_x: i64, world_y: i64 },
     SetSelectedTile {
         tile_id: u64,
     },
@@ -49,7 +63,10 @@ pub enum McpCmd {
         x: f32,
         y: f32,
     },
+    GetTileCatalog,
     GetSnapshot,
+    /// Returns bounding box of all tiles (min/max grid coords, center, dimensions).
+    GetSceneBounds,
     RequestLoadScene,
     RequestLoadEmptyScene,
     RequestSaveScene,

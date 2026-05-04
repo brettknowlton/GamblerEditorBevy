@@ -5,12 +5,13 @@ use bevy::prelude::*;
 use crate::{
     Crosshair, EditorObject, EditorObjectKind, EditorState, SelectedTileID, TileID,
 };
+use crate::editor::editor_modes::actor_mode::actor::Actor;
 use crate::editor::editor_modes::collider_mode::ColliderObject;
 use crate::editor::editor_modes::significant_component::SignificantComponent;
 use crate::editor::editor_modes::tile_mode::TileObject;
 use crate::editor::ui::message_display::MessageDisplay;
 use crate::utilities::coordinate::{Coordinate, CoordinateSpace};
-use crate::{MAX_SPRITESHEET_ITEMS, SCALED_TILE_WIDTH};
+use crate::{MAX_SPRITESHEET_ITEMS, SCALED_TILE_WIDTH, TileCatalog};
 
 use super::bridge::{McpCmd, McpEnvelope, McpReply, PlaceTilePayload};
 use super::EditorMcpBridge;
@@ -105,6 +106,7 @@ fn editor_state_label(state: &EditorState) -> String {
 
 pub fn drain_mcp_inbox(
     bridge: Res<EditorMcpBridge>,
+    tile_catalog: Res<TileCatalog>,
     mut commands: Commands,
     mut next_editor: ResMut<NextState<EditorState>>,
     editor_state: Res<State<EditorState>>,
@@ -112,12 +114,14 @@ pub fn drain_mcp_inbox(
     mut bottom_bar: ResMut<MessageDisplay>,
     tiles: Query<(Entity, &EditorObject), With<TileObject>>,
     colliders: Query<(Entity, &EditorObject), With<ColliderObject>>,
+    actors: Query<(Entity, &EditorObject), With<Actor>>,
     mut crosshair: Query<&mut Transform, With<Crosshair>>,
 ) {
     while let Ok(env) = bridge.from_mcp.try_recv() {
         let McpEnvelope { id, cmd } = env;
         let result = run_mcp_cmd(
             cmd,
+            &tile_catalog,
             &mut commands,
             &mut next_editor,
             editor_state.get(),
@@ -125,6 +129,7 @@ pub fn drain_mcp_inbox(
             &mut bottom_bar,
             &tiles,
             &colliders,
+            &actors,
             &mut crosshair,
         );
         let _ = bridge.to_mcp.send(McpReply { id, result });
@@ -133,6 +138,7 @@ pub fn drain_mcp_inbox(
 
 fn run_mcp_cmd(
     cmd: McpCmd,
+    tile_catalog: &TileCatalog,
     commands: &mut Commands,
     next_editor: &mut NextState<EditorState>,
     current: &EditorState,
@@ -140,6 +146,7 @@ fn run_mcp_cmd(
     bottom_bar: &mut MessageDisplay,
     tiles: &Query<(Entity, &EditorObject), With<TileObject>>,
     colliders: &Query<(Entity, &EditorObject), With<ColliderObject>>,
+    actors: &Query<(Entity, &EditorObject), With<Actor>>,
     crosshair: &mut Query<&mut Transform, With<Crosshair>>,
 ) -> Result<serde_json::Value, String> {
     match cmd {
@@ -321,6 +328,100 @@ fn run_mcp_cmd(
             bottom_bar.send_remove_eo_message("tile (MCP)", coord);
             Ok(serde_json::json!({ "removed": true, "grid_x": coord.x, "grid_y": coord.y }))
         }
+        McpCmd::RemoveCollider { world_x, world_y } => {
+            let coord = Coordinate::new_world_space(world_x, world_y).snap_to_grid();
+            ColliderObject::remove(commands, coord, EditorObjectKind::Collider, colliders);
+            bottom_bar.send_remove_eo_message("collider (MCP)", coord);
+            Ok(serde_json::json!({ "removed": true, "grid_x": coord.x, "grid_y": coord.y }))
+        }
+        McpCmd::FillRect { x1, y1, x2, y2, tile_id } => {
+            validate_tile_id(tile_id)?;
+            let stride = stride_world();
+            // snap corners to grid
+            let c1 = Coordinate::new_world_space(x1, y1).snap_to_grid();
+            let c2 = Coordinate::new_world_space(x2, y2).snap_to_grid();
+            let min_x = c1.x.min(c2.x);
+            let max_x = c1.x.max(c2.x);
+            let min_y = c1.y.min(c2.y);
+            let max_y = c1.y.max(c2.y);
+            let mut placed = 0u64;
+            let mut gx = min_x;
+            while gx <= max_x {
+                let mut gy = min_y;
+                while gy <= max_y {
+                    let coord = Coordinate { x: gx, y: gy, format: CoordinateSpace::GridSpace };
+                    let to_place = EditorObject::new(EditorObjectKind::Tile(TileID::Some(tile_id)), coord);
+                    TileObject::place(commands, to_place, tiles);
+                    placed += 1;
+                    gy += stride;
+                }
+                gx += stride;
+            }
+            bottom_bar.send_message(format!("MCP: fill_rect placed {placed} tiles"));
+            Ok(serde_json::json!({
+                "placed_cells": placed,
+                "min_x": min_x, "min_y": min_y,
+                "max_x": max_x, "max_y": max_y,
+                "tile_id": tile_id,
+            }))
+        }
+        McpCmd::PlaceActor { world_x, world_y } => {
+            let coord = Coordinate::new_world_space(world_x, world_y).snap_to_grid();
+            let to_place = EditorObject::new(EditorObjectKind::Actor, coord);
+            Actor::place(commands, to_place, actors);
+            bottom_bar.send_place_eo_message("actor (MCP)", coord);
+            Ok(serde_json::json!({ "placed": true, "grid_x": coord.x, "grid_y": coord.y }))
+        }
+        McpCmd::RemoveActor { world_x, world_y } => {
+            let coord = Coordinate::new_world_space(world_x, world_y).snap_to_grid();
+            Actor::remove(commands, coord, EditorObjectKind::Actor, actors);
+            bottom_bar.send_remove_eo_message("actor (MCP)", coord);
+            Ok(serde_json::json!({ "removed": true, "grid_x": coord.x, "grid_y": coord.y }))
+        }
+        McpCmd::GetSceneBounds => {
+            let mut min_x = i64::MAX;
+            let mut max_x = i64::MIN;
+            let mut min_y = i64::MAX;
+            let mut max_y = i64::MIN;
+            let mut tile_count = 0u64;
+            for (_, eo) in tiles.iter() {
+                if let EditorObjectKind::Tile(TileID::Some(_)) = eo.kind {
+                    let c = eo.coordinate;
+                    min_x = min_x.min(c.x);
+                    max_x = max_x.max(c.x);
+                    min_y = min_y.min(c.y);
+                    max_y = max_y.max(c.y);
+                    tile_count += 1;
+                }
+            }
+            let actor_count = actors.iter().count() as u64;
+            let collider_count = colliders.iter().count() as u64;
+            if tile_count == 0 {
+                return Ok(serde_json::json!({
+                    "tile_count": 0,
+                    "actor_count": actor_count,
+                    "collider_count": collider_count,
+                    "bounds": null,
+                }));
+            }
+            let stride = stride_world() as i64;
+            let width_cells = (max_x - min_x) / stride + 1;
+            let height_cells = (max_y - min_y) / stride + 1;
+            let center_x = (min_x + max_x) / 2;
+            let center_y = (min_y + max_y) / 2;
+            Ok(serde_json::json!({
+                "tile_count": tile_count,
+                "actor_count": actor_count,
+                "collider_count": collider_count,
+                "bounds": {
+                    "min_x": min_x, "min_y": min_y,
+                    "max_x": max_x, "max_y": max_y,
+                    "center_x": center_x, "center_y": center_y,
+                    "width_cells": width_cells,
+                    "height_cells": height_cells,
+                },
+            }))
+        }
         McpCmd::SetSelectedTile { tile_id } => {
             validate_tile_id(tile_id)?;
             selected_tile.0 = tile_id;
@@ -397,6 +498,24 @@ fn run_mcp_cmd(
                     "spritesheet_columns": crate::consts::SPRITESHEET_WIDTH,
                     "mcp_max_place_tiles_per_call": MCP_MAX_PLACE_TILES,
                 },
+            }))
+        }
+        McpCmd::GetTileCatalog => {
+            let mut missing_tile_ids = Vec::new();
+            for tile_id in 0..MAX_SPRITESHEET_ITEMS {
+                if !tile_catalog.0.contains_key(&tile_id) {
+                    missing_tile_ids.push(tile_id);
+                }
+            }
+
+            let catalog = serde_json::to_value(&tile_catalog.0)
+                .map_err(|err| format!("failed to serialize tile catalog: {err}"))?;
+
+            Ok(serde_json::json!({
+                "catalog": catalog,
+                "defined_count": tile_catalog.0.len(),
+                "missing_tile_ids": missing_tile_ids,
+                "max_tile_id": MAX_SPRITESHEET_ITEMS - 1,
             }))
         }
         McpCmd::RequestLoadScene => {

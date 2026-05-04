@@ -45,18 +45,4 @@ pub const GRAVITY: f32 = 12.; // applied per FixedUpdate tick (64hz) → effecti
 pub const FRICTION: f32 = 0.1; //Friction of the ground, this is a value between 0 and 1, 0 is no friction, 1 is full friction
 
 //Epsilon
-pub const EPSILON: f32 = 0.0001;//A small value
-/*
-
-alright what the hell does this mean? im sure hyrum just said that in his head lol
-
-    ALL THE VARIABLES THAT NEVER CHANGE FOR THE ENRITE TIME THE GAME IS RUNNING:
-    the space between things doesnt matter, but the order does, first entry is just an example of that
-
-
-    pub(crate)const WINDOW_TITLE2:&str= "GamblerEditor";
-    ignore this    -   The Name for coding it     -    the kind of thing      -    the value it holds
-    pub(crate)const     WINDOW_TITLE:                   &str                        = "Gambler";
-
-
-*/
+pub const EPSILON: f32 = 0.01;//A small value

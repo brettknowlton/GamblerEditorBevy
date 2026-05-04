@@ -117,36 +117,77 @@ pub struct PlaceColliderArgs {
     pub world_y: i64,
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]
+pub struct RemoveColliderArgs {
+    pub world_x: i64,
+    pub world_y: i64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]
+pub struct FillRectArgs {
+    /// World-space X of one corner.
+    pub x1: i64,
+    /// World-space Y of one corner.
+    pub y1: i64,
+    /// World-space X of the opposite corner.
+    pub x2: i64,
+    /// World-space Y of the opposite corner.
+    pub y2: i64,
+    pub tile_id: u64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]
+pub struct PlaceActorArgs {
+    pub world_x: i64,
+    pub world_y: i64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]
+pub struct RemoveActorArgs {
+    pub world_x: i64,
+    pub world_y: i64,
+}
+
 // !!!`[EDIT OR ADD TO THIS TO FINE TUNE HOW THE AI WORKS WITH THE EDITOR.]`!!!
 
 /// Shown to MCP clients once per session — level-design contract for this editor.
-pub const GAMBLER_MCP_INSTRUCTIONS: &str = r#"Gambler: Bevy 2D level editor for a playable game (not abstract art).
+pub const GAMBLER_MCP_INSTRUCTIONS: &str = r#"
+Gambler: Bevy 2D level editor for a metroidvania game. (not abstract art).
 
-PLAYER SPAWN / CROSSHAIR
-- **`gambler_set_crosshair` is the player spawn point** (and camera reset target): new spawns / respawns use the crosshair `Transform`.
-- **Always finish a level by moving the crosshair onto solid, continuous tile+collider ground** — not over pits, decorative gaps, or empty sky. If the column under the feet has missing tiles/colliders, the player will fall through or hover over a “hole”.
-- After edits, confirm the snapped cells under your chosen spawn include real floor (wide is safer than a 1-tile pillar).
+HARD ENFORCEMENTS (verified in MCP handlers)
+- World inputs are snapped to the grid for place/remove tile, collider, actor, and fill rect operations.
+- gambler_place_collider rejects cells that do not currently contain a tile.
+- gambler_remove_tile removes both tile and collider at that snapped cell.
+- gambler_ensure_colliders_for_all_tiles adds colliders only to tile cells missing colliders.
+- gambler_place_tiles and gambler_place_tile_picture reject oversized batches (max 8192 logical cells).
+- gambler_place_tiles deduplicates by snapped cell (last write wins).
+- gambler_request_load_empty_scene switches to LoadingEmpty, and the scene system clears all EditorObject entities and scene roots.
 
-COLLIDERS ↔ TILES (hard rule — no invisible walls)
-- **A collider may exist only on a grid cell that already has a tile.** Empty air must never get a collider or the player walks into invisible geometry.
-- `gambler_place_collider` **rejects** cells with no tile (enforced in the editor).
-- Prefer **`gambler_ensure_colliders_for_all_tiles`** after laying **only** tiles that should all be solid (it adds colliders one-to-one under existing tiles). If part of your tile art is non-solid decoration, **do not** blanket-ensure — instead omit tiles there or add colliders manually only on solid cells (still requires a tile first).
-- **`gambler_remove_tile` removes the collider on the same cell** so deleting art does not leave invisible walls.
-- `gambler_get_snapshot`: keep **`tile_cells_missing_collider`** and **`collider_cells_without_tile`** at **0** for a shippable layout.
+SPAWN / CROSSHAIR
+- gambler_set_crosshair controls spawn and reset target behavior because player spawn/respawn reads crosshair transform.
+- Treat crosshair placement as gameplay-critical: place it on solid, continuous tile+collider ground.
+- Prefer 2+ tiles of support under spawn instead of single-column perches.
 
-GAMEPLAY / PHYSICS
-- Rapier uses **colliders** for contact; tiles are the visible layer. Walkable surfaces need **both** on the same cell.
+COLLIDERS AND GAMEPLAY
+- Physics contact is collider-driven; visible tiles alone are not walkable.
+- For fully solid layouts: place tiles, then run gambler_ensure_colliders_for_all_tiles.
+- For mixed solid/decorative layouts: place colliders explicitly only where solid traversal is intended.
+- Validate with gambler_get_snapshot and keep tile_cells_missing_collider=0 and collider_cells_without_tile=0 before shipping.
 
-TOOLS (prefer bulk)
-- `gambler_place_tiles` — many placements, one round-trip; dedupes by snapped cell (last wins).
-- `gambler_place_tile_picture` — ASCII art: `rows[0]` top; `origin_*` bottom-left of the picture; `0`-`9`, `a`-`v` / `A`-`V`, space/`.`/`_` skip.
+TOOLING NOTES
+- Prefer gambler_place_tiles for large structured edits to reduce round-trips.
+- gambler_place_tile_picture charset: space . _ = skip; 0-9 = tile ids 0-9; a-v / A-V = tile ids 10-31.
+- rows[0] in picture mode is the visual top row; origin is bottom-left in world space.
+- World step size equals editor_constants.grid_cell_world_px.
 
-LEVEL DESIGN
-- Readable silhouettes, coherent materials, intentional platforms, clear routes, floating routes that still read as built for play — avoid random tile noise.
-
-Workflow: snapshot → `gambler_request_load_empty_scene` (clears all placed `EditorObject` tiles/colliders and prior scene roots) → tiles / picture → **set crosshair on safe spawn** → `gambler_ensure_colliders_for_all_tiles` only when every placed tile should be solid → snapshot (both gap counts **0**) → save.
-
-World coords snap to `editor_constants.grid_cell_world_px`."#;
+RECOMMENDED WORKFLOW
+1) gambler_get_snapshot (or gambler_get_scene_bounds)
+2) gambler_request_load_empty_scene for clean rebuilds
+3) place_tiles / place_tile_picture / fill_rect
+4) place or remove colliders (or ensure_colliders_for_all_tiles for all-solid maps)
+5) set crosshair on safe spawn floor
+6) gambler_get_snapshot and verify no collider/tile mismatches
+7) gambler_request_save_scene"#;
 
 #[derive(Debug, Clone)]
 pub struct GamblerEditorMcp {
@@ -275,6 +316,83 @@ impl GamblerEditorMcp {
     }
 
     #[tool(
+        name = "gambler_remove_collider",
+        description = "Remove only the collider at a snapped cell, leaving the tile in place. Use to fix orphan colliders (collider_cells_without_tile > 0) or make a tile purely decorative."
+    )]
+    pub async fn remove_collider(&self, Parameters(args): Parameters<RemoveColliderArgs>) -> String {
+        let b = self.bridge.clone();
+        let world_x = args.world_x;
+        let world_y = args.world_y;
+        match tokio::task::spawn_blocking(move || b.call(McpCmd::RemoveCollider { world_x, world_y })).await {
+            Ok(Ok(v)) => Self::map_ok(v),
+            Ok(Err(e)) => Self::map_err(e),
+            Err(e) => Self::map_err(e.to_string()),
+        }
+    }
+
+    #[tool(
+        name = "gambler_fill_rect",
+        description = "Fill every grid cell in a rectangle with the given tile_id. x1/y1 and x2/y2 are opposite world-space corners (order doesn't matter). Equivalent to calling place_tiles for every cell in the rect. Walkable floors still need gambler_ensure_colliders_for_all_tiles afterward."
+    )]
+    pub async fn fill_rect(&self, Parameters(args): Parameters<FillRectArgs>) -> String {
+        let b = self.bridge.clone();
+        match tokio::task::spawn_blocking(move || b.call(McpCmd::FillRect {
+            x1: args.x1,
+            y1: args.y1,
+            x2: args.x2,
+            y2: args.y2,
+            tile_id: args.tile_id,
+        })).await {
+            Ok(Ok(v)) => Self::map_ok(v),
+            Ok(Err(e)) => Self::map_err(e),
+            Err(e) => Self::map_err(e.to_string()),
+        }
+    }
+
+    #[tool(
+        name = "gambler_place_actor",
+        description = "Place an actor (player/NPC spawn marker) at the snapped grid cell. Only one actor per cell; placing on an occupied cell replaces it."
+    )]
+    pub async fn place_actor(&self, Parameters(args): Parameters<PlaceActorArgs>) -> String {
+        let b = self.bridge.clone();
+        let world_x = args.world_x;
+        let world_y = args.world_y;
+        match tokio::task::spawn_blocking(move || b.call(McpCmd::PlaceActor { world_x, world_y })).await {
+            Ok(Ok(v)) => Self::map_ok(v),
+            Ok(Err(e)) => Self::map_err(e),
+            Err(e) => Self::map_err(e.to_string()),
+        }
+    }
+
+    #[tool(
+        name = "gambler_remove_actor",
+        description = "Remove the actor at the snapped grid cell."
+    )]
+    pub async fn remove_actor(&self, Parameters(args): Parameters<RemoveActorArgs>) -> String {
+        let b = self.bridge.clone();
+        let world_x = args.world_x;
+        let world_y = args.world_y;
+        match tokio::task::spawn_blocking(move || b.call(McpCmd::RemoveActor { world_x, world_y })).await {
+            Ok(Ok(v)) => Self::map_ok(v),
+            Ok(Err(e)) => Self::map_err(e),
+            Err(e) => Self::map_err(e.to_string()),
+        }
+    }
+
+    #[tool(
+        name = "gambler_get_scene_bounds",
+        description = "Returns the bounding box of all tiles in the scene: min/max grid coords, center, and cell dimensions. Much faster than parsing a full snapshot when you only need spatial orientation."
+    )]
+    pub async fn get_scene_bounds(&self) -> String {
+        let b = self.bridge.clone();
+        match tokio::task::spawn_blocking(move || b.call(McpCmd::GetSceneBounds)).await {
+            Ok(Ok(v)) => Self::map_ok(v),
+            Ok(Err(e)) => Self::map_err(e),
+            Err(e) => Self::map_err(e.to_string()),
+        }
+    }
+
+    #[tool(
         name = "gambler_remove_tile",
         description = "Remove the tile at the snapped cell and also remove any collider on that cell (keeps colliders aligned with tile art)."
     )]
@@ -356,6 +474,19 @@ impl GamblerEditorMcp {
     pub async fn get_snapshot(&self) -> String {
         let b = self.bridge.clone();
         match tokio::task::spawn_blocking(move || b.call(McpCmd::GetSnapshot)).await {
+            Ok(Ok(v)) => Self::map_ok(v),
+            Ok(Err(e)) => Self::map_err(e),
+            Err(e) => Self::map_err(e.to_string()),
+        }
+    }
+
+    #[tool(
+        name = "gambler_get_tile_catalog",
+        description = "Return semantic catalog metadata per tile_id: name, material_type, solidity_default, traversal_affordance, style_tags, usage_hints, anti_patterns."
+    )]
+    pub async fn get_tile_catalog(&self) -> String {
+        let b = self.bridge.clone();
+        match tokio::task::spawn_blocking(move || b.call(McpCmd::GetTileCatalog)).await {
             Ok(Ok(v)) => Self::map_ok(v),
             Ok(Err(e)) => Self::map_err(e),
             Err(e) => Self::map_err(e.to_string()),

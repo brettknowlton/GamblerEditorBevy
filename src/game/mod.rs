@@ -1,4 +1,4 @@
-use crate::editor_modes::actor_mode;
+use crate::editor_modes::actor_mode::{self, animation::drive_sprite_animations};
 
 use super::editor::*;
 
@@ -26,8 +26,8 @@ pub fn game_plugin(app: &mut App) {
             (
                 game_keybinds,
                 Player::player_controls,
-                Player::animate_player,
-                Player::sync_player_sprite,
+                Player::update_player_animation_state,
+                drive_sprite_animations,
             )
                 .chain()
                 .run_if(in_state(GameState::Running)),

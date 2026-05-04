@@ -11,6 +11,9 @@ use crate::mouse_state::MouseState;
 pub mod mouse;
 pub use mouse::*;
 
+mod catalogue_update;
+pub use catalogue_update::*;
+
 pub use crate::consts::*;
 use crate::coordinate::*;
 
@@ -94,6 +97,7 @@ impl Editor {
             .add_message::<ResetScene>()
             //plugins
             .add_plugins(UIPlugin)
+            .add_plugins(CatalogueUpdatePlugin)
             .add_plugins(NormalModePlugin)
             .add_plugins(TileModePlugin)
             .add_plugins(ColliderModePlugin)
@@ -147,6 +151,7 @@ impl Editor {
     fn reset_scene(
         commands: Commands,
         asset_server: Res<AssetServer>,
+        texture_atlas_layouts: ResMut<Assets<TextureAtlasLayout>>,
         mut player_q: Option<
             Single<
                 (
@@ -170,10 +175,10 @@ impl Editor {
             controller.translation = None;
 
             bottom_bar.send_message("Respawning player...");
-            Player::respawn(commands, *e, asset_server, crosshair);
+            Player::respawn(commands, *e, asset_server, texture_atlas_layouts, crosshair);
         } else {
             bottom_bar.send_message("No player found, spawning new player...");
-            Player::spawn_player(commands, asset_server, crosshair);
+            Player::spawn_player(commands, asset_server, texture_atlas_layouts, crosshair);
         }
 
         for (mut t, _) in cameras.iter_mut() {

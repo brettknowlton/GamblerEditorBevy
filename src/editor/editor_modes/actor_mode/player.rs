@@ -1,13 +1,17 @@
 use std::ops::DerefMut;
 
 use crate::{
-    actor_mode::animation::{
-        anim_map::{AnimationMap, AnimationMapBuidler},
-        AnimBehavior,
-    },
+    actor_mode::animation::{AnimBehavior, SpriteAnimation},
     direction::Direction,
     DEFAULT_GENERAL_SCALE_FACTOR, EPSILON, FRICTION, GRAVITY,
 };
+
+const SHEET_COLS: u32 = 18;
+const ANIM_FPS: f32 = 10.0;
+const ANIM_IDLE_FIRST: u32 = 0;
+const ANIM_IDLE_LAST: u32 = 9;
+const ANIM_RUN_FIRST: u32 = 10;
+const ANIM_RUN_LAST: u32 = 17; // atlas has 18 frames (0-17); 10-17 = 8 run frames
 
 use bevy::sprite::Anchor;
 use bevy_rapier2d::prelude::{Collider, RigidBody};
@@ -58,8 +62,6 @@ pub enum PlayerState {
 #[derive(Component, Debug, Reflect)]
 pub struct Player {
     pub state: PlayerState,
-    pub animation_map: AnimationMap,
-    pub shown_sprite: Option<Sprite>,
     pub facing: Direction,
     pub air_timer: f32,
     pub velocity: Vec2,
@@ -70,17 +72,16 @@ pub struct Player {
     pub trying_walk_right: bool,
 }
 
+#[derive(Component, Debug, Default, Reflect)]
+pub struct PlayerSpriteTag;
+
 impl Player {
-    pub fn new(asset_server: &AssetServer) -> Self {
+    pub fn new() -> Self {
         Self {
             state: PlayerState::Idle,
             facing: Direction::Right,
-
-            animation_map: Player::create_animation_map(asset_server),
-            shown_sprite: None,
             air_timer: 0.0,
-            velocity: Vec2::new(0.0, 0.0),
-
+            velocity: Vec2::ZERO,
             trying_jump: false,
             jump_queued: false,
             trying_walk_left: false,
@@ -195,91 +196,61 @@ impl Player {
         }
     }
 
-    pub fn animate_player(mut player: Single<&mut Player>, dt: Res<Time>) {
-        player.animation_map.drive(dt);
-    }
-
-    /// Copies the current animation frame's UV rect from the `AnimationMap` to the player's
-    /// child sprite entity every render frame. Without this, the sprite never visually updates.
-    pub fn sync_player_sprite(
-        player_query: Query<(&Player, &Children)>,
-        mut sprite_query: Query<&mut Sprite>,
+    /// Reads movement state from the physics output and switches the child sprite's animation.
+    pub fn update_player_animation_state(
+        mut player_query: Query<(&mut Player, &KinematicCharacterControllerOutput, &Children)>,
+        mut anim_query: Query<&mut SpriteAnimation, With<PlayerSpriteTag>>,
     ) {
-        for (player, children) in player_query.iter() {
-            let Some(anim) = player.animation_map.get_current() else {
-                continue;
+        for (mut player, kpco, children) in player_query.iter_mut() {
+            let is_moving = kpco.grounded && player.velocity.x.abs() > EPSILON;
+            player.state = if is_moving {
+                PlayerState::Walking
+            } else {
+                PlayerState::Idle
             };
-            let frame = anim.get_current_frame();
+
             for child in children.iter() {
-                if let Ok(mut sprite) = sprite_query.get_mut(child) {
-                    sprite.rect = Some(frame.uv_rect);
-                    sprite.image = anim.spritesheet.clone();
-                    break; // only the first child is the sprite
+                if let Ok(mut anim) = anim_query.get_mut(child) {
+                    if is_moving {
+                        anim.switch_to(ANIM_RUN_FIRST, ANIM_RUN_LAST, ANIM_FPS, AnimBehavior::Loop);
+                    } else {
+                        anim.switch_to(ANIM_IDLE_FIRST, ANIM_IDLE_LAST, ANIM_FPS, AnimBehavior::Loop);
+                    }
+                    break;
                 }
             }
         }
-    }
-
-    fn get_first_sprite(&self) -> Sprite {
-        //placeholder until we implement the animation map
-        self.animation_map
-            .get_current()
-            .expect("Player animation map has no current animation")
-            .get_current_frame()
-            .get_sprite(&self.animation_map.spritesheet)
     }
 
     pub fn respawn(
         mut commands: Commands,
         player_entity: Entity,
         asset_server: Res<AssetServer>,
+        texture_atlas_layouts: ResMut<Assets<TextureAtlasLayout>>,
         crosshair: Single<&Transform, (With<Crosshair>, Without<Camera2d>)>,
     ) {
         commands.entity(player_entity).despawn();
-        Player::spawn_player(commands, asset_server, crosshair);
-    }
-
-    fn create_animation_map(asset_server: &AssetServer) -> AnimationMap {
-        let path = PathBuf::from("textures/player/player_anims-sheet.png");
-        let map = AnimationMapBuidler::new()
-            .with_spritesheet_path(asset_server, path.to_str().unwrap().to_string())
-            .standard_cut(
-                "idle",
-                Vec2::new(PLAYER_SIZE_X as f32, PLAYER_SIZE_Y as f32),
-                0,
-                9,
-                Vec2::new(18.0, 1.0),
-                0.1,
-                AnimBehavior::Loop,
-            )
-            .standard_cut(
-                "run",
-                Vec2::new(PLAYER_SIZE_X as f32, PLAYER_SIZE_Y as f32),
-                10,
-                18,
-                Vec2::new(18.0, 1.0),
-                0.1,
-                AnimBehavior::Loop,
-            )
-            .set_initial_animation("idle")
-            .build()
-            .unwrap();
-
-        print!("created player animation map: \"{:?}\"", map);
-        map
+        Player::spawn_player(commands, asset_server, texture_atlas_layouts, crosshair);
     }
 
     pub fn spawn_player(
         mut commands: Commands,
         asset_server: Res<AssetServer>,
+        mut texture_atlas_layouts: ResMut<Assets<TextureAtlasLayout>>,
         crosshair: Single<&Transform, (With<Crosshair>, Without<Camera2d>)>,
     ) {
         println!("spawning player...");
-        let crosshair_position = crosshair.clone().translation;
+        let crosshair_position = crosshair.translation;
 
-        let player = Player::new(&asset_server);
-
-        let player_sprite = player.get_first_sprite();
+        let spritesheet: Handle<Image> =
+            asset_server.load("textures/player/player_anims-sheet.png");
+        let atlas_layout = texture_atlas_layouts.add(TextureAtlasLayout::from_grid(
+            UVec2::new(PLAYER_SIZE_X, PLAYER_SIZE_Y),
+            SHEET_COLS,
+            1,
+            None,
+            None,
+        ));
 
         let mut ec = commands.spawn((
             Transform {
@@ -303,34 +274,30 @@ impl Player {
                 snap_to_ground: Some(CharacterLength::Relative(0.1)),
                 ..default()
             },
-            player,
+            Player::new(),
         ));
         ec.with_child((
-            player_sprite,
+            Sprite {
+                image: spritesheet,
+                texture_atlas: Some(TextureAtlas {
+                    layout: atlas_layout,
+                    index: ANIM_IDLE_FIRST as usize,
+                }),
+                ..Default::default()
+            },
+            PlayerSpriteTag,
+            SpriteAnimation::new(ANIM_IDLE_FIRST, ANIM_IDLE_LAST, ANIM_FPS, AnimBehavior::Loop),
             Transform {
-                translation: Vec3::new(0.0, 0.0 + (PLAYER_HB_Y_OFFSET as f32) / 4.0, 1.0),
+                translation: Vec3::new(0.0, PLAYER_HB_Y_OFFSET as f32 / 4.0, 1.0),
                 ..Default::default()
             },
             Anchor::CENTER,
         ));
-
-        //update the kindematic character controller to use the collider
     }
 }
 
 impl Default for Player {
     fn default() -> Self {
-        Self {
-            state: PlayerState::Idle,
-            facing: Direction::Down,
-            animation_map: AnimationMap::default(),
-            shown_sprite: None,
-            air_timer: 0.0,
-            velocity: Vec2::new(0.0, 0.0),
-            trying_jump: false,
-            jump_queued: false,
-            trying_walk_left: false,
-            trying_walk_right: false,
-        }
+        Self::new()
     }
 }

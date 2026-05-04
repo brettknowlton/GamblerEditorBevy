@@ -13,6 +13,7 @@ mod systems;
 pub use bridge::{McpCmd, McpEnvelope, McpReply, PlaceTilePayload};
 pub use server::{
     GamblerEditorMcp, GAMBLER_MCP_INSTRUCTIONS, MCP_DEFAULT_PORT, McpToBevyBridge, PlaceColliderArgs,
+    RemoveColliderArgs, FillRectArgs, PlaceActorArgs, RemoveActorArgs,
     PlaceTileArgs, PlaceTileEntry, PlaceTilePictureArgs, PlaceTilesArgs, RemoveTileArgs,
     SetCrosshairArgs, SetEditorStateArgs, SetSelectedTileArgs, spawn_mcp_streamable_http,
 };

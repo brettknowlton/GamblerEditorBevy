@@ -6,21 +6,23 @@ use bevy::prelude::*;
 
 use crate::{SCALED_TILE_WIDTH, TILE_SCALE, TILE_SIZE, ZONE_SIZE};
 
-/// this function takes a value and a grid size, and snaps the value to the nearest multiple of the grid size, rounding down,
-/// if the value is negative it will round down to the nearest multiple of the grid size further negative,
-/// this is useful for snapping coordinates to a grid, as it will ensure that the snapped coordinate is always less than or equal to the original coordinate,
-///  which is generally what you want when snapping to a grid
+/// Snap to the containing grid cell using Euclidean floor math.
+///
+/// This preserves exact multiples on both sides of the axis:
+/// - `64 -> 64`
+/// - `-64 -> -64`
+/// - `-1 -> -64`
 pub fn snap_value_to_grid(value: i64, grid_size: i64) -> i64 {
-    //floor x and y values to the last multiple of grid_size
-    //if coordinate is negative, this will round down to the nearest multiple of grid_size further negative
-    let x: i64;
-    if value < 0 {
-        x = value - (grid_size + (value % grid_size));
-    } else {
-        x = value - (value % grid_size);
-    }
+    assert!(grid_size > 0, "grid_size must be > 0");
+    value.div_euclid(grid_size) * grid_size
+}
 
-    x
+/// Keeps both raw world input and snapped output so placement logic can reason
+/// about the original coordinate and the grid-aligned coordinate independently.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct CoordinateSnapResult {
+    pub world: Coordinate,
+    pub snapped: Coordinate,
 }
 
 #[derive(
@@ -576,6 +578,49 @@ impl Coordinate {
             y: snap_value_to_grid(self.y, (TILE_SIZE * TILE_SCALE) as i64),
             format: CoordinateSpace::GridSpace,
         }
+    }
+
+    /// Returns both the original world coordinate and the snapped coordinate.
+    pub fn snap_to_grid_with_world_tracking(&self) -> CoordinateSnapResult {
+        assert!(
+            self.format == CoordinateSpace::WorldSpace,
+            "Can only snap coordinates in WorldSpace format to the grid, but got {:?}",
+            self.format
+        );
+
+        CoordinateSnapResult {
+            world: *self,
+            snapped: self.snap_to_grid(),
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn snap_preserves_exact_negative_multiples() {
+        assert_eq!(snap_value_to_grid(-64, 64), -64);
+        assert_eq!(snap_value_to_grid(-512, 64), -512);
+    }
+
+    #[test]
+    fn snap_floors_toward_negative_infinity() {
+        assert_eq!(snap_value_to_grid(-1, 64), -64);
+        assert_eq!(snap_value_to_grid(63, 64), 0);
+        assert_eq!(snap_value_to_grid(64, 64), 64);
+    }
+
+    #[test]
+    fn track_world_and_snapped_coordinates() {
+        let world = Coordinate::new_world_space(-1, -1);
+        let tracked = world.snap_to_grid_with_world_tracking();
+
+        assert_eq!(tracked.world, world);
+        assert_eq!(tracked.snapped.x, -64);
+        assert_eq!(tracked.snapped.y, -64);
+        assert_eq!(tracked.snapped.format, CoordinateSpace::GridSpace);
     }
 }
 
