@@ -10,6 +10,7 @@ use crate::editor::editor_modes::collider_mode::ColliderObject;
 use crate::editor::editor_modes::significant_component::SignificantComponent;
 use crate::editor::editor_modes::tile_mode::TileObject;
 use crate::editor::ui::message_display::MessageDisplay;
+use crate::rendering::{PixelArtSettings, PixelEffectParams};
 use crate::utilities::coordinate::{Coordinate, CoordinateSpace};
 use crate::{MAX_SPRITESHEET_ITEMS, SCALED_TILE_WIDTH, TileCatalog};
 
@@ -104,9 +105,28 @@ fn editor_state_label(state: &EditorState) -> String {
     }
 }
 
+fn pixel_effect_to_json(params: &PixelEffectParams) -> serde_json::Value {
+    serde_json::json!({
+        "pixel_size": params.pixel_size,
+        "color_levels": params.color_levels,
+        "dither_strength": params.dither_strength,
+        "scanline_strength": params.scanline_strength,
+        "palette_enabled": params.palette_enabled,
+    })
+}
+
+fn clamp_pixel_effect_params(params: &mut PixelEffectParams) {
+    params.pixel_size = params.pixel_size.clamp(1.0, 24.0);
+    params.color_levels = params.color_levels.clamp(2.0, 32.0);
+    params.dither_strength = params.dither_strength.clamp(0.0, 1.0);
+    params.scanline_strength = params.scanline_strength.clamp(0.0, 1.0);
+    params.palette_enabled = params.palette_enabled.clamp(0.0, 1.0);
+}
+
 pub fn drain_mcp_inbox(
     bridge: Res<EditorMcpBridge>,
     tile_catalog: Res<TileCatalog>,
+    mut pixel_settings: ResMut<PixelArtSettings>,
     mut commands: Commands,
     mut next_editor: ResMut<NextState<EditorState>>,
     editor_state: Res<State<EditorState>>,
@@ -122,6 +142,7 @@ pub fn drain_mcp_inbox(
         let result = run_mcp_cmd(
             cmd,
             &tile_catalog,
+            &mut pixel_settings,
             &mut commands,
             &mut next_editor,
             editor_state.get(),
@@ -139,6 +160,7 @@ pub fn drain_mcp_inbox(
 fn run_mcp_cmd(
     cmd: McpCmd,
     tile_catalog: &TileCatalog,
+    pixel_settings: &mut PixelArtSettings,
     commands: &mut Commands,
     next_editor: &mut NextState<EditorState>,
     current: &EditorState,
@@ -498,6 +520,61 @@ fn run_mcp_cmd(
                     "spritesheet_columns": crate::consts::SPRITESHEET_WIDTH,
                     "mcp_max_place_tiles_per_call": MCP_MAX_PLACE_TILES,
                 },
+            }))
+        }
+        McpCmd::GetPixelArtSettings => {
+            Ok(serde_json::json!({
+                "tile": pixel_effect_to_json(&pixel_settings.tile),
+                "player": pixel_effect_to_json(&pixel_settings.player),
+                "palette_texture_loaded": pixel_settings.palette_texture.is_some(),
+            }))
+        }
+        McpCmd::SetPixelArtSettings {
+            target,
+            pixel_size,
+            color_levels,
+            dither_strength,
+            scanline_strength,
+            palette_enabled,
+        } => {
+            let update = |params: &mut PixelEffectParams| {
+                if let Some(v) = pixel_size {
+                    params.pixel_size = v;
+                }
+                if let Some(v) = color_levels {
+                    params.color_levels = v;
+                }
+                if let Some(v) = dither_strength {
+                    params.dither_strength = v;
+                }
+                if let Some(v) = scanline_strength {
+                    params.scanline_strength = v;
+                }
+                if let Some(v) = palette_enabled {
+                    params.palette_enabled = v;
+                }
+                clamp_pixel_effect_params(params);
+            };
+
+            match target.trim().to_ascii_lowercase().as_str() {
+                "tile" => update(&mut pixel_settings.tile),
+                "player" => update(&mut pixel_settings.player),
+                "both" => {
+                    update(&mut pixel_settings.tile);
+                    update(&mut pixel_settings.player);
+                }
+                other => {
+                    return Err(format!(
+                        "invalid target '{other}', expected tile|player|both"
+                    ));
+                }
+            }
+
+            bottom_bar.send_message("MCP: updated pixel shader settings");
+            Ok(serde_json::json!({
+                "target": target,
+                "tile": pixel_effect_to_json(&pixel_settings.tile),
+                "player": pixel_effect_to_json(&pixel_settings.player),
             }))
         }
         McpCmd::GetTileCatalog => {

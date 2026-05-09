@@ -33,6 +33,7 @@ use std::ops::DerefMut;
 pub use std::{fmt::Debug, path::PathBuf};
 
 use bevy::{prelude::*, sprite::Anchor};
+use crate::rendering::MainWorldCamera;
 
 //EditorState is an enum that defines the different states the editor can be in, this is used to determine what the editor is currently doing
 #[derive(Clone, Copy, Default, Eq, PartialEq, Debug, Hash, States)]
@@ -70,6 +71,9 @@ impl EditorState {
 #[derive(Message)]
 struct ResetScene;
 
+#[derive(Message)]
+struct RedrawScene;
+
 pub struct Editor;
 
 impl Editor {
@@ -95,6 +99,7 @@ impl Editor {
             //messages to queue systems
             .add_message::<BottomBarUpdate>()
             .add_message::<ResetScene>()
+            .add_message::<RedrawScene>()
             //plugins
             .add_plugins(UIPlugin)
             .add_plugins(CatalogueUpdatePlugin)
@@ -113,6 +118,7 @@ impl Editor {
                     .chain()
                     .run_if(not(in_state(EditorState::Inactive))),
             )
+            .add_systems(Update, Editor::process_redraw_requests)
             .add_systems(Update, Editor::reset_scene.run_if(on_message::<ResetScene>));
     }
 
@@ -132,7 +138,16 @@ impl Editor {
             .insert(EditorObjectKind::Other, asset_server.load(tex_path));
 
         //create camera and add a UIItem component to it
-        commands.spawn((Camera2d::default(), CameraLockedUI::default()));
+        commands.spawn((
+            Camera2d::default(),
+            Camera {
+                order: 20,
+                clear_color: bevy::camera::ClearColorConfig::None,
+                ..default()
+            },
+            CameraLockedUI::default(),
+            MainWorldCamera,
+        ));
 
         //set the state to ask about loading a scene
         next_state.set(EditorState::LoadAsk);
@@ -158,12 +173,11 @@ impl Editor {
                     Entity,
                     &mut actor_mode::player::Player,
                     &mut KinematicCharacterController,
-                ),
-                (Without<Crosshair>, Without<Camera2d>),
+                )
             >,
         >,
-        mut cameras: Query<(&mut Transform, &mut Camera2d), Without<Crosshair>>,
-        crosshair: Single<&Transform, (With<Crosshair>, Without<Camera2d>)>, // mut ui_items: Query<(&mut UIItem, &mut Transform), Without<Crosshair>>,
+        mut cameras: Query<&mut Transform, With<MainWorldCamera>>,
+        crosshair: Single<&Transform, (With<Crosshair>, (Without<Camera2d>, Without<MainWorldCamera>))>, // mut ui_items: Query<(&mut UIItem, &mut Transform), Without<Crosshair>>,
         mut bottom_bar: ResMut<MessageDisplay>,
     ) {
         bottom_bar.send_message("Resetting scene...");
@@ -181,7 +195,7 @@ impl Editor {
             Player::spawn_player(commands, asset_server, texture_atlas_layouts, crosshair);
         }
 
-        for (mut t, _) in cameras.iter_mut() {
+        for mut t in cameras.iter_mut() {
             t.translation = crosshair_position;
         }
     }
@@ -202,14 +216,15 @@ impl Editor {
         input: Res<ButtonInput<KeyCode>>,
         mut bottom_bar: ResMut<MessageDisplay>,
         // m_input: Res<ButtonInput<MouseButton>>,
-        mut crosshairs: Query<(&mut Crosshair, &mut Transform, &mut Sprite), Without<Camera2d>>,
+        mut crosshairs: Query<(&mut Crosshair, &mut Transform, &mut Sprite), (Without<Camera2d>, Without<MainWorldCamera>)>,
         // mut active_selection: ResMut<PlaceholderHandle>,
-        mut cameras: Query<(&mut CameraLockedUI, &mut Transform), With<Camera2d>>,
+        mut cameras: Query<(&mut CameraLockedUI, &mut Transform), With<MainWorldCamera>>,
         mut ui_items: Query<
             (&mut CameraLockedUI, &mut Transform),
-            (Without<Camera2d>, Without<Crosshair>),
+            (Without<Camera2d>, Without<Crosshair>, Without<MainWorldCamera>),
         >,
         mut message_writer: MessageWriter<ResetScene>,
+        mut redraw_writer: MessageWriter<RedrawScene>,
     ) {
         Editor::handle_global_editor_shortcuts(
             editor_state.as_ref(),
@@ -224,6 +239,7 @@ impl Editor {
             &mut bottom_bar,
             &mut crosshairs,
             &mut message_writer,
+            &mut redraw_writer,
         );
         Self::handle_rectangle_tool_shortcuts(&input, &mut bottom_bar, &mut crosshairs);
 
@@ -246,10 +262,22 @@ impl Editor {
         }
     }
 
+    fn process_redraw_requests(
+        mut redraw_hint: ResMut<SceneRedrawHint>,
+        mut redraw_writer: MessageWriter<RedrawScene>,
+        mut bottom_bar: ResMut<MessageDisplay>,
+    ) {
+        if redraw_hint.request_redraw {
+            redraw_hint.request_redraw = false;
+            redraw_writer.write(RedrawScene);
+            bottom_bar.send_message("Re-drawing scene visuals...");
+        }
+    }
+
     fn handle_rectangle_tool_shortcuts(
         input: &ButtonInput<KeyCode>,
         bottom_bar: &mut MessageDisplay,
-        crosshairs: &mut Query<(&mut Crosshair, &mut Transform, &mut Sprite), Without<Camera2d>>,
+        crosshairs: &mut Query<(&mut Crosshair, &mut Transform, &mut Sprite), (Without<Camera2d>, Without<MainWorldCamera>)>,
     ) {
         if input.just_pressed(KeyCode::KeyO) {
             let Ok((_, _, _)) = crosshairs.single() else {
@@ -329,8 +357,9 @@ impl Editor {
 
         bottom_bar: &mut MessageDisplay,
 
-        crosshairs: &mut Query<(&mut Crosshair, &mut Transform, &mut Sprite), Without<Camera2d>>,
+        crosshairs: &mut Query<(&mut Crosshair, &mut Transform, &mut Sprite), (Without<Camera2d>, Without<MainWorldCamera>)>,
         message_writer: &mut MessageWriter<ResetScene>,
+        redraw_writer: &mut MessageWriter<RedrawScene>,
     ) {
         if input.pressed(KeyCode::ControlLeft) {
             if input.just_pressed(KeyCode::KeyS)
@@ -369,6 +398,11 @@ impl Editor {
                 bottom_bar.send_message("Resetting scene...");
                 next_editor_state.set(EditorState::Normal);
                 message_writer.write(ResetScene);
+            } else if input.just_pressed(KeyCode::KeyD)
+                && editor_state.get() != &EditorState::Inactive
+            {
+                bottom_bar.send_message("Re-drawing scene visuals...");
+                redraw_writer.write(RedrawScene);
             } else if input.just_pressed(KeyCode::KeyG)
                 && !input.pressed(KeyCode::ShiftLeft)
                 && editor_state.get() != &EditorState::Inactive
@@ -476,10 +510,10 @@ impl Editor {
     fn apply_editor_movement(
         ui_items: &mut Query<
             (&mut CameraLockedUI, &mut Transform),
-            (Without<Camera2d>, Without<Crosshair>),
+            (Without<Camera2d>, Without<Crosshair>, Without<MainWorldCamera>),
         >,
-        cameras: &mut Query<(&mut CameraLockedUI, &mut Transform), With<Camera2d>>,
-        crosshairs: &mut Query<(&mut Crosshair, &mut Transform, &mut Sprite), Without<Camera2d>>,
+        cameras: &mut Query<(&mut CameraLockedUI, &mut Transform), With<MainWorldCamera>>,
+        crosshairs: &mut Query<(&mut Crosshair, &mut Transform, &mut Sprite), (Without<Camera2d>, Without<MainWorldCamera>)>,
         velocity: Vec2,
         delta_secs: f32,
     ) {

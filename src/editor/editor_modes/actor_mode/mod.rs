@@ -41,7 +41,7 @@ impl EditorModePlugin for ActorModePlugin {
         asset_server: Res<AssetServer>,
     ) {
         //load the tilesheet for this mode
-        let texpath = PathBuf::from("textures/player/PlayerHD.png");
+        let texpath = PathBuf::from("textures/player/player_anims-sheet.png");
 
         bottom_bar.send_message(format!(
             "Actor Spritesheet Loaded: \"{}\"",

@@ -5,9 +5,10 @@ use crate::editor_modes::editor_mode::EditorModePlugin;
 use crate::editor_modes::significant_component::SignificantComponent;
 use crate::ui::{message_display::*, ToolingMenuItem};
 use crate::{
-    mouse_state::MouseState, Crosshair, CustomInput, EditorState,
-    TextureHandles, MAX_SPRITESHEET_ITEMS,
+    mouse_state::MouseState, Crosshair, CustomInput, EditorState, TextureHandles,
+    MAX_SPRITESHEET_ITEMS,
 };
+use crate::rendering::MainWorldCamera;
 
 use crate::{configure_tooling_menu, SelectedTileID, ToolingMenuState};
 
@@ -41,12 +42,10 @@ impl EditorModePlugin for TileModePlugin {
         mut bottom_bar: ResMut<MessageDisplay>,
         asset_server: Res<AssetServer>,
     ) {
-        //load the tilesheet for this mode
         let tex_path = PathBuf::from("textures/tiles/tilesheet.png");
 
         bottom_bar.send_message(format!("Tilesheet Loaded: \"{}\"", tex_path.display()));
 
-        //load happens here
         spritesheets.0.insert(
             EditorObjectKind::Tile(TileID::Any),
             asset_server.load(tex_path),
@@ -76,33 +75,34 @@ impl EditorModePlugin for TileModePlugin {
         bottom_bar.send_mode_exit_message("Tile");
     }
 
-    fn mode_keybinds<T: Component + SignificantComponent + Default>(
+    fn mode_keybinds<T: Component + SignificantComponent>(
         mut commands: Commands,
         input: Res<ButtonInput<KeyCode>>,
-
         crosshair: Single<(&Transform, &Crosshair)>,
         tiles: Query<(Entity, &EditorObject), With<T>>,
         selected_tile_id: ResMut<SelectedTileID>,
-
         mut bottom_bar: ResMut<MessageDisplay>,
         _next_editor_state: ResMut<NextState<EditorState>>,
     ) {
-        //"P" handles placement of a tile and adding it to the scene
-        //places the first tile in the selection rect
         if input.just_pressed(KeyCode::KeyP) {
-            let coord = Coordinate::new_world_space(crosshair.0.translation.x as i64, crosshair.0.translation.y as i64).snap_to_grid();
-            let to_place = EditorObject::new(
-                EditorObjectKind::Tile(TileID::Some(selected_tile_id.0)),
-                coord,
-            );
+            let coord = Coordinate::new_world_space(
+                crosshair.0.translation.x as i64,
+                crosshair.0.translation.y as i64,
+            )
+            .snap_to_grid();
+            let to_place =
+                EditorObject::new(EditorObjectKind::Tile(TileID::Some(selected_tile_id.0)), coord);
 
             TileObject::place(&mut commands, to_place, &tiles);
             bottom_bar.send_place_eo_message("tile", coord);
         }
 
-        // "L" handles removal of a tile from the scene, similar to placing one just doesnt need to worry about the tile creation part afterwards
         if input.just_pressed(KeyCode::KeyL) {
-            let coord = Coordinate::new_world_space(crosshair.0.translation.x as i64, crosshair.0.translation.y as i64).snap_to_grid();
+            let coord = Coordinate::new_world_space(
+                crosshair.0.translation.x as i64,
+                crosshair.0.translation.y as i64,
+            )
+            .snap_to_grid();
 
             TileObject::remove(
                 &mut commands,
@@ -117,7 +117,7 @@ impl EditorModePlugin for TileModePlugin {
     fn mode_click<T: SignificantComponent + Component + Default>(
         commands: Commands,
         window: Single<&Window, With<PrimaryWindow>>,
-        camera: Single<(&Camera, &GlobalTransform), With<Camera2d>>,
+        camera: Single<(&Camera, &GlobalTransform), With<MainWorldCamera>>,
         items: Query<(Entity, &EditorObject), With<T>>,
         mut selected_tile_id: ResMut<SelectedTileID>,
         mouse_state: Res<MouseState>,
@@ -139,7 +139,6 @@ impl EditorModePlugin for TileModePlugin {
                 items,
             );
 
-            // Eyedropper: update the selected tile to whatever was under the cursor
             if let Some(EditorObjectKind::Tile(TileID::Some(id))) = eyedropped {
                 selected_tile_id.0 = id;
             }

@@ -65,6 +65,16 @@ pub enum McpCmd {
     },
     GetTileCatalog,
     GetSnapshot,
+    GetPixelArtSettings,
+    /// Update one or both shader passes (tile/player). Omitted fields remain unchanged.
+    SetPixelArtSettings {
+        target: String,
+        pixel_size: Option<f32>,
+        color_levels: Option<f32>,
+        dither_strength: Option<f32>,
+        scanline_strength: Option<f32>,
+        palette_enabled: Option<f32>,
+    },
     /// Returns bounding box of all tiles (min/max grid coords, center, dimensions).
     GetSceneBounds,
     RequestLoadScene,

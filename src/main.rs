@@ -5,6 +5,7 @@ pub mod consts;
 pub mod editor;
 pub mod game;
 pub mod mcp;
+pub mod rendering;
 pub mod utilities;
 
 use bevy_rapier2d::{
@@ -40,6 +41,7 @@ fn main() {
         .add_plugins(RapierPhysicsPlugin::<NoUserData>::pixels_per_meter(32.0))
         .add_plugins(RapierDebugRenderPlugin::default())
         .add_plugins(EguiPlugin::default())
+        .add_plugins(rendering::PixelArtRenderPlugin)
         .insert_resource(ClearColor(Color::from(WINDOW_DEFAULT_BACKGROUND_COLOR)))
         .insert_resource(Time::<Fixed>::from_hz(120.0))
         .add_plugins(editor::Editor)

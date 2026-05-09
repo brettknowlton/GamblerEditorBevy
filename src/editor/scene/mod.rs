@@ -8,8 +8,10 @@ use crate::editor_modes::{
 
 use super::*;
 use bevy::{prelude::*, tasks::IoTaskPool};
+use bevy::camera::visibility::RenderLayers;
 use resources::*;
 use std::{fs::File, io::Write, path::Path};
+use crate::rendering::TILE_PASS_LAYER;
 
 pub fn scene_plugin(app: &mut App) {
     app.register_type::<EditorObject>()
@@ -58,7 +60,26 @@ pub fn scene_plugin(app: &mut App) {
             (add_missing_colliders)
                 .chain()
                 .run_if(not(in_state(EditorState::LoadAsk))),
-        );
+        )
+        .add_systems(Update, redraw_scene_visuals.run_if(on_message::<RedrawScene>));
+}
+
+fn redraw_scene_visuals(
+    mut commands: Commands,
+    mut bottom_bar: ResMut<MessageDisplay>,
+    mut redraw_hint: ResMut<crate::ui::SceneRedrawHint>,
+    tiles_with_sprite: Query<Entity, (With<TileObject>, With<Sprite>)>,
+) {
+    let mut refreshed = 0usize;
+    for entity in tiles_with_sprite.iter() {
+        commands.entity(entity).remove::<Sprite>();
+        refreshed += 1;
+    }
+
+    bottom_bar.send_message(format!(
+        "Scene re-draw recommended: refreshed {refreshed} tile sprites"
+    ));
+    redraw_hint.required = false;
 }
 
 fn add_save_ask_mode_kb(mut available_keybinds: ResMut<AvailableKeybinds>) {
@@ -125,6 +146,7 @@ fn add_missing_colliders(
         Option<&Collider>,
     )>,
 ) {
+    let mut collider_count: u32 = 0;
     for (entity, editor_object, collider_object, physics_collider) in editor_objects.iter() {
         if editor_object.get_major_type() != EditorObjectKind::Collider {
             continue;
@@ -133,10 +155,11 @@ fn add_missing_colliders(
         let mut ecmd = commands.entity(entity);
 
         if physics_collider.is_none() {
-            println!(
+            info!(
                 "Adding missing Rapier collider for EditorObject ID: {:?}",
                 editor_object.coordinate
             );
+            collider_count += 1;
             ecmd.insert((
                 Collider::cuboid(
                     ((TILE_SIZE / 2) * TILE_SCALE) as f32,
@@ -157,20 +180,27 @@ fn add_missing_colliders(
         if collider_object.is_none() {
             let coord = editor_object.coordinate;
 
-            println!(
+            debug!(
                 "Adding missing ColliderObject marker for EditorObject ID: {:?}",
                 editor_object.coordinate
             );
             ecmd.insert(ColliderObject::at_coordinate(coord));
         }
     }
+    if collider_count > 0 {
+        debug!("Added {} missing colliders to the scene.", collider_count);
+    }
 }
 
 fn spawn_sprites(
     mut tiles: Query<(Entity, &mut EditorObject), (With<TileObject>, Without<Sprite>)>,
+    rendered_tiles: Query<Entity, (With<TileObject>, With<Sprite>)>,
     mut commands: Commands,
     spritesheets: Res<TextureHandles>,
+    mut redraw_hint: ResMut<crate::ui::SceneRedrawHint>,
 ) {
+    let had_rendered_tiles = !rendered_tiles.is_empty();
+    let mut spawned_any = false;
     //spawn the sprites for each tile, use the editorObject's kind and coordinate to determine the sprite's position
     //if the EditorObject has a kind of Tile
     for (entity, eo) in tiles.iter_mut() {
@@ -205,6 +235,7 @@ fn spawn_sprites(
                 sprite,
                 TileObject::at_coordinate(eo.coordinate).with_id(eo.kind),
                 Visibility::default(),
+                RenderLayers::layer(TILE_PASS_LAYER),
                 Transform {
                     translation: pos,
                     scale: Vec3::new((TILE_SCALE / 2) as f32, (TILE_SCALE / 2) as f32, 1.0),
@@ -212,7 +243,12 @@ fn spawn_sprites(
                 },
                 eo.clone(),
             ));
+            spawned_any = true;
         }
+    }
+
+    if spawned_any && had_rendered_tiles {
+        redraw_hint.required = true;
     }
 }
 

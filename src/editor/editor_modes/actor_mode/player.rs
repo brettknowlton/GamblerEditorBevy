@@ -1,9 +1,7 @@
 use std::ops::DerefMut;
 
 use crate::{
-    actor_mode::animation::{AnimBehavior, SpriteAnimation},
-    direction::Direction,
-    DEFAULT_GENERAL_SCALE_FACTOR, EPSILON, FRICTION, GRAVITY,
+    DEFAULT_GENERAL_SCALE_FACTOR, EPSILON, FRICTION, GRAVITY, actor_mode::animation::{AnimBehavior, SpriteAnimation}, direction::Direction, rendering::MainWorldCamera
 };
 
 const SHEET_COLS: u32 = 18;
@@ -14,7 +12,9 @@ const ANIM_RUN_FIRST: u32 = 10;
 const ANIM_RUN_LAST: u32 = 17; // atlas has 18 frames (0-17); 10-17 = 8 run frames
 
 use bevy::sprite::Anchor;
+use bevy::camera::visibility::RenderLayers;
 use bevy_rapier2d::prelude::{Collider, RigidBody};
+use crate::rendering::PLAYER_PASS_LAYER;
 
 use super::*;
 /// Width of the player source image in pixels
@@ -227,7 +227,7 @@ impl Player {
         player_entity: Entity,
         asset_server: Res<AssetServer>,
         texture_atlas_layouts: ResMut<Assets<TextureAtlasLayout>>,
-        crosshair: Single<&Transform, (With<Crosshair>, Without<Camera2d>)>,
+        crosshair: Single<&Transform, (With<Crosshair>, (Without<Camera2d>, Without<MainWorldCamera>))>,
     ) {
         commands.entity(player_entity).despawn();
         Player::spawn_player(commands, asset_server, texture_atlas_layouts, crosshair);
@@ -237,7 +237,7 @@ impl Player {
         mut commands: Commands,
         asset_server: Res<AssetServer>,
         mut texture_atlas_layouts: ResMut<Assets<TextureAtlasLayout>>,
-        crosshair: Single<&Transform, (With<Crosshair>, Without<Camera2d>)>,
+        crosshair: Single<&Transform, (With<Crosshair>, (Without<Camera2d>, Without<MainWorldCamera>))>,
     ) {
         println!("spawning player...");
         let crosshair_position = crosshair.translation;
@@ -286,6 +286,7 @@ impl Player {
                 ..Default::default()
             },
             PlayerSpriteTag,
+            RenderLayers::layer(PLAYER_PASS_LAYER),
             SpriteAnimation::new(ANIM_IDLE_FIRST, ANIM_IDLE_LAST, ANIM_FPS, AnimBehavior::Loop),
             Transform {
                 translation: Vec3::new(0.0, PLAYER_HB_Y_OFFSET as f32 / 4.0, 1.0),

@@ -1,4 +1,5 @@
 use crate::editor_modes::actor_mode::{self, animation::drive_sprite_animations};
+use crate::rendering::MainWorldCamera;
 
 use super::editor::*;
 
@@ -54,13 +55,13 @@ fn game_keybinds(
 }
 
 fn player_camera(
-    player: Single<(&actor_mode::player::Player, &Transform), Without<Camera>>,
-    mut camera_query: Query<(&mut Camera, &mut Transform)>,
+    player: Single<(&actor_mode::player::Player, &Transform), (Without<Camera2d>, Without<MainWorldCamera>)>,
+    mut camera_query: Query<&mut Transform, With<MainWorldCamera>>,
     time: Res<Time>,
 ) {
     let player_t = player.1.translation;
     let alpha = (time.delta_secs() * 18.0).clamp(0.0, 1.0);
-    for (_, mut t) in camera_query.iter_mut() {
+    for mut t in camera_query.iter_mut() {
         t.translation.x = t.translation.x.lerp(player_t.x, alpha);
         t.translation.y = t.translation.y.lerp(player_t.y, alpha);
     }

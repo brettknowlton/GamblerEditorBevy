@@ -4,6 +4,7 @@ use bevy_egui::EguiContexts;
 use crate::{
     editor_modes::EditorObjectKind, mouse_state::MouseState, EditorState, SelectedTileID,
     TextureHandles, SCALED_TILE_HEIGHT, SCALED_TILE_WIDTH,
+    rendering::PixelArtSettings,
 };
 
 use super::*;
@@ -157,6 +158,22 @@ pub fn render_right_panel(
         mouse_state,
     )?;
 
+    Ok(())
+}
+
+pub fn render_shader_panel(
+    mut contexts: EguiContexts,
+    editor_state: Res<State<EditorState>>,
+    mut shader_panel: ResMut<ShaderPanel>,
+    mut shader_settings: ResMut<PixelArtSettings>,
+    mut redraw_hint: ResMut<SceneRedrawHint>,
+) -> Result {
+    shader_panel.show(
+        &mut contexts,
+        editor_state.get(),
+        &mut shader_settings,
+        &mut redraw_hint,
+    )?;
     Ok(())
 }
 

@@ -43,6 +43,8 @@ impl UIPlugin {
             .init_resource::<LeftPanel>()
             .init_resource::<panels::ModeTabsPanel>()
             .init_resource::<panels::RightToolsPanel>()
+            .init_resource::<panels::ShaderPanel>()
+            .init_resource::<SceneRedrawHint>()
             .add_message::<UpdatePlaceholderMessage>()
             .add_plugins(message_display::BottomBarPlugin)
             .add_systems(
@@ -58,6 +60,7 @@ impl UIPlugin {
                     menu::render_mode_tabs_panel,
                     menu::render_left_panel,
                     menu::render_right_panel,
+                    menu::render_shader_panel,
                     menu::sync_tile_selection,
                 )
                     .chain(),

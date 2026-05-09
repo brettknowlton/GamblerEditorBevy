@@ -9,6 +9,7 @@ use crate::{
     configure_tooling_menu, mouse_state::MouseState, Crosshair, CustomInput, EditorState,
     SelectedTileID, TextureHandles, ToolingMenuItem, ToolingMenuState, TILE_SIZE,
 };
+use crate::rendering::MainWorldCamera;
 use std::path::PathBuf;
 
 /// A component to track some basic info about a tile
@@ -131,7 +132,7 @@ impl EditorModePlugin for ColliderModePlugin {
     fn mode_click<T: SignificantComponent + Component + Default>(
         commands: Commands,
         window: Single<&Window, With<PrimaryWindow>>,
-        camera: Single<(&Camera, &GlobalTransform), With<Camera2d>>,
+        camera: Single<(&Camera, &GlobalTransform), With<MainWorldCamera>>,
         items: Query<(Entity, &EditorObject), With<T>>,
         _selected_tile_id: ResMut<SelectedTileID>,
         mouse_state: Res<MouseState>,

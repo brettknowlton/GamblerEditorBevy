@@ -6,6 +6,7 @@ use crate::{
     mouse_state::MouseState,
     ui, AvailableKeybinds, Crosshair, CustomInput, Editor, EditorObjectKind, EditorState,
     SelectedTileID, TextureHandles, TileID, UpdatePlaceholderMessage,
+    rendering::MainWorldCamera,
 };
 
 pub trait EditorModePlugin: Plugin {
@@ -133,7 +134,7 @@ pub trait EditorModePlugin: Plugin {
     fn mode_click<T: SignificantComponent>(
         _commands: Commands,
         _window: Single<&Window, With<bevy::window::PrimaryWindow>>,
-        _camera: Single<(&Camera, &GlobalTransform), With<Camera2d>>,
+        _camera: Single<(&Camera, &GlobalTransform), With<MainWorldCamera>>,
         _items: Query<(Entity, &super::EditorObject), With<T>>,
         _selected_tile_id: ResMut<crate::SelectedTileID>,
         _mouse_state: Res<MouseState>,

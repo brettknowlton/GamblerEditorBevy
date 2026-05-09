@@ -148,6 +148,17 @@ pub struct RemoveActorArgs {
     pub world_y: i64,
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]
+pub struct SetPixelArtSettingsArgs {
+    /// one of: tile, player, both
+    pub target: String,
+    pub pixel_size: Option<f32>,
+    pub color_levels: Option<f32>,
+    pub dither_strength: Option<f32>,
+    pub scanline_strength: Option<f32>,
+    pub palette_enabled: Option<f32>,
+}
+
 // !!!`[EDIT OR ADD TO THIS TO FINE TUNE HOW THE AI WORKS WITH THE EDITOR.]`!!!
 
 /// Shown to MCP clients once per session — level-design contract for this editor.
@@ -179,6 +190,7 @@ TOOLING NOTES
 - gambler_place_tile_picture charset: space . _ = skip; 0-9 = tile ids 0-9; a-v / A-V = tile ids 10-31.
 - rows[0] in picture mode is the visual top row; origin is bottom-left in world space.
 - World step size equals editor_constants.grid_cell_world_px.
+- gambler_get_pixel_art_settings / gambler_set_pixel_art_settings allow runtime shader tuning.
 
 RECOMMENDED WORKFLOW
 1) gambler_get_snapshot (or gambler_get_scene_bounds)
@@ -235,7 +247,6 @@ impl GamblerEditorMcp {
             Err(e) => Self::map_err(e.to_string()),
         }
     }
-
     #[tool(
         name = "gambler_place_tiles",
         description = "Bulk place many tiles in one editor frame. Snaps each cell; duplicate grid cells keep the last tile_id. Max 8192 entries. Use for structured game levels instead of hundreds of gambler_place_tile calls."
@@ -474,6 +485,46 @@ impl GamblerEditorMcp {
     pub async fn get_snapshot(&self) -> String {
         let b = self.bridge.clone();
         match tokio::task::spawn_blocking(move || b.call(McpCmd::GetSnapshot)).await {
+            Ok(Ok(v)) => Self::map_ok(v),
+            Ok(Err(e)) => Self::map_err(e),
+            Err(e) => Self::map_err(e.to_string()),
+        }
+    }
+
+    #[tool(
+        name = "gambler_get_pixel_art_settings",
+        description = "Return current PixelArtSettings values for tile and player shader passes."
+    )]
+    pub async fn get_pixel_art_settings(&self) -> String {
+        let b = self.bridge.clone();
+        match tokio::task::spawn_blocking(move || b.call(McpCmd::GetPixelArtSettings)).await {
+            Ok(Ok(v)) => Self::map_ok(v),
+            Ok(Err(e)) => Self::map_err(e),
+            Err(e) => Self::map_err(e.to_string()),
+        }
+    }
+
+    #[tool(
+        name = "gambler_set_pixel_art_settings",
+        description = "Update pixel shader params. target is tile|player|both; omitted fields keep current values."
+    )]
+    pub async fn set_pixel_art_settings(
+        &self,
+        Parameters(args): Parameters<SetPixelArtSettingsArgs>,
+    ) -> String {
+        let b = self.bridge.clone();
+        match tokio::task::spawn_blocking(move || {
+            b.call(McpCmd::SetPixelArtSettings {
+                target: args.target,
+                pixel_size: args.pixel_size,
+                color_levels: args.color_levels,
+                dither_strength: args.dither_strength,
+                scanline_strength: args.scanline_strength,
+                palette_enabled: args.palette_enabled,
+            })
+        })
+        .await
+        {
             Ok(Ok(v)) => Self::map_ok(v),
             Ok(Err(e)) => Self::map_err(e),
             Err(e) => Self::map_err(e.to_string()),

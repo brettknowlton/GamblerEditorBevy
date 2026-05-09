@@ -4,11 +4,14 @@ pub mod bottom_panel;
 pub mod left_panel;
 pub mod mode_tabs_panel;
 pub mod right_tools_panel;
+pub mod shader_panel;
 
 pub use bottom_panel::BottomPanel;
 pub use left_panel::LeftPanel;
 pub use mode_tabs_panel::ModeTabsPanel;
 pub use right_tools_panel::RightToolsPanel;
+pub use shader_panel::ShaderPanel;
+pub use shader_panel::SceneRedrawHint;
 
 pub fn editor_panel_frame() -> egui::Frame {
     egui::Frame {

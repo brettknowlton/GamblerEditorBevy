@@ -27,6 +27,7 @@ pub const SCALED_TILE_WIDTH: u32 = TILE_SIZE * TILE_SCALE;
 /// Total pixel size the tile height takes up IN GAME
 pub const SCALED_TILE_HEIGHT: u32 = TILE_SIZE * TILE_SCALE;
 
+pub const PIXEL_SCALE: f32 = 4.0;
 
 pub const DEFAULT_WINDOW_WIDTH: u32 = 1200;
 pub const DEFAULT_WINDOW_HEIGHT: u32 = 800;
